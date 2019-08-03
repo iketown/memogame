@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="85px" height="170px" viewBox="0 0 85 170" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 56.3 (81716) - https://sketch.com -->
+    <title>bathroom</title>
+    <desc>Created with Sketch.</desc>
+    <g id="bathroom" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Bathroom" transform="translate(0.000000, -1.000000)">
+            <polygon id="Fill-18" fill="#FF5D60" points="0.008 173.54 84.698 173.54 84.698 0 0.008 0"></polygon>
+            <polygon id="Fill-67" fill="#FFFFFF" points="50.584 173.54 93.698 173.54 93.698 135.657 50.584 135.657"></polygon>
+            <polygon id="Fill-68" fill="#E9E8E7" points="66.538 124.481 84.698 124.481 84.698 118.9 66.538 118.9"></polygon>
+            <polygon id="Fill-69" fill="#E9E8E7" points="66.538 128.059 75.139 128.059 75.139 124.481 66.538 124.481"></polygon>
+            <path d="M33.578,140.645 L0,140.645 L0,173.54 L19.255,173.54 L16.713,160.504 C26.275,158.933 33.578,150.652 33.578,140.645" id="Fill-70" fill="#E9E8E7"></path>
+            <polygon id="Fill-71" fill="#FFFFFF" points="0.008 140.645 8.469 140.645 8.469 115.681 0.008 115.681"></polygon>
+            <polygon id="Fill-72" fill="#56CEE6" points="19.827 89.735 65.662 89.735 65.662 29.241 19.827 29.241"></polygon>
+            <path d="M26.561,49.278 C25.519,48.236 25.519,46.547 26.561,45.505 L36.028,36.039 C37.07,34.997 38.759,34.997 39.801,36.039 C40.843,37.081 40.843,38.77 39.801,39.812 L30.334,49.278 C29.292,50.32 27.603,50.32 26.561,49.278" id="Fill-73" fill="#FFFFFF"></path>
+            <path d="M26.457,66.632 C25.415,65.59 25.415,63.901 26.457,62.859 L50.935,38.38 C51.977,37.338 53.666,37.338 54.708,38.38 C55.75,39.422 55.75,41.111 54.708,42.153 L30.23,66.632 C29.188,67.673 27.499,67.673 26.457,66.632" id="Fill-74" fill="#FFFFFF"></path>
+            <polygon id="Fill-75" fill="#FFFFFF" points="14.416 110.445 71.072 110.445 71.072 101.391 14.416 101.391"></polygon>
+            <polygon id="Fill-76" fill="#E9E8E7" points="23.039 116.821 62.45 116.821 62.45 110.445 23.039 110.445"></polygon>
+            <polygon id="Fill-77" fill="#E9E8E7" points="39.739 101.391 45.749 101.391 45.749 93.387 39.739 93.387"></polygon>
+        </g>
+    </g>
+</svg>

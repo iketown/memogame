@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="85px" height="170px" viewBox="0 0 85 170" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 56.3 (81716) - https://sketch.com -->
+    <title>kitchen</title>
+    <desc>Created with Sketch.</desc>
+    <g id="kitchen" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Kitchen" transform="translate(-33.000000, 0.000000)">
+            <polygon id="Fill-16" fill="#98C21F" points="33 173.54 159.067 173.54 159.067 0 33 0"></polygon>
+            <g id="range" transform="translate(96.000000, 52.000000)">
+                <polygon id="Fill-30" fill="#C7C5C4" points="1.77635684e-15 63.45 23.728 63.45 23.728 53.663 1.77635684e-15 53.663"></polygon>
+                <polygon id="Fill-32" fill="#E9E8E7" points="1.77635684e-15 53.663 23.728 53.663 23.728 47.196 1.77635684e-15 47.196"></polygon>
+                <polygon id="Fill-63" fill="#C7C5C4" points="3.272 19.801 47.178 19.801 47.178 8.417 3.272 8.417"></polygon>
+                <polyline id="Fill-64" fill="#D2D1D0" points="3.272 8.417 47.178 8.417 39.785 -4.26325641e-14 10.665 -4.26325641e-14 3.272 8.417"></polyline>
+            </g>
+            <path d="M107.897,94.424 C105.349,94.424 103.284,96.489 103.284,99.037 L112.51,99.037 C112.51,96.489 110.445,94.424 107.897,94.424" id="Fill-33" fill="#5F625F"></path>
+            <polygon id="Fill-34" fill="#C7C5C4" points="82.225 173.54 159.067 173.54 159.067 126.155 82.225 126.155"></polygon>
+            <polygon id="Fill-35" fill="#E9E8E7" points="82.225 126.155 159.067 126.155 159.067 115.291 82.225 115.291"></polygon>
+            <polygon id="Fill-36" fill="#E9E8E7" points="5.68434189e-14 173.54 49.225 173.54 49.225 54.47 5.68434189e-14 54.47"></polygon>
+            <polygon id="Fill-37" fill="#C7C5C4" points="33 138.983 82.225 138.983 82.225 134.469 33 134.469"></polygon>
+            <polygon id="Fill-38" fill="#C7C5C4" points="37.606 162.29 42.218 162.29 42.218 143.588 37.606 143.588"></polygon>
+            <polygon id="Fill-39" fill="#C7C5C4" points="37.606 129.878 42.218 129.878 42.218 111.176 37.606 111.176"></polygon>
+            <polyline id="Fill-58" fill="#A9774E" points="129.424 115.291 129.424 144.375 107.627 144.375 107.627 173.54 113.092 173.54 113.092 149.84 129.424 149.84 129.424 173.54 134.889 173.54 134.889 115.291 129.424 115.291"></polyline>
+            <polyline id="Fill-59" fill="#A9774E" points="62.643 144.375 62.643 115.291 57.178 115.291 57.178 173.54 62.643 173.54 62.643 149.84 78.975 149.84 78.975 173.54 84.44 173.54 84.44 144.375 62.643 144.375"></polyline>
+            <polygon id="Fill-60" fill="#996B45" points="92.322 173.54 99.745 173.54 99.745 138.983 92.322 138.983"></polygon>
+            <polyline id="Fill-61" fill="#FFFFFF" points="123.991 136.264 96.033 146.015 68.076 136.264 68.076 121.321 123.991 121.321 123.991 136.264"></polyline>
+            <polygon id="Fill-62" fill="#C7C5C4" points="106.698 51.841 135.818 51.841 135.818 0 106.698 0"></polygon>
+        </g>
+    </g>
+</svg>
