@@ -12,7 +12,7 @@ import { Droppable } from "react-beautiful-dnd"
 //
 import { useHouseCtx } from "./houseContext"
 import roomImages from "../../images"
-import { DragDot } from "./House"
+import { DraggableCard } from "./House"
 import DialogDot from "./DialogDot"
 const widthVW = 70
 //
@@ -21,8 +21,6 @@ const RoomContainer = styled.div`
   position: relative;
   height: 32rem;
   width: 17rem;
-  /* height: ${p => widthVW / roomImages[p.roomId].ratio}vw;
-  width: ${widthVW}vw; */
 `
 const RoomBackground = styled.div`
   position: absolute;
@@ -48,7 +46,7 @@ const CirclesDiv = styled.div`
   align-items: center;
   height: 30rem;
   .dot {
-    margin: 2rem 0;
+    margin: 1rem 0;
   }
 `
 

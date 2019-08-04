@@ -3,9 +3,9 @@ import React, { createContext, useContext, useReducer } from "react"
 const HouseCtx = createContext()
 
 const initialState = {
-  faceUpPile: ["b", "c", "d", "e", "f", "g", "h", "i"],
+  faceUpPile: [],
   dialog: { open: false, roomId: "garage" },
-  bedroom: ["a", false, false],
+  bedroom: [false, false, false],
   bathroom: [false, false, false],
   garage: [false, false, false],
   kitchen: [false, false, false]
@@ -15,6 +15,11 @@ const reducer = (state, action) => {
   switch (type) {
     case "CLOSE_DIALOG": {
       return { ...state, dialog: { ...state.dialog, open: false } }
+    }
+    case "START_GAME": {
+      const { items } = action
+      const faceUpPile = Object.values(items).map(item => item.id)
+      return { ...state, faceUpPile }
     }
     case "REORDER-ROOM": {
       const { roomId } = state.dialog

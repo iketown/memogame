@@ -1,9 +1,11 @@
 import React from "react"
 import { Draggable } from "react-beautiful-dnd"
 //
-import { CircleDot } from "./House.jsx"
-
+import { StyledCard } from "./DraggableCard.jsx"
+import { useItemCtx } from "../../contexts/ItemContext.js"
+import brain from "../../images/cards/brain.svg"
 const DialogDot = ({ dragId, index }) => {
+  const { imagesObj } = useItemCtx()
   return (
     <Draggable
       isDragDisabled={!dragId}
@@ -17,7 +19,10 @@ const DialogDot = ({ dragId, index }) => {
           {...draggableProps}
           ref={innerRef}
         >
-          <CircleDot>{dragId}</CircleDot>
+          <StyledCard
+            cardImage={dragId ? imagesObj[dragId] : ""}
+            height={"8rem"}
+          />
         </div>
       )}
     </Draggable>

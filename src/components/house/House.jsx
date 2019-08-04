@@ -1,17 +1,19 @@
 import React, { useReducer } from "react"
 import styled from "styled-components"
-import { Container, Grid, Avatar } from "@material-ui/core"
+import { Container, Grid, Avatar, Button, Typography } from "@material-ui/core"
 import { FaCircle } from "react-icons/fa"
 import imgs from "../../images/index"
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
 import { HouseCtxProvider, useHouseCtx } from "./houseContext"
 import FaceUpHousePile from "./FaceUpHousePile"
 import RoomDialog from "./RoomDialog"
+import { useItemCtx } from "../../contexts/ItemContext"
+import DraggableCard from "./DraggableCard.jsx"
 //
 //
 const gridGap = "1rem"
 const wallColor = "#3a3a3a"
-const boxHeight = "3rem"
+const boxHeight = "5rem"
 const HouseGrid = styled.div`
   width: 21rem;
   display: grid;
@@ -32,6 +34,14 @@ const HouseGrid = styled.div`
   }
   .room {
     position: relative;
+  }
+  .room-name {
+    position: absolute;
+    writing-mode: vertical-lr;
+    margin-top: 1rem;
+    right: 0;
+    color: white;
+    font-size: 18px;
   }
   .room:after {
     background-size: cover;
@@ -88,36 +98,55 @@ const House = () => {
 
 const HouseContents = () => {
   const { state, dispatch } = useHouseCtx()
+  const { allItems } = useItemCtx()
+  console.log("allItems", allItems)
   const onDragEnd = result => {
     console.log("result", result)
-    if (result.source.droppableId === "dialog") {
+    if (!result.destination) return null
+    if (result.destination.droppableId === "dialog") {
       dispatch({ type: "REORDER-ROOM", result })
       return null
     }
     dispatch({ result, type: "MOVE-DOT" })
   }
+  const handleStart = () => {
+    dispatch({ type: "START_GAME", items: allItems })
+  }
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <RoomDialog />
       <Grid container spacing={2}>
-        <Grid item xs={12} md={6}>
-          <FaceUpHousePile />
-        </Grid>
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} sm={8} md={6}>
           <HouseGrid>
             <div className="bedroom room">
+              <Typography className="room-name" variant="caption">
+                BEDROOM
+              </Typography>
               <DotColumn room={"bedroom"} />
             </div>
             <div className="bath room">
+              <Typography className="room-name" variant="caption">
+                BATHROOM
+              </Typography>
               <DotColumn room={"bathroom"} />
             </div>
             <div className="garage room">
+              <Typography className="room-name" variant="caption">
+                GARAGE
+              </Typography>
               <DotColumn room={"garage"} />
             </div>
             <div className="kitchen room">
+              <Typography className="room-name" variant="caption">
+                KITCHEN
+              </Typography>
               <DotColumn room={"kitchen"} />
             </div>
           </HouseGrid>
+        </Grid>
+        <Grid item xs={12} sm={4} md={6}>
+          <Button onClick={handleStart}>START</Button>
+          <FaceUpHousePile />
         </Grid>
       </Grid>
     </DragDropContext>
@@ -161,8 +190,6 @@ const CircleTarget = styled.div`
   justify-content: center;
   align-items: center;
   transition: all 0.3s;
-  .drag-dot {
-  }
 `
 const DropCircle = ({ index, id, dragId, room }) => {
   const dropTarget = (
@@ -170,7 +197,9 @@ const DropCircle = ({ index, id, dragId, room }) => {
       {({ droppableProps, innerRef }, { isDraggingOver }) => (
         <div {...droppableProps} ref={innerRef}>
           <CircleTarget isDraggingOver={isDraggingOver}>
-            {!!dragId && <DragDot index={index} dragId={dragId} />}
+            {!!dragId && (
+              <DraggableCard index={index} dragId={dragId} flipped />
+            )}
           </CircleTarget>
         </div>
       )}
@@ -179,34 +208,41 @@ const DropCircle = ({ index, id, dragId, room }) => {
   return dropTarget
 }
 
-export const CircleDot = styled.div`
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: ${boxHeight};
-  width: ${boxHeight};
-  background: white;
-  border: 2px solid black;
-  /* border-radius: 50%; */
-  font-weight: bold;
-  font-size: 2rem;
-`
+// export const StyledCard = styled.div`
+//   display: flex;
+//   justify-content: center;
+//   align-items: center;
+//   height: ${p => p.height || boxHeight};
+//   width: ${p => p.height || boxHeight};
+//   background-color: white;
+//   background-image: url(${p => p.cardImage});
+//   background-size: contain;
+//   border: 2px solid black;
+//   /* border-radius: 50%; */
+//   font-weight: bold;
+//   font-size: 2rem;
+// `
 
-export const DragDot = ({ index, dragId }) => {
-  const dragChip = (
-    <Draggable draggableId={dragId} index={index}>
-      {({ dragHandleProps, draggableProps, innerRef }) => (
-        <div
-          {...dragHandleProps}
-          {...draggableProps}
-          ref={innerRef}
-          index={index}
-          className="drag-dot"
-        >
-          <CircleDot>{dragId}</CircleDot>
-        </div>
-      )}
-    </Draggable>
-  )
-  return dragChip
-}
+// export const DraggableCard = ({ index, dragId, flipped }) => {
+//   const { imagesObj } = useItemCtx()
+
+//   const dragChip = (
+//     <Draggable draggableId={dragId} index={index}>
+//       {({ dragHandleProps, draggableProps, innerRef }) => (
+//         <div
+//           {...dragHandleProps}
+//           {...draggableProps}
+//           ref={innerRef}
+//           index={index}
+//           className="drag-dot"
+//         >
+//           <StyledCard
+//             cardImage={flipped ? brain : imagesObj[dragId]}
+//             height="5rem"
+//           />
+//         </div>
+//       )}
+//     </Draggable>
+//   )
+//   return dragChip
+// }

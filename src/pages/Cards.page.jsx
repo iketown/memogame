@@ -9,7 +9,7 @@ import ItemCard from "../components/ItemCard.jsx"
 //
 const Cards = () => {
   const { allItems } = useItemCtx()
-
+  if (!allItems) return <div>no items. ?</div>
   return (
     <Grid container spacing={2}>
       {Object.entries(allItems).map(([itemId, item]) => {

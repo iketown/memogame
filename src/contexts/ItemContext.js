@@ -8,7 +8,7 @@ import React, {
 //
 import { getAllItems, saveItem, deleteItem } from "../utils/ItemLocalStorage"
 import { useAttrCtx } from "./AttrContext"
-
+import imgs from "../images/cards"
 const ItemCtx = createContext()
 
 export const ItemCtxProvider = props => {
@@ -16,12 +16,15 @@ export const ItemCtxProvider = props => {
   const { allAttrs } = useAttrCtx()
   const [selectedItem, setSelectedItem] = useState()
   const itemsAttrsObj = useMemo(() => {
-    return getItemAttrsObj({ allItems, allAttrs })
+    const _itemsAttrsObj = getItemAttrsObj({ allItems, allAttrs })
+    return _itemsAttrsObj
   }, [allItems, allAttrs])
+  const imagesObj = useMemo(() => {
+    return getImagesObj(allItems, imgs)
+  }, [allItems])
 
   function refreshAllItems() {
     const _allItems = getAllItems()
-    console.log("_allItems", _allItems)
     setAllItems(_allItems)
   }
   useEffect(() => {
@@ -43,6 +46,7 @@ export const ItemCtxProvider = props => {
     saveItem: handleSaveItem,
     deleteItem: handleDeleteItem,
     itemsAttrsObj,
+    imagesObj,
     handleSelectItem,
     selectedItem
   }
@@ -58,6 +62,7 @@ export const useItemCtx = () => {
     saveItem,
     deleteItem,
     itemsAttrsObj,
+    imagesObj,
     handleSelectItem,
     selectedItem
   } = ctx
@@ -66,6 +71,7 @@ export const useItemCtx = () => {
     saveItem,
     deleteItem,
     itemsAttrsObj,
+    imagesObj,
     handleSelectItem,
     selectedItem
   }
@@ -102,11 +108,15 @@ function getItemAttrsObj({ allItems, allAttrs }) {
   return itemsAttrsObj
 }
 
-// const targetObj = {
-//   attr_0001: {
-//     name: "Color",
-//     opt_01: { name: "Brown", items: ["itemId001", "itemId002"] },
-//     opt_02: { name: "Green", items: [] },
-//     opt_03: { name: "Yellow", items: ["itemId003"] }
-//   }
-// }
+function getImagesObj(allItems, imgs) {
+  const _imagesObj = Object.entries(allItems)
+    .map(([itemId, item]) => {
+      const image = imgs[item.name]
+      return [itemId, image]
+    })
+    .reduce((obj, [itemId, image]) => {
+      obj[itemId] = image
+      return obj
+    }, {})
+  return _imagesObj
+}
