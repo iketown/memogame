@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useReducer } from "react"
-
+import { shuffle } from "../../utils/gameLogic"
 const HouseCtx = createContext()
 
 const initialState = {
@@ -19,6 +19,7 @@ const reducer = (state, action) => {
     case "START_GAME": {
       const { items } = action
       const faceUpPile = Object.values(items).map(item => item.id)
+      shuffle(faceUpPile)
       return { ...state, faceUpPile }
     }
     case "REORDER-ROOM": {

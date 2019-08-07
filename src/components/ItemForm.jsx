@@ -26,6 +26,7 @@ const ItemForm = () => {
 
   function handleSubmit(values) {
     values.firstLetter = values.name.trim()[0].toUpperCase()
+
     const newValues = Object.entries(values)
       .filter(([_attrId, value]) => {
         if (_attrId === "id") return true
@@ -35,6 +36,7 @@ const ItemForm = () => {
       }, {})
       .reduce((_newValues, [_attrId, _optId]) => {
         _newValues[_attrId] = _optId
+
         return _newValues
       }, {})
     console.log("newValues", newValues)

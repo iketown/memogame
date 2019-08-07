@@ -1,13 +1,20 @@
+import items from "../json/items"
+import { useLocalStorage } from "./AttrLocalStorage"
+
 export const getAllItems = () => {
   return getOldItems()
 }
 
 const getOldItems = () => {
-  const items = localStorage.getItem("items")
-  return JSON.parse(items) || {}
+  if (useLocalStorage) {
+    const localItems = localStorage.getItem("items")
+    return JSON.parse(localItems) || {}
+  }
+  return items
 }
 
 const saveNewItems = newItems => {
+  if (!useLocalStorage) throw new Error("switch useLocalStorage to true")
   const newItemsJson = JSON.stringify(newItems)
   localStorage.setItem("items", newItemsJson)
 }

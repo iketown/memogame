@@ -15,14 +15,32 @@ export const useFirebase = () => {
     doCreateUserWithEmailAndPassword,
     doSignInWithUserAndPassword,
     doSignOut,
+    doCreateGame,
+    doCancelGame,
+    doRequestToJoinGame,
+    doHandleGameRequest,
+    doExitFromGame,
+    doStartGame,
+    fdb,
+    // fsdb,
     auth,
-    user
+    user,
+    app
   } = ctx
   return {
     doCreateUserWithEmailAndPassword,
     doSignInWithUserAndPassword,
     doSignOut,
+    doCreateGame,
+    doCancelGame,
+    doRequestToJoinGame,
+    doHandleGameRequest,
+    doExitFromGame,
+    doStartGame,
+    fdb,
+    // fsdb,
     auth,
-    user
+    user,
+    app
   }
 }

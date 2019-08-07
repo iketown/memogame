@@ -16,13 +16,7 @@ import { auth } from "firebase"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { useDialogCtx } from "../contexts/DialogCtx"
 import { FaUser } from "react-icons/fa"
-const ButtonLink = ({ to, children, color }) => {
-  return (
-    <Link to={to}>
-      <Button color={color}>{children}</Button>
-    </Link>
-  )
-}
+import ButtonLink from "./navigation/ButtonLink.jsx"
 
 const StyledDiv = styled.div`
   position: fixed;
@@ -34,13 +28,17 @@ const StyledDiv = styled.div`
 `
 const NavBar = () => {
   // const { user } = useFirebase()
-  const { user } = useAuthCtx()
+  const { user, displayName } = useAuthCtx()
   const { state, dispatch: dialogDispatch } = useDialogCtx()
-  console.log("user in nav", user)
+  const { fsdb } = useFirebase()
   const handleAuth = formType => () => {
     dialogDispatch({ type: "OPEN_FORM", formType })
   }
-  const signedInMenuItems = <UserMenuButton />
+  const signedInMenuItems = (
+    <>
+      <UserMenuButton /> <span>{displayName}</span>
+    </>
+  )
   const signedOutMenuItems = (
     <>
       <Button onClick={handleAuth("signIn")} color="inherit">
@@ -59,6 +57,8 @@ const NavBar = () => {
         <ButtonLink to="/allcards">Cards</ButtonLink>
         <ButtonLink to="/dragtest">Drag Test</ButtonLink>
         <ButtonLink to="/house">House</ButtonLink>
+        <ButtonLink to="/allgames">Find a Game</ButtonLink>
+        <ButtonLink to="/gamestart">Start a Game</ButtonLink>
         {user && signedInMenuItems}
         {!user && signedOutMenuItems}
       </Toolbar>
@@ -70,6 +70,7 @@ export default NavBar
 
 const UserMenuButton = () => {
   const [anchorEl, setAnchorEl] = useState(null)
+  const { dispatch } = useDialogCtx()
   const { doSignOut } = useFirebase()
   const { user } = useAuthCtx()
   const handleClick = e => {
@@ -77,6 +78,10 @@ const UserMenuButton = () => {
   }
   const handleClose = () => {
     setAnchorEl(null)
+  }
+  const handleEditProfile = () => {
+    dispatch({ type: "OPEN_FORM", formType: "editProfile" })
+    handleClose()
   }
   if (!user) return null
 
@@ -92,7 +97,7 @@ const UserMenuButton = () => {
             {user.email}
           </MenuItem>
           <MenuItem>hey</MenuItem>
-          <MenuItem>hey</MenuItem>
+          <MenuItem onClick={handleEditProfile}>Edit Profile</MenuItem>
           <MenuItem onClick={doSignOut}>Sign Out</MenuItem>
         </MenuList>
       </Menu>

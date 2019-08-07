@@ -5,20 +5,21 @@ const AuthCtx = createContext()
 
 export const AuthCtxProvider = props => {
   const [user, setUser] = useState(null)
+  const [displayName, setDisplayName] = useState("")
   const { auth } = useFirebase()
   auth.onAuthStateChanged(authUser => {
+    const _displayName = authUser ? authUser.displayName || authUser.email : ""
+    setDisplayName(_displayName)
     setUser(authUser)
   })
-  const value = useMemo(() => {
-    return { user }
-  }, [user])
-  return <AuthCtx.Provider value={value} {...props} />
+
+  return <AuthCtx.Provider value={{ user, displayName }} {...props} />
 }
 
 export const useAuthCtx = () => {
   const context = useContext(AuthCtx)
   if (!context)
     throw new Error("useAuthCtx must be a descendant of AuthCtxProvider 😕")
-  const { user } = context
-  return { user }
+  const { user, displayName } = context
+  return { user, displayName }
 }

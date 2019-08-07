@@ -1,31 +1,29 @@
+import attrs from "../json/attributes.js"
+
+export const useLocalStorage = false
+
 export const getAllAttrs = () => {
-  const attrs = localStorage.getItem("attributes")
-  return JSON.parse(attrs)
+  if (useLocalStorage) {
+    const localAttrs = localStorage.getItem("attributes")
+    return JSON.parse(localAttrs)
+  }
+  return attrs
 }
 
-const getOldAttrs = () => {
-  const attrsJson = localStorage.getItem("attributes")
-  const oldAttrs = JSON.parse(attrsJson) || {}
-  return oldAttrs
-}
 const saveNewAttrs = newAttrs => {
+  if (!useLocalStorage) throw new Error("switch useLocalStorage to true")
   const newAttrsJson = JSON.stringify(newAttrs)
   localStorage.setItem("attributes", newAttrsJson)
 }
 
 export const saveAttr = newAttr => {
   if (!newAttr.id) throw new Error("needs an id")
-  // const optionsObj = newAttr.options.reduce((obj, opt) => {
-  //   obj[opt.id] = opt
-  //   return obj
-  // }, {})
-  // newAttr.options = optionsObj
-  const oldAttrs = getOldAttrs()
+  const oldAttrs = getAllAttrs()
   saveNewAttrs({ ...oldAttrs, [newAttr.id]: newAttr })
 }
 
 export const deleteAttr = attrId => {
-  const oldAttrs = getOldAttrs()
+  const oldAttrs = getAllAttrs()
   delete oldAttrs[attrId]
   saveNewAttrs(oldAttrs)
 }

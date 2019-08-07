@@ -4,6 +4,7 @@ import { Dialog, DialogContent } from "@material-ui/core"
 import ShowMe from "../utils/ShowMe.jsx"
 import SignUpForm from "../components/form/SignUpForm.jsx"
 import SignInForm from "../components/form/SignInForm"
+import EditProfile from "../components/form/EditProfile.jsx"
 import ResetPasswordForm from "../components/form/ResetPasswordForm"
 
 //
@@ -16,6 +17,8 @@ function getContent(formType) {
       return <SignInForm />
     case "resetPassword":
       return <ResetPasswordForm />
+    case "editProfile":
+      return <EditProfile />
     default:
       return <div>no formtype</div>
   }

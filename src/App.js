@@ -10,6 +10,7 @@ import { AttrCtxProvider } from "./contexts/AttrContext"
 import { ItemCtxProvider } from "./contexts/ItemContext"
 import { DialogCtxProvider } from "./contexts/DialogCtx"
 import { FirebaseCtxProvider } from "./contexts/FirebaseCtx"
+import { FirestoreProvider } from "./contexts/FirestoreCtx"
 import { AuthCtxProvider } from "./contexts/AuthCtx"
 import DialogContainer from "./contexts/DialogContainer.jsx"
 import ItemForm from "./components/ItemForm"
@@ -17,6 +18,9 @@ import ItemPage from "./pages/Items.page.jsx"
 import Cards from "./pages/Cards.page"
 import DragTest from "./pages/DragTest.page"
 import House from "./components/house/House"
+import AllGames from "./components/game/AllGames"
+import Game from "./pages/Game.page.jsx"
+import GameStart from "./pages/GameStart.page"
 //
 //
 const App = () => {
@@ -24,22 +28,27 @@ const App = () => {
     <Router>
       <FirebaseCtxProvider>
         <AuthCtxProvider>
-          <AttrCtxProvider>
-            <ItemCtxProvider>
-              <DialogCtxProvider>
-                <DialogContainer />
-                <NavBar />
-                <Container>
-                  <div style={{ marginTop: "5rem" }} />
-                  <Route path="/attributes" component={AttributeForm} />
-                  <Route path="/items" component={ItemPage} />
-                  <Route path="/allCards" component={Cards} />
-                  <Route path="/dragTest" component={DragTest} />
-                  <Route path="/house" component={House} />
-                </Container>
-              </DialogCtxProvider>
-            </ItemCtxProvider>
-          </AttrCtxProvider>
+          <FirestoreProvider>
+            <AttrCtxProvider>
+              <ItemCtxProvider>
+                <DialogCtxProvider>
+                  <DialogContainer />
+                  <NavBar />
+                  <Container>
+                    <div style={{ marginTop: "5rem" }} />
+                    <Route path="/attributes" component={AttributeForm} />
+                    <Route path="/items" component={ItemPage} />
+                    <Route path="/allCards" component={Cards} />
+
+                    <Route path="/house" component={House} />
+                    <Route path="/allgames" component={AllGames} />
+                    <Route path="/gamestart" component={GameStart} />
+                    <Route path="/game/:gameId" component={Game} />
+                  </Container>
+                </DialogCtxProvider>
+              </ItemCtxProvider>
+            </AttrCtxProvider>
+          </FirestoreProvider>
         </AuthCtxProvider>
       </FirebaseCtxProvider>
     </Router>
