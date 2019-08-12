@@ -13,6 +13,7 @@ export const useItemMatches = item => {
     ].items.filter(_item => _item.id !== item.id)
     let allMatchingItems = [...firstLetterItems]
     Object.entries(itemAttrs).forEach(([attrId, optId]) => {
+      if (attrId === "matchId") return null
       const sharedItems = itemsAttrsObj[attrId][optId].items.filter(
         _item => _item.id !== item.id
       )

@@ -24,6 +24,10 @@ export const useFirebase = () => {
     fdb,
     // fsdb,
     auth,
+    fxns,
+    playCard,
+    endTurn,
+    changeHouse,
     user,
     app
   } = ctx
@@ -40,6 +44,10 @@ export const useFirebase = () => {
     fdb,
     // fsdb,
     auth,
+    fxns,
+    playCard,
+    endTurn,
+    changeHouse,
     user,
     app
   }

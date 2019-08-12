@@ -2,13 +2,20 @@ import React, { useReducer } from "react"
 import styled from "styled-components"
 import { Container, Grid, Avatar, Button, Typography } from "@material-ui/core"
 import { FaCircle } from "react-icons/fa"
-import imgs from "../../images/index"
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd"
+//
+import CenterPile from "../game/CenterPile.jsx"
+import imgs from "../../images/index"
 import { HouseCtxProvider, useHouseCtx } from "./houseContext"
 import FaceUpHousePile from "./FaceUpHousePile"
 import RoomDialog from "./RoomDialog"
 import { useItemCtx } from "../../contexts/ItemContext"
 import DraggableCard from "./DraggableCard.jsx"
+import ShowMe from "../../utils/ShowMe"
+import { useFirebase } from "../../contexts/FirebaseCtx.js"
+import { useGameCtx } from "../../contexts/GameCtx.js"
+import { useGamePlayCtx } from "../../contexts/GamePlayCtx.js"
+import { useAuthCtx } from "../../contexts/AuthCtx.js"
 //
 //
 const gridGap = "1rem"
@@ -34,6 +41,7 @@ const HouseGrid = styled.div`
   }
   .room {
     position: relative;
+    transition: transform 0.3s;
   }
   .room-name {
     position: absolute;
@@ -67,6 +75,9 @@ const HouseGrid = styled.div`
   .kitchen::after {
     background-image: url(${imgs.kitchen.image});
   }
+  .room:hover {
+    /* transform: scale(1.2); */
+  }
   .room:hover:after {
     opacity: 0.9;
     filter: blur(0);
@@ -76,46 +87,81 @@ const Floor = styled.div`
   display: grid;
   grid-template-rows: 26rem;
 `
-// const TopFloor = styled(Floor)`
-//   grid-template-columns: 2fr 1fr;
 
-// `
-// const BottomFloor = styled(Floor)`
-//   grid-template-columns: 1fr 1fr;
-
-// `
-
-//
-//
-
-const House = () => {
+const House = ({ gameId }) => {
   return (
-    <HouseCtxProvider>
-      <HouseContents />
+    <HouseCtxProvider gameId={gameId}>
+      <HouseContents gameId={gameId} />
     </HouseCtxProvider>
   )
 }
 
-const HouseContents = () => {
+const HouseContents = ({ gameId }) => {
   const { state, dispatch } = useHouseCtx()
+  const { state: responseState, dispatch: responseDispatch } = useGamePlayCtx()
   const { allItems } = useItemCtx()
-  console.log("allItems", allItems)
+  const {
+    houseToCenter,
+    faceUpToCenter,
+    faceUpToHouse,
+    houseToHouse
+  } = useGamePlayCtx()
+  const { gamePlay } = useGameCtx()
+
   const onDragEnd = result => {
+    // TODO if its not your turn, nothing should happen
     console.log("result", result)
     if (!result.destination) return null
-    if (result.destination.droppableId === "dialog") {
-      dispatch({ type: "REORDER-ROOM", result })
+    const sourceId = result.source.droppableId
+    const destId = result.destination.droppableId
+    if (sourceId === destId) {
+      // it wasnt moved (unless it was a dialog move 👆)
       return null
     }
-    dispatch({ result, type: "MOVE-DOT" })
+    const topCardId =
+      gamePlay && gamePlay.centerCardPile && gamePlay.centerCardPile[0]
+    const { draggableId: cardId } = result
+    if (sourceId === "dialog") {
+      dispatch({ type: "REORDER-ROOM", result })
+    }
+    const fromFaceUp = sourceId === "faceUpPile"
+    const toCenter = destId === "centerPile"
+    if (!fromFaceUp && !toCenter) {
+      // move within your own house (any time)
+      houseToHouse({ sourceId, destId, cardId })
+    }
+    if (!fromFaceUp && toCenter) {
+      // move card to center, dont end turn yet
+      houseToCenter({ cardId, sourceId })
+      responseDispatch({
+        type: "OPEN_RESPONSE",
+        itemId1: topCardId,
+        itemId2: cardId
+      })
+    }
+    if (fromFaceUp && toCenter) {
+      faceUpToCenter({ cardId, sourceId })
+      const response = responseDispatch({
+        type: "OPEN_RESPONSE",
+        itemId1: topCardId,
+        itemId2: cardId
+      })
+      console.log("response from dispatch", response)
+      // end turn with discard to center
+    }
+    if (fromFaceUp && !toCenter) {
+      faceUpToHouse({ cardId, destId })
+      // end turn by moving to own house
+    }
   }
-  const handleStart = () => {
-    dispatch({ type: "START_GAME", items: allItems })
-  }
+
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <RoomDialog />
       <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <CenterPile />
+        </Grid>
         <Grid item xs={12} sm={8} md={6}>
           <HouseGrid>
             <div className="bedroom room">
@@ -128,7 +174,7 @@ const HouseContents = () => {
               <Typography className="room-name" variant="caption">
                 BATHROOM
               </Typography>
-              <DotColumn room={"bathroom"} />
+              <DotColumn room={"bath"} />
             </div>
             <div className="garage room">
               <Typography className="room-name" variant="caption">
@@ -145,7 +191,7 @@ const HouseContents = () => {
           </HouseGrid>
         </Grid>
         <Grid item xs={12} sm={4} md={6}>
-          <Button onClick={handleStart}>START</Button>
+          {/* <Button onClick={handleStart}>START</Button> */}
           <FaceUpHousePile />
         </Grid>
       </Grid>
@@ -163,8 +209,12 @@ const StyleColumn = styled.div`
   align-items: center;
 `
 const DotColumn = ({ room }) => {
-  const { state } = useHouseCtx()
-  const slotArr = state[room]
+  const { user } = useAuthCtx()
+  const { gamePlay } = useGameCtx()
+  // const slotArr = state[room]
+  const slotArr =
+    gamePlay && gamePlay.gameStates && gamePlay.gameStates[user.uid].house[room]
+  if (!slotArr) return <div>no slotArr</div>
   return (
     <StyleColumn>
       {slotArr.map((slot, index) => (
@@ -194,12 +244,18 @@ const CircleTarget = styled.div`
 const DropCircle = ({ index, id, dragId, room }) => {
   const dropTarget = (
     <Droppable isDropDisabled={!!dragId} droppableId={`${room}-${index}`}>
-      {({ droppableProps, innerRef }, { isDraggingOver }) => (
+      {({ droppableProps, innerRef, placeholder }, { isDraggingOver }) => (
         <div {...droppableProps} ref={innerRef}>
           <CircleTarget isDraggingOver={isDraggingOver}>
             {!!dragId && (
-              <DraggableCard index={index} dragId={dragId} flipped />
+              <DraggableCard
+                index={index}
+                dragId={dragId}
+                flipped
+                height={boxHeight}
+              />
             )}
+            {placeholder}
           </CircleTarget>
         </div>
       )}
@@ -208,41 +264,14 @@ const DropCircle = ({ index, id, dragId, room }) => {
   return dropTarget
 }
 
-// export const StyledCard = styled.div`
-//   display: flex;
-//   justify-content: center;
-//   align-items: center;
-//   height: ${p => p.height || boxHeight};
-//   width: ${p => p.height || boxHeight};
-//   background-color: white;
-//   background-image: url(${p => p.cardImage});
-//   background-size: contain;
-//   border: 2px solid black;
-//   /* border-radius: 50%; */
-//   font-weight: bold;
-//   font-size: 2rem;
-// `
-
-// export const DraggableCard = ({ index, dragId, flipped }) => {
-//   const { imagesObj } = useItemCtx()
-
-//   const dragChip = (
-//     <Draggable draggableId={dragId} index={index}>
-//       {({ dragHandleProps, draggableProps, innerRef }) => (
-//         <div
-//           {...dragHandleProps}
-//           {...draggableProps}
-//           ref={innerRef}
-//           index={index}
-//           className="drag-dot"
-//         >
-//           <StyledCard
-//             cardImage={flipped ? brain : imagesObj[dragId]}
-//             height="5rem"
-//           />
-//         </div>
-//       )}
-//     </Draggable>
-//   )
-//   return dragChip
-// }
+const DealMeIn = () => {
+  const { dealMeIn } = useGameCtx()
+  return (
+    <div>
+      deal me in:
+      <Button onClick={dealMeIn} variant="contained" color="primary">
+        GO
+      </Button>
+    </div>
+  )
+}

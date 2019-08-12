@@ -1,6 +1,20 @@
-import React, { createContext, useContext, useReducer } from "react"
+import React, { createContext, useContext, useReducer, useEffect } from "react"
 import { shuffle } from "../../utils/gameLogic"
+import { useFirebase } from "../../contexts/FirebaseCtx"
+import { useAuthCtx } from "../../contexts/AuthCtx"
 const HouseCtx = createContext()
+
+const initialFaceUpPile = []
+function init(initialFaceUpPile) {
+  return {
+    faceUpPile: initialFaceUpPile,
+    dialog: { open: false, roomId: "garage" },
+    bedroom: [false, false, false],
+    bathroom: [false, false, false],
+    garage: [false, false, false],
+    kitchen: [false, false, false]
+  }
+}
 
 const initialState = {
   faceUpPile: [],
@@ -17,9 +31,9 @@ const reducer = (state, action) => {
       return { ...state, dialog: { ...state.dialog, open: false } }
     }
     case "START_GAME": {
-      const { items } = action
-      const faceUpPile = Object.values(items).map(item => item.id)
-      shuffle(faceUpPile)
+      const { items, faceUpPile } = action
+      // const faceUpPile = Object.values(items).map(item => item.id)
+      // shuffle(faceUpPile)
       return { ...state, faceUpPile }
     }
     case "REORDER-ROOM": {
@@ -42,6 +56,7 @@ const reducer = (state, action) => {
         source.droppableId === "faceUpPile" &&
         destination.droppableId !== "centerPile"
       ) {
+        // open dialog to reorder room
         const faceUpPile = [...state.faceUpPile]
         const movingId = faceUpPile.shift()
         const [destRoomId, destIndex] = destination.droppableId.split("-")
@@ -75,7 +90,39 @@ const reducer = (state, action) => {
 }
 
 export const HouseCtxProvider = props => {
-  const [state, dispatch] = useReducer(reducer, initialState)
+  const [state, dispatch] = useReducer(reducer, initialFaceUpPile, init)
+  const { fdb } = useFirebase()
+  const { user } = useAuthCtx()
+  const gameId = props.gameId
+  // useEffect(() => {
+  //   // send new state to RTDB
+  //   console.log("updating FDB state", state)
+  //   const gameRef = fdb.ref(`/currentGames/${gameId}/gameStates/${user.uid}`)
+  //   const { dialog, ...stateToUpdate } = state
+  //   gameRef.set({ ...stateToUpdate }, err => {
+  //     if (err) {
+  //       console.log("error in updating state", err)
+  //     } else {
+  //       console.log("ok")
+  //     }
+  //   })
+  // }, [fdb, gameId, state, user.uid])
+
+  // useEffect(() => {
+  //   // get initialFaceUp cards
+  //   const initialFaceUpPileRef = fdb.ref(
+  //     `/currentGames/${gameId}/initialFaceUpPiles`
+  //   )
+  //   initialFaceUpPileRef.on("value", snap => {
+  //     if (!snap || !snap.val()) return null
+  //     const faceUpPiles = snap.val()
+  //     const myPile = faceUpPiles[user.uid]
+  //     console.log("myPile", myPile)
+  //     dispatch({ type: "START_GAME", faceUpPile: myPile })
+  //     console.log("value", snap.val())
+  //   })
+  // }, [fdb, gameId, user.uid])
+
   return <HouseCtx.Provider value={{ state, dispatch }} {...props} />
 }
 
@@ -83,6 +130,7 @@ export const useHouseCtx = () => {
   const ctx = useContext(HouseCtx)
   if (!ctx)
     throw new Error("house ctx needs to be a descendant of house provider")
+
   const { state, dispatch } = ctx
   return { state, dispatch }
 }

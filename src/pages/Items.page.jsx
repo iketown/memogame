@@ -81,7 +81,7 @@ const ItemListItem = ({ item }) => {
   const { allAttrs } = useAttrCtx()
   const { allItems, handleSelectItem, deleteItem } = useItemCtx()
   const { matchesObj, matchesQuantity } = useItemMatches(item)
-  console.log("matchesObj", item.name, matchesObj)
+  // console.log("matchesObj", item.name, matchesObj)
   function toggleExpanded() {
     setExpanded(old => !old)
   }

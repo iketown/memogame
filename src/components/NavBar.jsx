@@ -55,9 +55,9 @@ const NavBar = () => {
         <ButtonLink to="/attributes">Attributes</ButtonLink>
         <ButtonLink to="/items">Items</ButtonLink>
         <ButtonLink to="/allcards">Cards</ButtonLink>
-        <ButtonLink to="/dragtest">Drag Test</ButtonLink>
-        <ButtonLink to="/house">House</ButtonLink>
-        <ButtonLink to="/allgames">Find a Game</ButtonLink>
+        <ButtonLink to="/playresponse">PlayResponse</ButtonLink>
+        <ButtonLink to="/housegrid">House Grid</ButtonLink>
+
         <ButtonLink to="/gamestart">Start a Game</ButtonLink>
         {user && signedInMenuItems}
         {!user && signedOutMenuItems}

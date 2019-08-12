@@ -23,3 +23,15 @@ export function shuffle(array) {
     ;[array[i], array[j]] = [array[j], array[i]] // swap elements
   }
 }
+
+export const doItemsMatch = (itemId1, itemId2) => {
+  if (!itemId1 || !itemId2) throw new Error("missing item", itemId1, itemId2)
+  const [color1, type1, let1] = itemId1.split("_")
+  const [color2, type2, let2] = itemId2.split("_")
+  const matches = { color: false, type: false, firstLetter: false }
+  if (color1 === color2) matches.color = color1
+  if (type1 === type2) matches.type = type1
+  if (let1 === let2) matches.firstLetter = let1
+  if (!!Object.values(matches).find(val => val)) return matches // if any are true
+  return false
+}

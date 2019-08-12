@@ -26,7 +26,6 @@ const ItemForm = () => {
 
   function handleSubmit(values) {
     values.firstLetter = values.name.trim()[0].toUpperCase()
-
     const newValues = Object.entries(values)
       .filter(([_attrId, value]) => {
         if (_attrId === "id") return true
@@ -36,7 +35,23 @@ const ItemForm = () => {
       }, {})
       .reduce((_newValues, [_attrId, _optId]) => {
         _newValues[_attrId] = _optId
-
+        // if (_attrId === "color__id") {
+        //   const colorName = allAttrs.color__id.options[_optId].text
+        //   let colorCode = colorName.slice(0, 2) // first 2 letter of color
+        //   colorCode += colorName.split("")[colorName.length - 1] // last letter of color
+        //   console.log("colorcode", colorCode)
+        //   debugger
+        //   _newValues.matchId[0] = colorCode.toUpperCase()
+        // }
+        // if (_attrId === "type__id") {
+        //   const typeName = allAttrs.type__id.options[_optId].text
+        //   console.log("typeName", typeName)
+        //   const typeCode = typeName.slice(0, 3).toUpperCase()
+        //   _newValues.matchId[1] = typeCode
+        // }
+        // if (_attrId === "firstLetter") {
+        //   _newValues.matchId[2] = _optId
+        // }
         return _newValues
       }, {})
     console.log("newValues", newValues)
@@ -71,7 +86,6 @@ const ItemForm = () => {
                   <FormSelect attr={attr} />
                 </Grid>
               ))}
-              <Grid item xs={12} />
 
               <Grid item xs={12} style={{ textAlign: "center" }}>
                 <Button

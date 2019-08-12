@@ -1,4 +1,4 @@
-import React from "react"
+import React, { Fragment } from "react"
 import { useItemCtx } from "../contexts/ItemContext"
 import { Card, CardContent, Typography } from "@material-ui/core"
 import styled from "styled-components"
@@ -35,15 +35,15 @@ const ItemChart = () => {
       <Card>
         <CardContent>
           <ChartGrid>
-            {Object.entries(itemsAttrsObj).map(([attrId, _opts]) => {
+            {Object.entries(itemsAttrsObj).map(([attrId, _opts], index) => {
               const { name, ...opts } = _opts
               return (
-                <>
+                <Fragment key={(attrId, index)}>
                   <div className="attr-column">{name}</div>
                   <div>
                     {Object.entries(opts).map(([optId, optInfo]) => {
                       return (
-                        <>
+                        <Fragment key={optId}>
                           {" "}
                           <Typography
                             onClick={() => toggleSoloAttr({ attrId, optId })}
@@ -63,11 +63,11 @@ const ItemChart = () => {
                           <Typography component="span" color="textSecondary">
                             {optInfo.items.length}
                           </Typography>
-                        </>
+                        </Fragment>
                       )
                     })}
                   </div>
-                </>
+                </Fragment>
               )
             })}
           </ChartGrid>

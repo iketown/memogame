@@ -26,6 +26,10 @@ class Firebase {
   constructor() {
     app.initializeApp(firebaseConfig)
     this.auth = app.auth()
+    this.fxns = app.functions()
+    this.playCard = app.functions().httpsCallable("playCard")
+    this.endTurn = app.functions().httpsCallable("endTurn")
+    this.changeHouse = app.functions().httpsCallable("changeHouse")
     this.app = app
     // this.fsdb = app.firestore()
     this.fdb = app.database()
@@ -58,19 +62,19 @@ class Firebase {
       inProgress: false
     })
   }
-  doStartGame = gameId => {
-    // change a game from 'pending' to 'current'
-    const values = this.getPendingGameValues(gameId)
-    if (values.startedBy !== this.auth.currentUser.uid) {
-      console.log("you cant start someone elses game mofo")
-      return null
-    }
-    values.inProgress = true
-    values.startedAt = new Date()
-    this.savePendingGameValues({ gameId, values })
-    const currentGamesRef = this.fdb.ref(`/currentGames/${gameId}`)
-    currentGamesRef.set(values)
-  }
+  // doStartGame = gameId => {
+  //   // change a game from 'pending' to 'current'
+  //   const values = this.getPendingGameValues(gameId)
+  //   if (values.startedBy !== this.auth.currentUser.uid) {
+  //     console.log("you cant start someone elses game mofo")
+  //     return null
+  //   }
+  //   values.inProgress = true
+  //   values.startedAt = new Date()
+  //   this.savePendingGameValues({ gameId, values })
+  //   const currentGamesRef = this.fdb.ref(`/currentGames/${gameId}`)
+  //   currentGamesRef.set(values)
+  // }
   doRequestToJoinGame = async gameId => {
     // request to join PENDING game.  you cant join a currentGame rightnow.
     // so you should also not be able to request to join a game that is inProgress
