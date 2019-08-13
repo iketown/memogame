@@ -1,22 +1,18 @@
 import React, { useState } from "react"
 import styled from "styled-components"
-import {
-  Grid,
-  Typography,
-  CardContent,
-  Card,
-  CardHeader,
-  CardActions,
-  Button
-} from "@material-ui/core"
+import { Grid } from "@material-ui/core"
+import { DragDropContext, Droppable } from "react-beautiful-dnd"
 //
-import ShowMe from "../../utils/ShowMe.jsx"
-import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
+import SelectedRoomView from "./SelectedRoomView"
 import houseImage from "../../images/handDrawnHouse.svg"
 import HouseWindow from "./HouseWindow"
 import { useWidth } from "../../hooks/useWidth"
-import { HouseGridCtxProvider } from "../../contexts/HouseGridCtx"
+import {
+  HouseGridCtxProvider,
+  useHouseGridCtx
+} from "../../contexts/HouseGridCtx"
 import StoragePile from "./StoragePile"
+import ShowMe from "../../utils/ShowMe"
 //
 
 export const houseDimensions = {
@@ -31,6 +27,7 @@ const StyleHouseGrid = styled.div`
   /* background-image: url(${houseImage}); */
   width: ${p => houseDimensions[p.width].houseWidth};
   display: grid;
+  grid-template-columns: 1fr 1fr;
   grid-template-areas:  "attic attic" "bedroom bathroom" "family kitchen" "cellar cellar";
   grid-template-rows:  repeat(4, ${p => houseDimensions[p.width].rowHeight});
   justify-content: space-around;
@@ -40,7 +37,6 @@ const StyleHouseGrid = styled.div`
     content: "";
     background: url(${houseImage});
     background-size: cover;
-    filter: saturate(.6);
     opacity: 0.7;
     top: 0;
     left: 0;
@@ -68,7 +64,13 @@ const StyleHouseGrid = styled.div`
     `
         : ``}
   }
-
+  .window {
+    height: 100%;
+    width: 100%;
+  }
+.dragging {
+  background-color: orange;
+}
   .attic {
     grid-area: attic;
   }
@@ -109,76 +111,56 @@ const windowArr = [
 const HouseGrid = () => {
   const width = useWidth()
   const [expanded, setExpanded] = useState(false)
+  function onDragEnd(result) {
+    console.log("result", result)
+  }
   return (
     <HouseGridCtxProvider>
-      <Grid container>
-        <Grid item xs={6}>
-          <StyleHouseGrid
-            width={width}
-            expanded={expanded}
-            onClick={() => setExpanded(false)}
-          >
-            <SelectedRoomView expanded={expanded} setExpanded={setExpanded} />
-            {windowArr.map(({ className, roomId, display }) => (
-              <div key={roomId} className={className}>
-                <HouseWindow
-                  expanded={expanded === roomId}
-                  setExpanded={setExpanded}
-                  roomId={roomId}
-                  display={display}
-                />
-              </div>
-            ))}
-          </StyleHouseGrid>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Grid container>
+          <Grid item xs={6}>
+            <StyleHouseGrid
+              width={width}
+              expanded={expanded}
+              onClick={() => setExpanded(false)}
+            >
+              <SelectedRoomView expanded={expanded} setExpanded={setExpanded} />
+              {windowArr.map(({ className, roomId, display }) => (
+                <Droppable key={roomId} droppableId={roomId}>
+                  {({ droppableProps, innerRef }, { isDraggingOver }) => (
+                    <div
+                      key={roomId}
+                      ref={innerRef}
+                      {...droppableProps}
+                      className={`window ${className} ${
+                        isDraggingOver ? "dragging" : ""
+                      }`}
+                    >
+                      <HouseWindow
+                        expanded={expanded === roomId}
+                        setExpanded={setExpanded}
+                        roomId={roomId}
+                        display={display}
+                      />
+                    </div>
+                  )}
+                </Droppable>
+              ))}
+            </StyleHouseGrid>
+            <ShowMeHouseState />
+          </Grid>
+          <Grid item xs={6}>
+            <StoragePile />
+          </Grid>
         </Grid>
-        <Grid item xs={6}>
-          <StoragePile />
-        </Grid>
-      </Grid>
+      </DragDropContext>
     </HouseGridCtxProvider>
   )
 }
 
 export default HouseGrid
 
-const StyledSelectedRoom = styled.div`
-  grid-area: 1 /1 / -1 / -1;
-  z-index: 20;
-  height: 100%;
-  width: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  .card {
-    height: 90%;
-    width: 90%;
-    display: flex;
-    flex-direction: column;
-    .content {
-      flex-grow: 1;
-    }
-  }
-`
-const SelectedRoomView = ({ expanded, setExpanded }) => {
+const ShowMeHouseState = () => {
   const { houseState } = useHouseGridCtx()
-  if (!expanded) return null
-  const thisRoom = houseState.house[expanded]
-  console.log("thisRoom", thisRoom)
-  console.log("house", houseState)
-  return (
-    <StyledSelectedRoom onClick={e => e.stopPropagation()}>
-      <Card className="card">
-        <CardHeader title={expanded.toUpperCase()} />
-        <CardContent className="content">
-          <ShowMe obj={thisRoom} name="thisRoom" />
-          {thisRoom.map(itemId => (
-            <p key={itemId}>{itemId}</p>
-          ))}
-        </CardContent>
-        <CardActions>
-          <Button onClick={() => setExpanded(false)}>ok</Button>
-        </CardActions>
-      </Card>
-    </StyledSelectedRoom>
-  )
+  return <ShowMe obj={houseState} name="houseState" />
 }

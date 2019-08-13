@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useReducer } from "react"
 //
 import { useItemCtx } from "./ItemContext"
+import { shuffle } from "../utils/gameLogic"
 const HouseGridCtx = createContext()
 
 const initialState = {
@@ -17,11 +18,12 @@ const initialState = {
 const reducer = (state, action) => {
   switch (action.type) {
     case "FILL_HOUSE": {
-      const { fillObject } = action
+      const { fillObject, fakeStoragePile } = action
       const newState = { ...state }
       Object.entries(fillObject).forEach(
         ([room, itemIdArr]) => (newState.house[room] = itemIdArr)
       )
+      newState.storagePile = fakeStoragePile
       return newState
     }
     default:
@@ -34,6 +36,7 @@ export const HouseGridCtxProvider = props => {
   const { allItems } = useItemCtx()
   const fillHouse = () => {
     const itemsArr = Object.entries(allItems)
+    shuffle(itemsArr)
     const fillObject = [
       "attic",
       "bedroom",
@@ -43,12 +46,16 @@ export const HouseGridCtxProvider = props => {
       "cellar"
     ].reduce((obj, roomName) => {
       const length = Math.floor(Math.random() * 4)
-      console.log("length", length)
-      obj[roomName] = [...Array.from({ length }, x => itemsArr.pop()[0])]
+      obj[roomName] = [
+        ...Array.from({ length }, x => `${itemsArr.pop()[0]}_${Math.random()}`)
+      ] //  grab the itemId and add id stuff on the end
       return obj
     }, {})
-    console.log("obj", fillObject)
-    houseDispatch({ type: "FILL_HOUSE", fillObject })
+    houseDispatch({
+      type: "FILL_HOUSE",
+      fillObject,
+      fakeStoragePile: itemsArr.map(i => i[0])
+    })
   }
   return (
     <HouseGridCtx.Provider
