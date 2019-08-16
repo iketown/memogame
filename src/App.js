@@ -43,7 +43,6 @@ const App = () => {
                       <DialogContainer />
                       <NavBar />
                       <Container>
-                        <div style={{ marginTop: "5rem" }} />
                         <Route path="/attributes" component={AttributeForm} />
                         <Route path="/items" component={ItemPage} />
                         <Route path="/allCards" component={Cards} />

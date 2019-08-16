@@ -47,7 +47,6 @@ const GameStarter = () => {
   return (
     <Card>
       <CardHeader
-        title={gameState.gameName}
         subheader="manage members"
         action={
           <IconButton onClick={toggleExpanded}>
@@ -85,6 +84,7 @@ const GameStarter = () => {
                 </Button>
               )}
               <ShowMe obj={gamePlay} name="gamePlay" />
+              <ShowMe obj={gameState} name="gameState" />
             </Grid>
           </Grid>
         </CardContent>

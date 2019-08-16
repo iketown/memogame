@@ -83,9 +83,11 @@ const LogBox = () => {
         {log &&
           logList.map(([id, msg], index) => {
             const nextEntry = logList[index + 1] && logList[index + 1][1]
+            const prevEntry = logList[index - 1] && logList[index - 1][1]
             return (
               <LogListItem
                 nextEntry={nextEntry}
+                prevEntry={prevEntry}
                 key={id}
                 msg={msg}
                 handleTrash={() => handleTrash(id)}

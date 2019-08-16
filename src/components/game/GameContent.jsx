@@ -1,5 +1,5 @@
 import React from "react"
-import { Grid } from "@material-ui/core"
+import { Grid, Typography } from "@material-ui/core"
 //
 import {
   useGameCtx,
@@ -27,12 +27,16 @@ const GameContent = ({ gameId }) => {
   const thisIsYourGame = gameState && gameState.startedBy === user.uid
   const gameMemberView = (
     <Grid container spacing={2}>
-      {/* <Grid item xs={12}>
-        <ShowGameStates />
-      </Grid> */}
-      <Grid item xs={12}>
-        {thisIsYourGame && <GameStarter />}
+      <Grid item xs={!thisIsYourGame ? 12 : 6}>
+        <Typography variant="h4" style={{ textAlign: "center" }}>
+          {gameState && gameState.gameName.toUpperCase()}
+        </Typography>
       </Grid>
+      {thisIsYourGame && (
+        <Grid item xs={6}>
+          <GameStarter />
+        </Grid>
+      )}
       <Grid item xs={12}>
         <HouseGrid gameId={gameId} />
       </Grid>

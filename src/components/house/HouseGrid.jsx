@@ -5,6 +5,7 @@ import { DndProvider } from "react-dnd"
 import HTML5Backend from "react-dnd-html5-backend"
 //
 import SelectedRoomView from "./SelectedRoomView"
+import OtherPlayersView from "../game/OtherPlayersView.jsx"
 import houseImage from "../../images/handDrawnHouse.svg"
 import HouseWindow from "./HouseWindow"
 import { useWidth, useWiderThan } from "../../hooks/useWidth"
@@ -141,10 +142,9 @@ const HouseGrid = () => {
                 />
               ))}
             </StyleHouseGrid>
-            <ShowMeHouseState />
           </Grid>
           <Grid item xs={6}>
-            <CenterPileDnD />
+            <OtherPlayersView />
             <StoragePile />
             <ChatBox />
           </Grid>
@@ -155,8 +155,3 @@ const HouseGrid = () => {
 }
 
 export default HouseGrid
-
-const ShowMeHouseState = () => {
-  const { houseState } = useHouseGridCtx()
-  return <ShowMe obj={houseState} name="houseState" />
-}
