@@ -1,6 +1,7 @@
 import app from "firebase/app"
 import "firebase/auth"
 import "firebase/firestore"
+import moment from "moment"
 
 const {
   REACT_APP_API_KEY,
@@ -30,6 +31,10 @@ class Firebase {
     this.playCard = app.functions().httpsCallable("playCard")
     this.endTurn = app.functions().httpsCallable("endTurn")
     this.changeHouse = app.functions().httpsCallable("changeHouse")
+    this.storageToCenter = app.functions().httpsCallable("storageToCenter")
+    this.storageToHouse = app.functions().httpsCallable("storageToHouse")
+    this.houseToCenter = app.functions().httpsCallable("houseToCenter")
+    this.houseToHouse = app.functions().httpsCallable("houseToHouse")
     this.app = app
     // this.fsdb = app.firestore()
     this.fdb = app.database()
@@ -43,6 +48,17 @@ class Firebase {
   doSignOut = () => this.auth.signOut()
   doPasswordReset = email => this.auth.sendPasswordResetEmail(email)
   doPasswordUpdate = password => this.auth.currentUser.updatePassword(password)
+
+  //// ⭐   gameLog API   ⭐ ////
+  doAddToLog = ({ gameId, ...logInfo }) => {
+    const timeStamp = moment().toISOString()
+    const logRef = this.fdb.ref(`/currentGames/${gameId}/gameLog`)
+    logRef.push({ ...logInfo, timeStamp })
+  }
+  doRemoveLog = ({ logId, gameId }) => {
+    const logRef = this.fdb.ref(`/currentGames/${gameId}/gameLog/${logId}`)
+    logRef.remove()
+  }
 
   //// ⭐   Game API   ⭐ ////
   doCreateGame = ({ maxMembers = 3, gameName }) => {
@@ -62,19 +78,7 @@ class Firebase {
       inProgress: false
     })
   }
-  // doStartGame = gameId => {
-  //   // change a game from 'pending' to 'current'
-  //   const values = this.getPendingGameValues(gameId)
-  //   if (values.startedBy !== this.auth.currentUser.uid) {
-  //     console.log("you cant start someone elses game mofo")
-  //     return null
-  //   }
-  //   values.inProgress = true
-  //   values.startedAt = new Date()
-  //   this.savePendingGameValues({ gameId, values })
-  //   const currentGamesRef = this.fdb.ref(`/currentGames/${gameId}`)
-  //   currentGamesRef.set(values)
-  // }
+
   doRequestToJoinGame = async gameId => {
     // request to join PENDING game.  you cant join a currentGame rightnow.
     // so you should also not be able to request to join a game that is inProgress

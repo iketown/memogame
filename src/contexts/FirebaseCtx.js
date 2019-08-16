@@ -21,6 +21,8 @@ export const useFirebase = () => {
     doHandleGameRequest,
     doExitFromGame,
     doStartGame,
+    doAddToLog,
+    doRemoveLog,
     fdb,
     // fsdb,
     auth,
@@ -29,7 +31,11 @@ export const useFirebase = () => {
     endTurn,
     changeHouse,
     user,
-    app
+    app,
+    storageToCenter,
+    storageToHouse,
+    houseToCenter,
+    houseToHouse
   } = ctx
   return {
     doCreateUserWithEmailAndPassword,
@@ -41,6 +47,8 @@ export const useFirebase = () => {
     doHandleGameRequest,
     doExitFromGame,
     doStartGame,
+    doAddToLog,
+    doRemoveLog,
     fdb,
     // fsdb,
     auth,
@@ -49,6 +57,10 @@ export const useFirebase = () => {
     endTurn,
     changeHouse,
     user,
-    app
+    app,
+    storageToCenter,
+    storageToHouse,
+    houseToCenter,
+    houseToHouse
   }
 }

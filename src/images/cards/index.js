@@ -99,6 +99,7 @@ const idMap = {
 }
 
 export function imageFromItemId(itemId) {
+  if (!itemId) return null
   const [col, type, firstLetter, uid] = itemId.split("_")
   const stripId = [col, type, firstLetter].join("_")
   return imageObject[idMap[stripId]]

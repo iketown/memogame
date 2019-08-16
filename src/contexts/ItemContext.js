@@ -9,6 +9,7 @@ import React, {
 import { getAllItems, saveItem, deleteItem } from "../utils/ItemLocalStorage"
 import { useAttrCtx } from "./AttrContext"
 import imgs from "../images/cards"
+import { removeUid } from "../utils/imageUtils"
 const ItemCtx = createContext()
 
 export const ItemCtxProvider = props => {
@@ -66,6 +67,10 @@ export const useItemCtx = () => {
     handleSelectItem,
     selectedItem
   } = ctx
+  const itemFromItemId = itemId => {
+    const strippedId = removeUid(itemId)
+    return allItems[strippedId]
+  }
   return {
     allItems,
     saveItem,
@@ -73,7 +78,8 @@ export const useItemCtx = () => {
     itemsAttrsObj,
     imagesObj,
     handleSelectItem,
-    selectedItem
+    selectedItem,
+    itemFromItemId
   }
 }
 

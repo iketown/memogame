@@ -25,7 +25,10 @@ export function shuffle(array) {
 }
 
 export const doItemsMatch = (itemId1, itemId2) => {
-  if (!itemId1 || !itemId2) throw new Error("missing item", itemId1, itemId2)
+  if (!itemId1 || !itemId2) {
+    console.log(`zero or one items provided item1:${itemId1} item2:${itemId2}`)
+    return { color: false, type: false, firstLetter: false }
+  }
   const [color1, type1, let1] = itemId1.split("_")
   const [color2, type2, let2] = itemId2.split("_")
   const matches = { color: false, type: false, firstLetter: false }
@@ -35,3 +38,5 @@ export const doItemsMatch = (itemId1, itemId2) => {
   if (!!Object.values(matches).find(val => val)) return matches // if any are true
   return false
 }
+
+export const maxItemsPerRoom = 3

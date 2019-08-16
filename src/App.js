@@ -24,6 +24,7 @@ import PlayResponse from "./components/game/PlayResponse.jsx"
 import GamePage from "./pages/Game.page.jsx"
 import GameStart from "./pages/GameStart.page"
 import HouseGrid from "./components/house/HouseGrid.jsx"
+import { LogCtxProvider } from "./contexts/LogCtx"
 //
 //
 
@@ -37,21 +38,23 @@ const App = () => {
             <FirestoreProvider>
               <AttrCtxProvider>
                 <ItemCtxProvider>
-                  <DialogCtxProvider>
-                    <DialogContainer />
-                    <NavBar />
-                    <Container>
-                      <div style={{ marginTop: "5rem" }} />
-                      <Route path="/attributes" component={AttributeForm} />
-                      <Route path="/items" component={ItemPage} />
-                      <Route path="/allCards" component={Cards} />
-                      <Route path="/allgames" component={AllGames} />
-                      <Route path="/gamestart" component={GameStart} />
-                      <Route path="/playresponse" component={PlayResponse} />
-                      <Route path="/game/:gameId" component={GamePage} />
-                      <Route path="/housegrid" component={HouseGrid} />
-                    </Container>
-                  </DialogCtxProvider>
+                  <LogCtxProvider>
+                    <DialogCtxProvider>
+                      <DialogContainer />
+                      <NavBar />
+                      <Container>
+                        <div style={{ marginTop: "5rem" }} />
+                        <Route path="/attributes" component={AttributeForm} />
+                        <Route path="/items" component={ItemPage} />
+                        <Route path="/allCards" component={Cards} />
+                        <Route path="/allgames" component={AllGames} />
+                        <Route path="/gamestart" component={GameStart} />
+                        <Route path="/playresponse" component={PlayResponse} />
+                        <Route path="/game/:gameId" component={GamePage} />
+                        <Route path="/housegrid" component={HouseGrid} />
+                      </Container>
+                    </DialogCtxProvider>
+                  </LogCtxProvider>
                 </ItemCtxProvider>
               </AttrCtxProvider>
             </FirestoreProvider>

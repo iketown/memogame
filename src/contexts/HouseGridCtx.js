@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useReducer } from "react"
+import React, { createContext, useContext, useReducer, useState } from "react"
 //
 import { useItemCtx } from "./ItemContext"
 import { shuffle } from "../utils/gameLogic"
@@ -16,6 +16,7 @@ const initialState = {
   }
 }
 const reducer = (state, action) => {
+  console.log("action", action)
   switch (action.type) {
     case "FILL_HOUSE": {
       const { fillObject, fakeStoragePile } = action
@@ -26,12 +27,35 @@ const reducer = (state, action) => {
       newState.storagePile = fakeStoragePile
       return newState
     }
+    case "ADD_TO_ROOM": {
+      const { itemId, roomId } = action
+      return {
+        ...state,
+        storagePile: state.storagePile.filter(id => id !== itemId),
+        house: { ...state.house, [roomId]: [...state.house[roomId], itemId] }
+      }
+    }
+    case "REORDER_ROOM": {
+      const { room, sourceIndex, destIndex, itemId } = action
+      const house = { ...state.house }
+      const [movingId] = house[room].splice(sourceIndex, 1)
+      house[room].splice(destIndex, 0, movingId)
+      if (movingId !== itemId) {
+        console.log("wrong itemId")
+        return state
+      }
+      return { ...state, house }
+    }
     default:
       return state
   }
 }
 
 export const HouseGridCtxProvider = props => {
+  const [expandedRoom, setExpandedRoom] = useState({
+    roomId: false,
+    faceUp: false
+  })
   const [houseState, houseDispatch] = useReducer(reducer, initialState)
   const { allItems } = useItemCtx()
   const fillHouse = () => {
@@ -59,7 +83,13 @@ export const HouseGridCtxProvider = props => {
   }
   return (
     <HouseGridCtx.Provider
-      value={{ houseState, houseDispatch, fillHouse }}
+      value={{
+        houseState,
+        houseDispatch,
+        fillHouse,
+        expandedRoom,
+        setExpandedRoom
+      }}
       {...props}
     />
   )
@@ -71,6 +101,12 @@ export const useHouseGridCtx = () => {
     throw new Error(
       "usehouseGridCtx must be a descendant of HouseGridCtxProvider 😕"
     )
-  const { houseState, houseDispatch, fillHouse } = ctx
-  return { houseState, houseDispatch, fillHouse }
+  const {
+    houseState,
+    houseDispatch,
+    fillHouse,
+    expandedRoom,
+    setExpandedRoom
+  } = ctx
+  return { houseState, houseDispatch, fillHouse, expandedRoom, setExpandedRoom }
 }

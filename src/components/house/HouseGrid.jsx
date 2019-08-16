@@ -1,35 +1,39 @@
 import React, { useState } from "react"
 import styled from "styled-components"
 import { Grid } from "@material-ui/core"
-import { DragDropContext, Droppable } from "react-beautiful-dnd"
+import { DndProvider } from "react-dnd"
+import HTML5Backend from "react-dnd-html5-backend"
 //
 import SelectedRoomView from "./SelectedRoomView"
 import houseImage from "../../images/handDrawnHouse.svg"
 import HouseWindow from "./HouseWindow"
-import { useWidth } from "../../hooks/useWidth"
+import { useWidth, useWiderThan } from "../../hooks/useWidth"
 import {
   HouseGridCtxProvider,
   useHouseGridCtx
 } from "../../contexts/HouseGridCtx"
 import StoragePile from "./StoragePile"
 import ShowMe from "../../utils/ShowMe"
+import HouseDropSection from "./HouseDropSection"
+import CenterPileDnD from "../game/CenterPileDnD"
+import ChatBox from "../ChatBox"
 //
 
 export const houseDimensions = {
-  xs: { houseWidth: "15rem", windowHeight: "65px", rowHeight: "103px" },
-  sm: { houseWidth: "15rem", windowHeight: "65px", rowHeight: "103px" },
-  md: { houseWidth: "20rem", windowHeight: "90px", rowHeight: "138px" },
-  lg: { houseWidth: "20rem", windowHeight: "90px", rowHeight: "138px" },
-  xl: { houseWidth: "20rem", windowHeight: "90px", rowHeight: "138px" }
+  xs: { houseWidth: "15rem", rowHeight: "103px" },
+  sm: { houseWidth: "15rem", rowHeight: "103px" },
+  md: { houseWidth: "20rem", rowHeight: "138px" },
+  lg: { houseWidth: "20rem", rowHeight: "138px" },
+  xl: { houseWidth: "20rem", rowHeight: "138px" }
 }
 const StyleHouseGrid = styled.div`
   position: relative;
   /* background-image: url(${houseImage}); */
-  width: ${p => houseDimensions[p.width].houseWidth};
+  width: ${p => p.width}rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-areas:  "attic attic" "bedroom bathroom" "family kitchen" "cellar cellar";
-  grid-template-rows:  repeat(4, ${p => houseDimensions[p.width].rowHeight});
+  grid-template-rows:  repeat(4, ${p => p.rowHeight}px);
   justify-content: space-around;
   align-items: end;
   justify-items: center;
@@ -67,6 +71,9 @@ const StyleHouseGrid = styled.div`
   .window {
     height: 100%;
     width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 .dragging {
   background-color: orange;
@@ -91,8 +98,8 @@ const StyleHouseGrid = styled.div`
   }
 
   .houseWindow {
-    width: ${p => houseDimensions[p.width].windowHeight};
-    height: ${p => houseDimensions[p.width].windowHeight};
+    width: ${p => p.windowHeight}px;
+    height: ${p => p.windowHeight}px;
     background: #0000007a;
     border-radius: 10px;
     transition: 0.3s all;
@@ -101,60 +108,49 @@ const StyleHouseGrid = styled.div`
 `
 
 const windowArr = [
-  { className: "attic", roomId: "attic", display: "attic" },
-  { className: "bedroom", roomId: "bedroom", display: "bedroom" },
-  { className: "bathroom", roomId: "bathroom", display: "bathroom" },
-  { className: "family", roomId: "family", display: "family" },
-  { className: "kitchen", roomId: "kitchen", display: "kitchen" },
-  { className: "cellar", roomId: "cellar", display: "cellar" }
+  { roomId: "attic", display: "attic" },
+  { roomId: "bedroom", display: "bedroom" },
+  { roomId: "bathroom", display: "bathroom" },
+  { roomId: "family", display: "family" },
+  { roomId: "kitchen", display: "kitchen" },
+  { roomId: "cellar", display: "cellar" }
 ]
 const HouseGrid = () => {
-  const width = useWidth()
+  const mdUp = useWiderThan("md")
   const [expanded, setExpanded] = useState(false)
-  function onDragEnd(result) {
-    console.log("result", result)
-  }
+
   return (
-    <HouseGridCtxProvider>
-      <DragDropContext onDragEnd={onDragEnd}>
+    <DndProvider backend={HTML5Backend}>
+      <HouseGridCtxProvider>
         <Grid container>
           <Grid item xs={6}>
             <StyleHouseGrid
-              width={width}
+              width={mdUp ? 20 : 15}
+              windowHeight={mdUp ? 90 : 65}
+              rowHeight={mdUp ? 138 : 103}
               expanded={expanded}
               onClick={() => setExpanded(false)}
             >
-              <SelectedRoomView expanded={expanded} setExpanded={setExpanded} />
-              {windowArr.map(({ className, roomId, display }) => (
-                <Droppable key={roomId} droppableId={roomId}>
-                  {({ droppableProps, innerRef }, { isDraggingOver }) => (
-                    <div
-                      key={roomId}
-                      ref={innerRef}
-                      {...droppableProps}
-                      className={`window ${className} ${
-                        isDraggingOver ? "dragging" : ""
-                      }`}
-                    >
-                      <HouseWindow
-                        expanded={expanded === roomId}
-                        setExpanded={setExpanded}
-                        roomId={roomId}
-                        display={display}
-                      />
-                    </div>
-                  )}
-                </Droppable>
+              <SelectedRoomView />
+              {windowArr.map(({ roomId, display }) => (
+                <HouseDropSection
+                  setExpanded={setExpanded}
+                  key={roomId}
+                  roomId={roomId}
+                  display={display}
+                />
               ))}
             </StyleHouseGrid>
             <ShowMeHouseState />
           </Grid>
           <Grid item xs={6}>
+            <CenterPileDnD />
             <StoragePile />
+            <ChatBox />
           </Grid>
         </Grid>
-      </DragDropContext>
-    </HouseGridCtxProvider>
+      </HouseGridCtxProvider>
+    </DndProvider>
   )
 }
 

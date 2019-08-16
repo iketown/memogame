@@ -1,7 +1,13 @@
 import React from "react"
 //
 import { useAuthCtx } from "../contexts/AuthCtx"
-import { GameCtxProvider } from "../contexts/GameCtx"
+import {
+  GameCtxProvider,
+  HouseCtxProvider,
+  CenterPileCtxProvider,
+  StoragePileCtxProvider
+} from "../contexts/GameCtx"
+import { ChatCtxProvider } from "../contexts/ChatCtx"
 import GameContent from "../components/game/GameContent.jsx"
 import { GamePlayCtxProvider } from "../contexts/GamePlayCtx.js"
 //
@@ -15,9 +21,17 @@ const Game = props => {
 
   return (
     <GameCtxProvider gameId={gameId}>
-      <GamePlayCtxProvider gameId={gameId}>
-        <GameContent gameId={gameId} />
-      </GamePlayCtxProvider>
+      <HouseCtxProvider gameId={gameId}>
+        <StoragePileCtxProvider gameId={gameId}>
+          <CenterPileCtxProvider gameId={gameId}>
+            <GamePlayCtxProvider gameId={gameId}>
+              <ChatCtxProvider gameId={gameId}>
+                <GameContent gameId={gameId} />
+              </ChatCtxProvider>
+            </GamePlayCtxProvider>
+          </CenterPileCtxProvider>
+        </StoragePileCtxProvider>
+      </HouseCtxProvider>
     </GameCtxProvider>
   )
 }

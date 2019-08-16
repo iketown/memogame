@@ -44,50 +44,15 @@ export const GamePlayCtxProvider = props => {
   const { playCard, changeHouse } = useFirebase()
   const { user } = useAuthCtx()
   const { gamePlay, setGamePlay } = useGameCtx()
-  const [state, dispatch] = useReducer(reducer, initialState)
-  const faceUpToCenter = ({ cardId, sourceId = "faceUpPile" }) => {
-    playCard({ cardId, gameId, sourceId }).then(res =>
-      console.log("faceup response", res)
-    )
-  }
-  const faceUpToHouse = ({ cardId, destId }) => {
-    console.log("sending changeHouse", gameId, cardId, destId)
-    const house = gamePlay.gameStates[user.uid].house
-    const faceUpPile = gamePlay.gameStates[user.uid].faceUpPile
+  const [gdState, gdDispatch] = useReducer(reducer, initialState)
 
-    const [room, index] = destId.split("-")
-    house[room][index] = faceUpPile.shift()
-    console.log(house, faceUpPile)
-    setGamePlay(old => {
-      const gamePlayObj = {
-        ...old,
-        gameStates: {
-          ...old.gameStates,
-          [user.uid]: { ...old.gameStates[user.uid], house, faceUpPile }
-        }
-      }
-      console.log("gamePlayObj", gamePlayObj)
-      return gamePlayObj
-    })
-    changeHouse({ gameId, cardId, destId, sourceId: "faceUpPile" })
-  }
-  const houseToHouse = ({ sourceId, destId, cardId }) => {
-    console.log("house to house", sourceId, destId, cardId)
-    changeHouse({ gameId, cardId, destId, sourceId })
-  }
-  const houseToCenter = ({ sourceId, cardId }) => {
-    console.log("house to center")
-    playCard({ cardId, gameId, sourceId })
-  }
   return (
     <GamePlayCtx.Provider
       value={{
-        faceUpToCenter,
-        faceUpToHouse,
-        houseToHouse,
-        houseToCenter,
-        state,
-        dispatch
+        gdState,
+        gdDispatch,
+        gamePlay,
+        setGamePlay
       }}
       {...otherProps}
     />
@@ -95,25 +60,47 @@ export const GamePlayCtxProvider = props => {
 }
 
 export const useGamePlayCtx = () => {
-  const ctx = useContext(GamePlayCtx)
-  if (!ctx)
+  const gPCtx = useContext(GamePlayCtx)
+  const { user } = useAuthCtx()
+  if (!gPCtx)
     throw new Error(
       "useGamePlayCtx must be a descendant of GamePlayCtxProvider 😕"
     )
-  const {
-    houseToCenter,
-    faceUpToCenter,
-    faceUpToHouse,
-    houseToHouse,
-    state,
-    dispatch
-  } = ctx
+  const { gdState, gdDispatch, gamePlay, setGamePlay } = gPCtx
+  // shared functions
+  const arrayMinusItem = (arr, itemId) => {
+    if (!arr || !arr.length || !itemId) throw new Error("missing something")
+    return [...arr].filter(_itemId => _itemId !== itemId)
+  }
+  //
+  const endTurnLocal = ({}) => {}
+  const storageToCenterLocal = ({ itemId, gameId }) => {
+    console.log("running storageToCenterLocal", itemId, gameId)
+    setGamePlay(old => ({
+      ...old,
+      gameStates: {
+        ...old.gameStates,
+        [user.uid]: {
+          ...old.gameStates[user.uid],
+          storagePile: arrayMinusItem(
+            old.gameStates[user.uid].storagePile,
+            itemId
+          )
+        },
+        centerCardPile: [itemId, ...old.centerCardPile]
+      }
+    }))
+  }
+  const storageToHouseLocal = ({ itemId, gameId, roomId }) => {}
+  const houseToCenterLocal = ({ itemId, gameId, roomId }) => {}
+  const houseToHouseLocal = ({}) => {}
   return {
-    houseToCenter,
-    faceUpToCenter,
-    faceUpToHouse,
-    houseToHouse,
-    state,
-    dispatch
+    gdState,
+    gdDispatch,
+    endTurnLocal,
+    storageToCenterLocal,
+    storageToHouseLocal,
+    houseToCenterLocal,
+    houseToHouseLocal
   }
 }

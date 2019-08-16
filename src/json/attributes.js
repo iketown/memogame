@@ -10,7 +10,16 @@ export default {
       opt_ulnNmTnoI: { id: "opt_ulnNmTnoI", text: "Orange" },
       opt_W12ovGmcFf: { id: "opt_W12ovGmcFf", text: "Purple" },
       opt_hIUz3d7Jy: { id: "opt_hIUz3d7Jy", text: "Grey" },
-      opt_dsSgorZokm: { id: "opt_dsSgorZokm", text: "Yellow" }
+      opt_dsSgorZokm: { id: "opt_dsSgorZokm", text: "Yellow" },
+      white: { id: "white", text: "White" },
+      blue: { id: "blue", text: "Blue" },
+      red: { id: "red", text: "Red" },
+      green: { id: "green", text: "Green" },
+      brown: { id: "brown", text: "Brown" },
+      orange: { id: "orange", text: "Orange" },
+      purple: { id: "purple", text: "Purple" },
+      grey: { id: "grey", text: "Grey" },
+      yellow: { id: "yellow", text: "Yellow" }
     },
     name: "Color"
   },
@@ -21,7 +30,12 @@ export default {
       opt_i7XFoxQSIV: { id: "opt_i7XFoxQSIV", text: "Fruit" },
       opt_TDpE64wnd: { id: "opt_TDpE64wnd", text: "Vegetable" },
       opt_INR8FfInV: { id: "opt_INR8FfInV", text: "Toy" },
-      opt_Saj7VmvhH: { id: "opt_Saj7VmvhH", text: "Clothing" }
+      opt_Saj7VmvhH: { id: "opt_Saj7VmvhH", text: "Clothing" },
+      animal: { id: "animal", text: "Animal" },
+      fruit: { id: "fruit", text: "Fruit" },
+      vegetable: { id: "vegetable", text: "Vegetable" },
+      toy: { id: "toy", text: "Toy" },
+      clothing: { id: "clothing", text: "Clothing" }
     },
     name: "Type"
   }
