@@ -10,6 +10,11 @@ import { useAuthCtx } from "../../contexts/AuthCtx.js"
 //
 const StyledBox = styled(Grid)`
   border: 1px solid navy;
+  .center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 `
 const OtherPlayersView = () => {
   const { gamePlay } = useGameCtx()
@@ -18,7 +23,7 @@ const OtherPlayersView = () => {
 
   return (
     <StyledBox container spacing={2}>
-      <Grid item xs={12} md={6}>
+      <Grid item xs={12} md={6} className="center">
         <CenterPileDnD />
       </Grid>
       <Grid item xs={12} md={6}>

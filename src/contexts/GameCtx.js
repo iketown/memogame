@@ -178,7 +178,9 @@ export const GameCtxProvider = props => {
     const gameRef = firestore.doc(`/games/${gameId}`)
     gameRef.onSnapshot(doc => {
       const values = doc.data()
-      setGameState({ ...values, gameId })
+      if (values) {
+        setGameState({ ...values, gameId })
+      }
     })
   }, [firestore, gameId])
 

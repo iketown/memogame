@@ -25,9 +25,7 @@ const firebaseConfig = {
 
 class Firebase {
   constructor() {
-    if (!app.apps.length) {
-      app.initializeApp(firebaseConfig)
-    }
+    app.initializeApp(firebaseConfig)
     // app.initializeApp(firebaseConfig)
     this.auth = app.auth()
     this.fxns = app.functions()

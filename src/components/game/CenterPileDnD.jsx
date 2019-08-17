@@ -35,22 +35,6 @@ const StyleTable = styled.div`
   justify-content: center;
   align-items: center;
   color: white;
-  .quantity {
-    position: absolute;
-    bottom: 0;
-    right: -2rem;
-    font-size: 2rem;
-    font-weight: bold;
-    background: #024e02;
-    border-radius: 50%;
-    padding: 4px;
-    width: 2rem;
-    height: 2rem;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 200;
-  }
 `
 const offset = 0
 const TableHalo = styled.div`
@@ -115,9 +99,36 @@ const CenterPileDnD = () => {
         />
       ))}
       {isOver && <TableHalo />}
-      <div className="quantity">{centerPile.length}</div>
+      <QuantityCircle background="#024e02" quantity={centerPile.length} />
     </StyleTable>
   )
 }
 
 export default CenterPileDnD
+
+const StyleQuantityCircle = styled.div`
+  position: absolute;
+  bottom: 0;
+  right: -2rem;
+  font-size: 2rem;
+  font-weight: bold;
+  background: ${p => p.background || "black"};
+  color: white;
+  border-radius: 50%;
+  padding: 4px;
+  width: 45px;
+  height: 32px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 200;
+  box-shadow: 0px 3px 2px #00000040;
+  border: 1px solid black;
+`
+export const QuantityCircle = ({ quantity = 0, background }) => {
+  return (
+    <StyleQuantityCircle background={background}>
+      {quantity}
+    </StyleQuantityCircle>
+  )
+}

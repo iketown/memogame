@@ -2,6 +2,7 @@ import React from "react"
 import styled from "styled-components"
 import { Grid, Typography } from "@material-ui/core"
 //
+import { QuantityCircle } from "../game/CenterPileDnD.jsx"
 import { useItemCtx } from "../../contexts/ItemContext.js"
 import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
 import ShowMe from "../../utils/ShowMe.jsx"
@@ -17,7 +18,9 @@ const StyledGrid = styled(Grid)`
   border: 1px solid green;
   margin-top: 4rem !important;
   .center {
-    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
   .yourturn {
     color: ${p => (p.myTurn ? "green" : "grey")};
@@ -55,15 +58,19 @@ const StoragePile = () => {
   const { storagePile = [] } = useStoragePileCtx()
   const { user } = useAuthCtx()
   const mdUp = useWiderThan("md")
-  const myTurn = gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
+  if (!gamePlay) return <div>waiting for game</div>
+  const myTurn =
+    gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
   const othersTurnText =
-    gamePlay.whosTurnItIs && `${gamePlay.whosTurnItIs.displayName}'s`
+    gamePlay &&
+    gamePlay.whosTurnItIs &&
+    `${gamePlay.whosTurnItIs.displayName}'s`
   if (!allItems) return null
   // const storagePile = houseState && houseState.storagePile
 
   return (
-    <StyledGrid myTurn={myTurn} container spacing={2} justify="center">
-      <Grid item xs={12} md={6}>
+    <StyledGrid myTurn={myTurn} container spacing={2}>
+      <Grid item xs={12} md={6} className="center">
         <StorageTable width={mdUp ? 11 : 9}>
           {!!storagePile && (
             <>
@@ -79,20 +86,17 @@ const StoragePile = () => {
             </>
           )}
           <TableImage width={mdUp ? 11 : 9} />
+          <QuantityCircle
+            background="#2f3235"
+            quantity={storagePile && storagePile.length}
+          />
         </StorageTable>
       </Grid>
       <Grid item xs={12} md={6} className="quantity-display">
         <Typography variant="h4" className="yourturn">
           {myTurn ? "YOUR" : othersTurnText} turn
         </Typography>
-        <div className="center">
-          <Typography variant="h4">
-            {storagePile && storagePile.length}
-          </Typography>
-          <Typography variant="caption" color="textSecondary">
-            cards in STORAGE
-          </Typography>
-        </div>
+        <div className="center" />
       </Grid>
     </StyledGrid>
   )
