@@ -43,13 +43,13 @@ const App = () => {
                       <DialogContainer />
                       <NavBar />
                       <Container>
+                        <Route path="/game/:gameId" component={GamePage} />
                         <Route path="/attributes" component={AttributeForm} />
                         <Route path="/items" component={ItemPage} />
                         <Route path="/allCards" component={Cards} />
                         <Route path="/allgames" component={AllGames} />
                         <Route path="/gamestart" component={GameStart} />
                         <Route path="/playresponse" component={PlayResponse} />
-                        <Route path="/game/:gameId" component={GamePage} />
                         <Route path="/housegrid" component={HouseGrid} />
                       </Container>
                     </DialogCtxProvider>
