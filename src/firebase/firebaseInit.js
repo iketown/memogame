@@ -25,7 +25,10 @@ const firebaseConfig = {
 
 class Firebase {
   constructor() {
-    app.initializeApp(firebaseConfig)
+    if (!app.apps.length) {
+      app.initializeApp(firebaseConfig)
+    }
+    // app.initializeApp(firebaseConfig)
     this.auth = app.auth()
     this.fxns = app.functions()
     this.playCard = app.functions().httpsCallable("playCard")
@@ -60,7 +63,127 @@ class Firebase {
     logRef.remove()
   }
 
-  //// ⭐   Game API   ⭐ ////
+  //// ⭐   Game PLAY API   ⭐ ////
+  playStorageToCenter = async ({ gameId, itemId }) => {
+    // remove from storage
+    await this._removeFromStorage({ gameId, itemId })
+    // add to center
+    await this._addToCenter({ gameId, itemId })
+    return this._endTurn({ gameId })
+  }
+  playStorageToHouse = async ({ gameId, itemId, roomId }) => {
+    // remove from storage
+    const promises = []
+    promises.push(this._removeFromStorage({ gameId, itemId }))
+    promises.push(this._addToHouse({ itemId, gameId, roomId }))
+    promises.push(this._endTurn({ gameId }))
+    return Promise.all(promises)
+  }
+  // houseToCenter = () => {}
+  // houseToHouse = () => {}
+
+  // shared Functions 👇
+  _getRoomRefAndOldData = async ({ gameId, roomId }) => {
+    const uid = this.auth.currentUser.uid
+    const roomRef = this.fdb.ref(
+      `currentGames/${gameId}/gameStates/${uid}/house/${roomId}`
+    )
+    const oldRoomData = await roomRef
+      .once("value")
+      .then(snapshot => snapshot.val())
+    return { roomRef, oldRoomData }
+  }
+  _addToHouse = async ({ itemId, gameId, roomId }) => {
+    const { roomRef, oldRoomData } = await this._getRoomRefAndOldData({
+      gameId,
+      roomId
+    })
+    const newRoomData = oldRoomData ? [itemId, ...oldRoomData] : [itemId]
+    return roomRef.set(newRoomData)
+  }
+  _removeFromStorage = async ({ gameId, itemId }) => {
+    const uid = this.auth.currentUser.uid
+    const storagePileRef = this.fdb.ref(
+      `currentGames/${gameId}/gameStates/${uid}/storagePile`
+    )
+    const oldStoragePile = await storagePileRef
+      .once("value")
+      .then(snapshot => snapshot.val())
+    const storagePile = oldStoragePile.filter(_itemId => _itemId !== itemId)
+    return storagePileRef.set(storagePile)
+  }
+
+  _endTurn = async ({ gameId }) => {
+    const uid = this.auth.currentUser.uid
+    if (!uid || !gameId) return { error: { message: "missing uid or gameId" } }
+    // see who's turn it is now
+    const turnRef = this.fdb.ref(`/currentGames/${gameId}/whosTurnItIs`)
+    const whosTurn = await turnRef
+      .once("value")
+      .then(snapshot => snapshot.val())
+      .catch(err => console.log("err getting whos turn", err))
+    if (uid !== whosTurn.uid) {
+      return { error: { message: "it wasnt your turn ???" } }
+    }
+    // get all members of this game
+    const membersRef = this.fdb.ref(`/currentGames/${gameId}/members`)
+    const members = await membersRef
+      .once("value")
+      .then(snap => snap.val())
+      .catch(err => console.log("err getting members", err))
+    if (!members) return { error: { message: "no members " } }
+
+    //  who's turn is next ?
+    const currentTurnMemberIndex = members.findIndex(mem => mem.uid === uid)
+    const nextTurnMemberIndex = (currentTurnMemberIndex + 1) % members.length
+
+    // set 'whosTurnItIs' to the next person
+    return turnRef.set(members[nextTurnMemberIndex])
+  }
+
+  _addPileToStorage = async ({ gameId, pileArr }) => {
+    const uid = this.auth.currentUser.uid
+    const storagePileRef = this.fdb.ref(
+      `currentGames/${gameId}/gameStates/${uid}/storagePile`
+    )
+    const oldStoragePile = await storagePileRef
+      .once("value")
+      .then(snapshot => snapshot.val())
+    const newStoragePile = [...pileArr, ...oldStoragePile]
+    return storagePileRef.set(newStoragePile)
+  }
+
+  _addToCenter = async ({ gameId, itemId }) => {
+    const centerPileRef = this.fdb.ref(`/currentGames/${gameId}/centerCardPile`)
+    const centerPileItems = await centerPileRef.once("value").then(snapshot => {
+      const pile = snapshot.val() || []
+      return pile
+    })
+    const topCard = centerPileItems[0] // will be undefined if this is the first play of the game
+    const validPlay = !topCard || this._checkMatch(topCard, itemId)
+    if (validPlay) {
+      centerPileItems.unshift(itemId)
+      return centerPileRef.set(centerPileItems)
+    } else {
+      await this._addPileToStorage({ pileArr: centerPileItems, gameId })
+      return centerPileRef.set([itemId])
+    }
+  }
+
+  _checkMatch = (item1, item2) => {
+    if (!item1 || !item2) {
+      console.log(`only one value in check match Item1:${item1} Item2:${item1}`)
+      return true
+    }
+    const [col1, type1, firstLet1] = item1.split("_")
+    const [col2, type2, firstLet2] = item2.split("_")
+    if (col1 === col2) return true
+    if (type1 === type2) return true
+    if (firstLet1 === firstLet2) return true
+    return false
+  }
+
+  //// ⭐   Game Admin API   ⭐ ////
   doCreateGame = ({ maxMembers = 3, gameName }) => {
     const uid = this.auth.currentUser.uid
     const displayName =

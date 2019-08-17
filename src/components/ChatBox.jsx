@@ -126,7 +126,6 @@ const LogListItem = ({ msg, handleTrash, nextEntry }) => {
     return () => clearInterval(everyThirtySec)
   }, [msg.timeStamp])
   const item = itemFromItemId(msg.itemId)
-  console.log("item", item)
   function formatText(txt, bolded) {
     return bolded ? (
       <b style={{ textDecoration: "underline" }}>{txt}</b>

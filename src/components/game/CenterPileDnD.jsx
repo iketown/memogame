@@ -35,6 +35,22 @@ const StyleTable = styled.div`
   justify-content: center;
   align-items: center;
   color: white;
+  .quantity {
+    position: absolute;
+    bottom: 0;
+    right: -2rem;
+    font-size: 2rem;
+    font-weight: bold;
+    background: #024e02;
+    border-radius: 50%;
+    padding: 4px;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 200;
+  }
 `
 const offset = 0
 const TableHalo = styled.div`
@@ -50,7 +66,7 @@ const TableHalo = styled.div`
 `
 const CenterPileDnD = () => {
   const mdUp = useWiderThan("md")
-  const { storageToCenter, houseToCenter, doAddToLog } = useFirebase()
+  const { storageToCenter, houseToCenter, playStorageToCenter } = useFirebase()
   const { addLogMessage } = useLogCtx()
   const { storageToCenterLocal, houseToCenterLocal } = useGamePlayCtx()
   const { removeFromStorageLocal } = useStoragePileCtx()
@@ -67,19 +83,20 @@ const CenterPileDnD = () => {
     drop: (item, monitor) => {
       console.log("item dropped in center", item)
       const { fromStorage, itemId, roomId } = item
-      addLogMessage({ itemId, destination: "center" })
       if (fromStorage) {
         removeFromStorageLocal(itemId)
         addToCenterLocal({ itemId })
-        storageToCenter({ itemId, gameId }).then(res =>
-          console.log("storageToCenter response")
-        )
+        playStorageToCenter({ gameId, itemId })
+        // storageToCenter({ itemId, gameId }).then(res =>
+        //   console.log("storageToCenter response")
+        // )
       } else {
         removeFromRoomLocal({ roomId, itemId })
         addToCenterLocal({ itemId })
         houseToCenter({ itemId, gameId, roomId })
         setExpandedRoom({ roomId: false })
       }
+      addLogMessage({ itemId, destination: "center" })
     },
     collect: mon => ({
       isOver: !!mon.isOver(),
@@ -98,6 +115,7 @@ const CenterPileDnD = () => {
         />
       ))}
       {isOver && <TableHalo />}
+      <div className="quantity">{centerPile.length}</div>
     </StyleTable>
   )
 }
