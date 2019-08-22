@@ -39,6 +39,7 @@ export const ItemCtxProvider = props => {
     refreshAllItems()
   }
   function handleDeleteItem(itemId) {
+    console.log("deleting", itemId)
     deleteItem(itemId)
     refreshAllItems()
   }

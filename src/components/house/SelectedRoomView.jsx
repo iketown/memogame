@@ -26,6 +26,8 @@ import { useWiderThan } from "../../hooks/useWidth"
 import { useGameCtx, useHouseCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import { useFirebase } from "../../contexts/FirebaseCtx"
+import { useItemCtx } from "../../contexts/ItemContext"
+import { removeUid } from "../../utils/imageUtils"
 //
 
 const roomImages = {
@@ -218,7 +220,8 @@ const StyledSorterCard = styled(Card)`
   margin: 8px;
 `
 const SorterCard = ({ itemId, faceUp }) => {
-  const image = faceUp ? imageFromItemId(itemId) : brain
+  const { allItems } = useItemCtx()
+  const image = faceUp ? allItems[removeUid(itemId)].card : brain
   const mdUp = useWiderThan("md")
   return <StyledSorterCard width={mdUp ? 6.5 : 4.5} image={image} />
 }

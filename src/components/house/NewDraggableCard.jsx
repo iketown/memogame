@@ -10,6 +10,8 @@ import { ItemTypes } from "../../dnd/itemTypes"
 import { useFirebase } from "../../contexts/FirebaseCtx"
 import { useGameCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
+import { useItemCtx } from "../../contexts/ItemContext"
+import { removeUid } from "../../utils/imageUtils"
 //
 //
 const NewDraggableCard = ({ itemId, scale, index }) => {
@@ -69,12 +71,13 @@ const BackgroundCard = styled(StyledCard)`
 `
 
 export const WindowCard = ({ index, itemId, scale = 1, dragMe }) => {
+  const { allItems } = useItemCtx()
   const mdUp = useWiderThan("md")
   const { imagesvg, rotation } = useMemo(() => {
-    const imagesvg = index < 5 ? imageFromItemId(itemId) : ""
+    const imagesvg = index < 5 && itemId ? allItems[removeUid(itemId)].card : ""
     const rotation = (Math.random() - 0.5) * 18 + index // adding index makes the pile twirl
     return { imagesvg, rotation }
-  }, [index, itemId])
+  }, [allItems, index, itemId])
 
   const windowHeight = mdUp ? 90 : 65
   const cardProps = {

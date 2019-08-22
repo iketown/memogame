@@ -29,6 +29,7 @@ import shoe from "./shoe.svg"
 import strawberry from "./strawberry.svg"
 import tie from "./tie.svg"
 import train from "./train.svg"
+import { useItemCtx } from "../../contexts/ItemContext"
 
 const imageObject = {
   alligator,
@@ -98,12 +99,12 @@ const idMap = {
   PUE_CLO_T: "tie"
 }
 
-export function imageFromItemId(itemId) {
-  if (!itemId) return null
-  const [col, type, firstLetter, uid] = itemId.split("_")
-  const stripId = [col, type, firstLetter].join("_")
-  return imageObject[idMap[stripId]]
-}
+// export function imageFromItemId(itemId) {
+//   if (!itemId) return null
+//   const [col, type, firstLetter, uid] = itemId.split("_")
+//   const stripId = [col, type, firstLetter].join("_")
+//   return allItems[stripId].card
+// }
 
 // get 'allItems' from somewhere and use this to create a new idMap if necc.
 // const imageMap = Object.entries(allItems).reduce((obj, [itemId, item]) => {

@@ -52,11 +52,11 @@ const NavBar = () => {
   return (
     <AppBar position="static" key={user}>
       <Toolbar>
-        {/* <ButtonLink to="/attributes">Attributes</ButtonLink>
+        {/* <ButtonLink to="/attributes">Attributes</ButtonLink> */}
         <ButtonLink to="/items">Items</ButtonLink>
-        <ButtonLink to="/allcards">Cards</ButtonLink>
-        <ButtonLink to="/playresponse">PlayResponse</ButtonLink>
-        <ButtonLink to="/housegrid">House Grid</ButtonLink> */}
+        {/* <ButtonLink to="/allcards">Cards</ButtonLink> */}
+        {/* <ButtonLink to="/playresponse">PlayResponse</ButtonLink> */}
+        {/* <ButtonLink to="/housegrid">House Grid</ButtonLink> */}
 
         <ButtonLink to="/gamestart">Start a Game</ButtonLink>
         {user && signedInMenuItems}

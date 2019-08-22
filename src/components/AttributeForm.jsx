@@ -45,7 +45,7 @@ const AttributeForm = () => {
   const addOption = () => {
     const newOptions = attr.options ? { ...attr.options } : {}
     const newOpt = {
-      id: `opt_${shortid.generate()}`,
+      id: `opt_${optionText}`,
       text: optionText
     }
     newOptions[newOpt.id] = newOpt
