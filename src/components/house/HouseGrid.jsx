@@ -7,17 +7,12 @@ import HTML5Backend from "react-dnd-html5-backend"
 import SelectedRoomView from "./SelectedRoomView"
 import OtherPlayersView from "../game/OtherPlayersView.jsx"
 import houseImage from "../../images/handDrawnHouse.svg"
-import HouseWindow from "./HouseWindow"
-import { useWidth, useWiderThan } from "../../hooks/useWidth"
-import {
-  HouseGridCtxProvider,
-  useHouseGridCtx
-} from "../../contexts/HouseGridCtx"
+import { useWiderThan } from "../../hooks/useWidth"
+import { HouseGridCtxProvider } from "../../contexts/HouseGridCtx"
 import StoragePile from "./StoragePile"
-import ShowMe from "../../utils/ShowMe"
 import HouseDropSection from "./HouseDropSection"
-import CenterPileDnD from "../game/CenterPileDnD"
 import ChatBox from "../ChatBox"
+import YourTurnSound from "../../sounds/YourTurn.sound.jsx"
 //
 
 export const houseDimensions = {
@@ -142,6 +137,7 @@ const HouseGrid = () => {
                 />
               ))}
             </StyleHouseGrid>
+            <YourTurnSound />
           </Grid>
           <Grid item xs={6}>
             <OtherPlayersView />

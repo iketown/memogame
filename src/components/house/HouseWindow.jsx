@@ -2,7 +2,7 @@ import React, { useState, useMemo } from "react"
 import styled from "styled-components"
 import { Card } from "@material-ui/core"
 //
-import brain from "../../images/cards/brain.svg"
+import brain from "../../images/newCards/brain.svg"
 import { useWidth, useWiderThan } from "../../hooks/useWidth"
 import { houseDimensions } from "./HouseGrid"
 import { useHouseGridCtx } from "../../contexts/HouseGridCtx"

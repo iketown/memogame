@@ -3,7 +3,9 @@ import { Draggable } from "react-beautiful-dnd"
 //
 import { StyledCard } from "./DraggableCard.jsx"
 import { useItemCtx } from "../../contexts/ItemContext.js"
-import brain from "../../images/cards/brain.svg"
+
+//
+//
 const DialogDot = ({ dragId, index }) => {
   const { imagesObj } = useItemCtx()
   return (

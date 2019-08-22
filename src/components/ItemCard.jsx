@@ -1,7 +1,5 @@
 import React from "react"
-import imgs from "../images/cards"
 import styled from "styled-components"
-import { useItemCtx } from "../contexts/ItemContext"
 
 export const defaultHeight = "8rem"
 export const cardShadow = `box-shadow: 1px 1px 2px #c1c1c1;`

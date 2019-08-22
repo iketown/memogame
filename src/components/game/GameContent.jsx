@@ -10,7 +10,6 @@ import {
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import YoureNotInThisGameYet from "./gameAdmin/YoureNotInThisGameYet.jsx"
 import ShowMe from "../../utils/ShowMe.jsx"
-import House from "../house/House.jsx"
 import HouseGrid from "../house/HouseGrid.jsx"
 import GameStarter from "./gameAdmin/GameStarter.jsx"
 import PlayResponse from "./PlayResponse"

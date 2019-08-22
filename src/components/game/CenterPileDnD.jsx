@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { useDrop } from "react-dnd"
 import styled from "styled-components"
 import felt from "../../images/felt.jpg"
@@ -18,6 +18,7 @@ import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
 import { useGamePlayCtx } from "../../contexts/GamePlayCtx"
 import { useLogCtx } from "../../contexts/LogCtx"
 import { doItemsMatch } from "../../utils/gameLogic"
+import DropCardSound from "../../sounds/DropCard.sound"
 //
 //
 
@@ -61,6 +62,7 @@ const CenterPileDnD = () => {
     gamePlay,
     gameState: { gameId }
   } = useGameCtx()
+  const [playDropCardSound, setPlayDropCardSound] = useState(false)
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     canDrop: () => true,
@@ -75,6 +77,7 @@ const CenterPileDnD = () => {
         //   console.log("storageToCenter response")
         // )
       } else {
+        setPlayDropCardSound(true)
         removeFromRoomLocal({ roomId, itemId })
         addToCenterLocal({ itemId })
         houseToCenter({ itemId, gameId, roomId })
@@ -89,6 +92,10 @@ const CenterPileDnD = () => {
   })
   return (
     <StyleTable isOver={isOver} width={mdUp ? 11 : 9} ref={dropRef}>
+      <DropCardSound
+        playDropCardSound={playDropCardSound}
+        setPlayDropCardSound={setPlayDropCardSound}
+      />
       <Typography variant="h5">CENTER</Typography>
       {centerPile.map((itemId, index) => (
         <WindowCard

@@ -8,7 +8,6 @@ import React, {
 //
 import { getAllItems, saveItem, deleteItem } from "../utils/ItemLocalStorage"
 import { useAttrCtx } from "./AttrContext"
-import imgs from "../images/cards"
 import { removeUid } from "../utils/imageUtils"
 const ItemCtx = createContext()
 
@@ -20,9 +19,9 @@ export const ItemCtxProvider = props => {
     const _itemsAttrsObj = getItemAttrsObj({ allItems, allAttrs })
     return _itemsAttrsObj
   }, [allItems, allAttrs])
-  const imagesObj = useMemo(() => {
-    return getImagesObj(allItems, imgs)
-  }, [allItems])
+  // const imagesObj = useMemo(() => {
+  //   return getImagesObj(allItems, imgs)
+  // }, [allItems])
 
   function refreshAllItems() {
     const _allItems = getAllItems()
@@ -48,7 +47,7 @@ export const ItemCtxProvider = props => {
     saveItem: handleSaveItem,
     deleteItem: handleDeleteItem,
     itemsAttrsObj,
-    imagesObj,
+    // imagesObj,
     handleSelectItem,
     selectedItem
   }
@@ -64,7 +63,7 @@ export const useItemCtx = () => {
     saveItem,
     deleteItem,
     itemsAttrsObj,
-    imagesObj,
+    // imagesObj,
     handleSelectItem,
     selectedItem
   } = ctx
@@ -80,7 +79,7 @@ export const useItemCtx = () => {
     saveItem,
     deleteItem,
     itemsAttrsObj,
-    imagesObj,
+    // imagesObj,
     handleSelectItem,
     selectedItem,
     itemFromItemId
