@@ -216,14 +216,21 @@ const StyledSorterCard = styled(Card)`
   height: ${p => p.width}rem;
   background-image: url(${p => p.image});
   background-size: cover;
+  ${p => p.cardBorder}
   padding: 5px;
   margin: 8px;
 `
 const SorterCard = ({ itemId, faceUp }) => {
-  const { allItems } = useItemCtx()
+  const { allItems, cardBorder } = useItemCtx()
   const image = faceUp ? allItems[removeUid(itemId)].card : brain
   const mdUp = useWiderThan("md")
-  return <StyledSorterCard width={mdUp ? 6.5 : 4.5} image={image} />
+  return (
+    <StyledSorterCard
+      cardBorder={cardBorder}
+      width={mdUp ? 6.5 : 4.5}
+      image={image}
+    />
+  )
 }
 
 const DnDCard = ({ faceUp, itemId, roomId }) => {

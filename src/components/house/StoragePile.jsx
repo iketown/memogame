@@ -23,7 +23,7 @@ const StyledGrid = styled(Grid)`
     align-items: center;
   }
   .yourturn {
-    color: ${p => (p.myTurn ? "green" : "grey")};
+    color: ${p => (p.myturn ? "green" : "grey")};
   }
   .quantity-display {
     display: flex;
@@ -59,7 +59,7 @@ const StoragePile = () => {
   const { user } = useAuthCtx()
   const mdUp = useWiderThan("md")
   if (!gamePlay) return <div>waiting for game</div>
-  const myTurn =
+  const myturn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
   const othersTurnText =
     gamePlay &&
@@ -69,7 +69,7 @@ const StoragePile = () => {
   // const storagePile = houseState && houseState.storagePile
 
   return (
-    <StyledGrid myTurn={myTurn} container spacing={2}>
+    <StyledGrid myturn={myturn} container spacing={2}>
       <Grid item xs={12} md={6} className="center">
         <StorageTable width={mdUp ? 11 : 9}>
           {!!storagePile && (
@@ -94,7 +94,7 @@ const StoragePile = () => {
       </Grid>
       <Grid item xs={12} md={6} className="quantity-display">
         <Typography variant="h4" className="yourturn">
-          {myTurn ? "YOUR" : othersTurnText} turn
+          {myturn ? "YOUR" : othersTurnText} turn
         </Typography>
         <div className="center" />
       </Grid>

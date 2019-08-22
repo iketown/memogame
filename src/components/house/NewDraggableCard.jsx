@@ -64,14 +64,16 @@ const StyledCard = styled(Card)`
   background-size: cover;
   z-index: ${p => 200 - p.index};
   position: absolute;
+  ${p => p.cardBorder}
 `
 const BackgroundCard = styled(StyledCard)`
   top: ${p => p.index * offsetMultiplier}px;
   transform: scale(${p => 1 - p.index * 0.02}) rotate(${p => p.rotation}deg);
+  ${p => p.cardBorder}
 `
 
 export const WindowCard = ({ index, itemId, scale = 1, dragMe }) => {
-  const { allItems } = useItemCtx()
+  const { allItems, cardBorder } = useItemCtx()
   const mdUp = useWiderThan("md")
   const { imagesvg, rotation } = useMemo(() => {
     const imagesvg = index < 5 && itemId ? allItems[removeUid(itemId)].card : ""
@@ -82,6 +84,7 @@ export const WindowCard = ({ index, itemId, scale = 1, dragMe }) => {
   const windowHeight = mdUp ? 90 : 65
   const cardProps = {
     heightwidth: `${windowHeight * scale}px`,
+    cardBorder,
     index,
     imagesvg,
     rotation,

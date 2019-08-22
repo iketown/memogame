@@ -72,8 +72,11 @@ export const useItemCtx = () => {
     const strippedId = removeUid(itemId)
     return allItems[strippedId]
   }
+  const cardBorder = `border: 5px solid white;`
+
   return {
     allItems,
+    cardBorder,
     saveItem,
     deleteItem,
     itemsAttrsObj,
