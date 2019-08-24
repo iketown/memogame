@@ -8,6 +8,7 @@ import { useFirebase } from "../../contexts/FirebaseCtx"
 import ShowMe from "../../utils/ShowMe.jsx"
 import FormTextInput from "./FormTextInput.jsx"
 import { useDialogCtx } from "../../contexts/DialogCtx.js"
+import { useAuthCtx } from "../../contexts/AuthCtx"
 //
 //
 const StyledForm = styled.form`
@@ -16,13 +17,17 @@ const StyledForm = styled.form`
   }
 `
 const SignUpForm = () => {
-  const firebase = useFirebase()
+  const { doCreateUserWithEmailAndPassword, firestore } = useFirebase()
   const { handleCloseForm } = useDialogCtx()
+  const { user } = useAuthCtx()
+  firestore
+    .collection("publicProfiles")
+    .doc(user.uid)
+    .set({})
   function formSubmit(values) {
     console.log("values", values)
     const { email, password } = values
-    return firebase
-      .doCreateUserWithEmailAndPassword(email.trim(), password.trim())
+    return doCreateUserWithEmailAndPassword(email.trim(), password.trim())
       .then(authUser => {
         handleCloseForm()
         console.log("authUser", authUser)

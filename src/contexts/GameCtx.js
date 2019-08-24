@@ -184,7 +184,6 @@ export const GameCtxProvider = props => {
     })
   }, [firestore, gameId])
 
-  // full game state (split this up)
   useEffect(() => {
     const gamePlayRef = fdb.ref(`/currentGames/${gameId}`)
     gamePlayRef.on("value", snapshot => {

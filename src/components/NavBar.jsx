@@ -7,12 +7,15 @@ import {
   Menu,
   MenuItem,
   MenuList,
-  ListItemText
+  ListItemText,
+  Typography,
+  Avatar
 } from "@material-ui/core"
-import { Link } from "react-router-dom"
+import AvatarMonster from "./AvatarMonster.jsx"
+import BrainGears from "../images/BrainGears.jsx"
 import styled from "styled-components"
+import { withRouter } from "react-router-dom"
 import { useFirebase } from "../contexts/FirebaseCtx"
-import { auth } from "firebase"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { useDialogCtx } from "../contexts/DialogCtx"
 import { FaUser } from "react-icons/fa"
@@ -26,17 +29,20 @@ const StyledDiv = styled.div`
   justify-content: space-around;
   align-items: center;
 `
-const NavBar = () => {
+const NavBar = props => {
   // const { user } = useFirebase()
-  const { user, displayName } = useAuthCtx()
+  console.log("navbar props", props)
+  const { user, publicProfile } = useAuthCtx()
+
   const { state, dispatch: dialogDispatch } = useDialogCtx()
-  const { fsdb } = useFirebase()
   const handleAuth = formType => () => {
     dialogDispatch({ type: "OPEN_FORM", formType })
   }
   const signedInMenuItems = (
     <>
-      <UserMenuButton /> <span>{displayName}</span>
+      <ButtonLink to="/gamestart">Start a Game</ButtonLink>
+      <UserMenuButton history={props.history} />
+      <span>{publicProfile && publicProfile.displayName}</span>
     </>
   )
   const signedOutMenuItems = (
@@ -52,27 +58,30 @@ const NavBar = () => {
   return (
     <AppBar position="static" key={user}>
       <Toolbar>
+        <BrainGears height="40px" />
+        <Typography variant="h6" style={{ flexGrow: 1 }}>
+          MEMOGA.ME
+        </Typography>
         {/* <ButtonLink to="/attributes">Attributes</ButtonLink> */}
-        <ButtonLink to="/items">Items</ButtonLink>
+        {/* <ButtonLink to="/items">Items</ButtonLink> */}
         {/* <ButtonLink to="/allcards">Cards</ButtonLink> */}
         {/* <ButtonLink to="/playresponse">PlayResponse</ButtonLink> */}
         {/* <ButtonLink to="/housegrid">House Grid</ButtonLink> */}
 
-        <ButtonLink to="/gamestart">Start a Game</ButtonLink>
-        {user && signedInMenuItems}
+        {!!user && signedInMenuItems}
         {!user && signedOutMenuItems}
       </Toolbar>
     </AppBar>
   )
 }
 
-export default NavBar
+export default withRouter(NavBar)
 
-const UserMenuButton = () => {
+const UserMenuButton = ({ history }) => {
   const [anchorEl, setAnchorEl] = useState(null)
   const { dispatch } = useDialogCtx()
   const { doSignOut } = useFirebase()
-  const { user } = useAuthCtx()
+  const { user, publicProfile } = useAuthCtx()
   const handleClick = e => {
     setAnchorEl(e.currentTarget)
   }
@@ -83,12 +92,16 @@ const UserMenuButton = () => {
     dispatch({ type: "OPEN_FORM", formType: "editProfile" })
     handleClose()
   }
-  if (!user) return null
+  const handleSignOut = async () => {
+    await doSignOut()
+    history.push("/")
+  }
+  if (!user) return <div />
 
   return (
     <>
       <IconButton onClick={handleClick} size="small" color="inherit">
-        <FaUser />
+        <AvatarMonster num={publicProfile && publicProfile.avatarNumber} />
       </IconButton>
       <Menu onClose={handleClose} anchorEl={anchorEl} open={!!anchorEl}>
         <MenuList>
@@ -98,7 +111,7 @@ const UserMenuButton = () => {
           </MenuItem>
           <MenuItem>hey</MenuItem>
           <MenuItem onClick={handleEditProfile}>Edit Profile</MenuItem>
-          <MenuItem onClick={doSignOut}>Sign Out</MenuItem>
+          <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
         </MenuList>
       </Menu>
     </>

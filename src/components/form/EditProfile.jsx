@@ -14,6 +14,9 @@ import { Form, Field } from "react-final-form"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import ShowMe from "../../utils/ShowMe"
 import FormTextInput from "./FormTextInput"
+import ChooseAvatar from "./ChooseAvatar"
+import AvatarMonster from "../AvatarMonster"
+import { useFirestore } from "../../contexts/FirestoreCtx"
 
 //
 //
@@ -24,28 +27,39 @@ const StyledHeader = styled.header`
   align-items: center;
 `
 const EditProfile = () => {
-  const { user } = useAuthCtx()
+  const { user, publicProfile } = useAuthCtx()
+  const { firestore } = useFirestore()
   console.log("user", user)
   if (!user) return null
-  const { email, displayName } = user
-  const handleSubmit = values => {
-    console.log("values", values)
-    const { displayName, email, favColor } = values
+  if (!publicProfile) return <div>loading profile . . .</div>
+  const { email, displayName, avatarNumber } = publicProfile
+
+  const handleSubmit = async values => {
+    const { displayName, email, avatarNumber } = values
     user.updateProfile({
       displayName,
       email,
-      favColor
+      avatarNumber
     })
+    firestore
+      .collection("publicProfiles")
+      .doc(user.uid)
+      .set(
+        {
+          email,
+          displayName,
+          avatarNumber
+        },
+        { merge: true }
+      )
+      .catch(err => console.log("error in profile", err))
   }
   return (
     <>
-      <StyledHeader>
-        <Avatar>
-          <FaUser />
-        </Avatar>
-        <DialogTitle>Edit Profile</DialogTitle>
-      </StyledHeader>
-      <Form onSubmit={handleSubmit} initialValues={{ email, displayName }}>
+      <Form
+        onSubmit={handleSubmit}
+        initialValues={{ email, displayName, avatarNumber }}
+      >
         {({
           handleSubmit,
           values,
@@ -55,7 +69,10 @@ const EditProfile = () => {
           errors
         }) => (
           <>
-            {" "}
+            <StyledHeader>
+              <AvatarMonster num={values.avatarNumber} />
+              <DialogTitle>Edit Profile</DialogTitle>
+            </StyledHeader>
             <DialogContent>
               <Grid container spacing={2}>
                 <Grid item xs={12} sm={6}>
@@ -64,11 +81,14 @@ const EditProfile = () => {
                 <Grid item xs={12} sm={6}>
                   <FormTextInput name="email" label="Email" />
                 </Grid>
+                <Grid item xs={12}>
+                  <ChooseAvatar />
+                </Grid>
 
-                {/* <Grid container item xs={12}>
+                <Grid container item xs={12}>
                   <ShowMe obj={values} name="values" />
                   <ShowMe obj={errors} name="errors" />
-                </Grid> */}
+                </Grid>
               </Grid>
             </DialogContent>
             <DialogActions>

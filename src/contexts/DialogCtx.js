@@ -3,7 +3,7 @@ import React, { useReducer, useContext } from "react"
 const DialogCtx = React.createContext()
 
 const initialState = {
-  formOpen: false,
+  formOpen: true,
   formType: "editProfile",
   maxWidth: "sm"
 }

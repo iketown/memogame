@@ -1,4 +1,5 @@
-import app from "firebase/app"
+// import app from "firebase/app"
+import * as firebase from "firebase"
 import "firebase/auth"
 import "firebase/firestore"
 import moment from "moment"
@@ -25,20 +26,22 @@ const firebaseConfig = {
 
 class Firebase {
   constructor() {
-    app.initializeApp(firebaseConfig)
-    // app.initializeApp(firebaseConfig)
-    this.auth = app.auth()
-    this.fxns = app.functions()
-    this.playCard = app.functions().httpsCallable("playCard")
-    this.endTurn = app.functions().httpsCallable("endTurn")
-    this.changeHouse = app.functions().httpsCallable("changeHouse")
-    this.storageToCenter = app.functions().httpsCallable("storageToCenter")
-    this.storageToHouse = app.functions().httpsCallable("storageToHouse")
-    this.houseToCenter = app.functions().httpsCallable("houseToCenter")
-    this.houseToHouse = app.functions().httpsCallable("houseToHouse")
-    this.app = app
+    if (!firebase.apps.length) {
+      firebase.initializeApp(firebaseConfig)
+    }
+    this.auth = firebase.auth()
+    this.fxns = firebase.functions()
+    // this.playCard = app.functions().httpsCallable("playCard")
+    // this.endTurn = app.functions().httpsCallable("endTurn")
+    // this.changeHouse = app.functions().httpsCallable("changeHouse")
+    // this.storageToCenter = app.functions().httpsCallable("storageToCenter")
+    // this.storageToHouse = app.functions().httpsCallable("storageToHouse")
+    // this.houseToCenter = app.functions().httpsCallable("houseToCenter")
+    // this.houseToHouse = app.functions().httpsCallable("houseToHouse")
     // this.fsdb = app.firestore()
-    this.fdb = app.database()
+    this.app = firebase
+    this.fdb = firebase.database()
+    this.firestore = firebase.firestore()
   }
   //// ⭐   Auth API   ⭐ ////
 
@@ -46,7 +49,9 @@ class Firebase {
     this.auth.createUserWithEmailAndPassword(email, password)
   doSignInWithUserAndPassword = (email, password) =>
     this.auth.signInWithEmailAndPassword(email, password)
-  doSignOut = () => this.auth.signOut()
+  doSignOut = () => {
+    return this.auth.signOut()
+  }
   doPasswordReset = email => this.auth.sendPasswordResetEmail(email)
   doPasswordUpdate = password => this.auth.currentUser.updatePassword(password)
 

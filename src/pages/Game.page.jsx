@@ -10,6 +10,7 @@ import {
 import { ChatCtxProvider } from "../contexts/ChatCtx"
 import GameContent from "../components/game/GameContent.jsx"
 import { GamePlayCtxProvider } from "../contexts/GamePlayCtx.js"
+import { PlayersCtxProvider } from "../contexts/PlayersCtx"
 //
 //
 const Game = props => {
@@ -21,17 +22,20 @@ const Game = props => {
 
   return (
     <GameCtxProvider gameId={gameId}>
-      <HouseCtxProvider gameId={gameId}>
-        <StoragePileCtxProvider gameId={gameId}>
-          <CenterPileCtxProvider gameId={gameId}>
-            <GamePlayCtxProvider gameId={gameId}>
-              <ChatCtxProvider gameId={gameId}>
-                <GameContent gameId={gameId} />
-              </ChatCtxProvider>
-            </GamePlayCtxProvider>
-          </CenterPileCtxProvider>
-        </StoragePileCtxProvider>
-      </HouseCtxProvider>
+      <PlayersCtxProvider>
+        <HouseCtxProvider gameId={gameId}>
+          <StoragePileCtxProvider gameId={gameId}>
+            <CenterPileCtxProvider gameId={gameId}>
+              <GamePlayCtxProvider gameId={gameId}>
+                {/* // playersctxprovider */}
+                <ChatCtxProvider gameId={gameId}>
+                  <GameContent gameId={gameId} />
+                </ChatCtxProvider>
+              </GamePlayCtxProvider>
+            </CenterPileCtxProvider>
+          </StoragePileCtxProvider>
+        </HouseCtxProvider>
+      </PlayersCtxProvider>
     </GameCtxProvider>
   )
 }

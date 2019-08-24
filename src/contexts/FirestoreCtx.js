@@ -2,8 +2,9 @@ import React, { useContext, createContext } from "react"
 import { useFirebase } from "./FirebaseCtx"
 import { useAuthCtx } from "./AuthCtx"
 import firebase from "firebase/app"
-
 const FirestoreCtx = createContext()
+
+// all this does is create a game.  probably don't need this firestore ctx becuase firestore is now availble on the firebaseCtx
 
 export const FirestoreProvider = props => {
   const { app } = useFirebase()
@@ -11,7 +12,18 @@ export const FirestoreProvider = props => {
   const displayName = (user && user.displayName) || (user && user.email)
   const firestore = app.firestore()
 
+  // if (user) {
+  //   const profileRef = firestore.doc(`users/${user.uid}`)
+  //   profileRef.onSnapshot(doc => {
+  //     console.log("current firestore data", doc.data())
+  //   })
+  // }
   const createGame = ({ gameName }) => {
+    if (!user) {
+      console.log("trying to create a game when not signed in")
+      return null
+    }
+
     const gamesRef = firestore.collection("games")
     return gamesRef.add({
       gameName,

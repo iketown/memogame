@@ -26,13 +26,13 @@ const GameContent = ({ gameId }) => {
   const thisIsYourGame = gameState && gameState.startedBy === user.uid
   const gameMemberView = (
     <Grid container spacing={2}>
-      <Grid item xs={!thisIsYourGame ? 12 : 6}>
+      <Grid item xs={!thisIsYourGame ? 12 : 4}>
         <Typography variant="h4" style={{ textAlign: "center" }}>
           {gameState && gameState.gameName.toUpperCase()}
         </Typography>
       </Grid>
       {thisIsYourGame && (
-        <Grid item xs={6}>
+        <Grid item xs={8}>
           <GameStarter />
         </Grid>
       )}

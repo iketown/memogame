@@ -57,12 +57,16 @@ const GameStarter = () => {
       <Collapse in={expanded}>
         <CardContent>
           <Grid container spacing={2}>
-            <Grid item xs={12} sm={6}>
+            <Grid item xs={12}>
               <MemberList members={gameState.members} />
             </Grid>
-            <Grid item xs={12} sm={6}>
-              <RequestList requests={gameState.memberRequests} />
-            </Grid>
+            {gameState.memberRequests && gameState.memberRequests.length ? (
+              <Grid item xs={12}>
+                <RequestList requests={gameState.memberRequests} />
+              </Grid>
+            ) : (
+              ""
+            )}
             <Grid item xs={12} style={{ textAlign: "center" }}>
               {gameIsInProgress ? (
                 <>
