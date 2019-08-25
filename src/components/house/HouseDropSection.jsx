@@ -40,7 +40,7 @@ const HouseDropSection = ({ roomId, display }) => {
   const { addLogMessage } = useLogCtx()
   const { user } = useAuthCtx()
   const gameId = gameState && gameState.gameId
-  const { storageToHouse, playStorageToHouse } = useFirebase()
+  const { storageToHouse, playStorageToHouse, endTurn } = useFirebase()
   const cardsThisRoom = myHouse[roomId] || []
 
   const [{ isOver, canDrop }, dropRef] = useDrop({
@@ -54,6 +54,7 @@ const HouseDropSection = ({ roomId, display }) => {
         removeFromStorageLocal(itemId)
         addToRoomFS({ itemId, roomId })
         setExpandedRoom({ roomId, faceUp: true })
+        endTurn({ gameId })
         // const response = await playStorageToHouse({
         //   itemId,
         //   gameId,

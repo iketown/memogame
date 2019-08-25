@@ -32,7 +32,7 @@ class Firebase {
     this.auth = firebase.auth()
     this.fxns = firebase.functions()
     // this.playCard = app.functions().httpsCallable("playCard")
-    // this.endTurn = app.functions().httpsCallable("endTurn")
+    this.endTurn = firebase.functions().httpsCallable("endTurn")
     // this.changeHouse = app.functions().httpsCallable("changeHouse")
     // this.storageToCenter = app.functions().httpsCallable("storageToCenter")
     // this.storageToHouse = app.functions().httpsCallable("storageToHouse")
