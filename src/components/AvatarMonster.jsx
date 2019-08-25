@@ -9,12 +9,7 @@ const AvatarMonster = ({ num }) => {
         <FaUser />
       </Avatar>
     )
-  return (
-    <Avatar
-      className="avatar"
-      src={`https://api.adorable.io/avatars/95/${num}.png`}
-    />
-  )
+  return <Avatar src={`https://api.adorable.io/avatars/95/${num}.png`} />
 }
 
 export default AvatarMonster

@@ -36,7 +36,7 @@ class Firebase {
     // this.changeHouse = app.functions().httpsCallable("changeHouse")
     // this.storageToCenter = app.functions().httpsCallable("storageToCenter")
     // this.storageToHouse = app.functions().httpsCallable("storageToHouse")
-    // this.houseToCenter = app.functions().httpsCallable("houseToCenter")
+    this.houseToCenter = firebase.functions().httpsCallable("houseToCenter")
     // this.houseToHouse = app.functions().httpsCallable("houseToHouse")
     // this.fsdb = app.firestore()
     this.app = firebase

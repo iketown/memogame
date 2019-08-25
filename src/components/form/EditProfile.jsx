@@ -29,17 +29,13 @@ const StyledHeader = styled.header`
 const EditProfile = () => {
   const { user, publicProfile } = useAuthCtx()
   const { firestore } = useFirestore()
-  console.log("user", user)
   if (!user) return null
-  if (!publicProfile) return <div>loading profile . . .</div>
-  const { email, displayName, avatarNumber } = publicProfile
 
   const handleSubmit = async values => {
     const { displayName, email, avatarNumber } = values
     user.updateProfile({
       displayName,
-      email,
-      avatarNumber
+      email
     })
     firestore
       .collection("publicProfiles")
@@ -54,12 +50,10 @@ const EditProfile = () => {
       )
       .catch(err => console.log("error in profile", err))
   }
+
   return (
     <>
-      <Form
-        onSubmit={handleSubmit}
-        initialValues={{ email, displayName, avatarNumber }}
-      >
+      <Form onSubmit={handleSubmit} initialValues={publicProfile || {}}>
         {({
           handleSubmit,
           values,

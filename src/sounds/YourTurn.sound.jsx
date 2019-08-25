@@ -75,12 +75,12 @@ const YourTurnSound = () => {
         }
         onFinishedPlaying={() => setSoundToPlay(false)}
       />
-      <Button onClick={() => setSoundToPlay("startTurn")}>
+      {/* <Button onClick={() => setSoundToPlay("startTurn")}>
         play start turn
       </Button>
       <Button onClick={() => setSoundToPlay("endTurn")}>end turn</Button>
       <Button onClick={() => setSoundToPlay("winGame")}>win</Button>
-      <Button onClick={() => setSoundToPlay("loseGame")}>lose</Button>
+      <Button onClick={() => setSoundToPlay("loseGame")}>lose</Button> */}
     </>
   )
 }

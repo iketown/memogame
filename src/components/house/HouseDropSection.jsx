@@ -34,7 +34,7 @@ const ColoredOverlay = styled.div`
 `
 const HouseDropSection = ({ roomId, display }) => {
   const { houseState, houseDispatch, setExpandedRoom } = useHouseGridCtx()
-  const { myHouse, addToRoomLocal } = useHouseCtx()
+  const { myHouse, addToRoomFS } = useHouseCtx()
   const { removeFromStorageLocal } = useStoragePileCtx()
   const { gamePlay, gameState } = useGameCtx()
   const { addLogMessage } = useLogCtx()
@@ -52,14 +52,14 @@ const HouseDropSection = ({ roomId, display }) => {
       if (fromStorage) {
         // they're all from storage right now ?
         removeFromStorageLocal(itemId)
-        addToRoomLocal({ itemId, roomId })
+        addToRoomFS({ itemId, roomId })
         setExpandedRoom({ roomId, faceUp: true })
-        const response = await playStorageToHouse({
-          itemId,
-          gameId,
-          roomId
-        }).catch(err => console.log("error from storageToHouse", err))
-        console.log("response from storageToHouse", response)
+        // const response = await playStorageToHouse({
+        //   itemId,
+        //   gameId,
+        //   roomId
+        // }).catch(err => console.log("error from storageToHouse", err))
+        // console.log("response from storageToHouse", response)
         addLogMessage({ itemId, destination: "house" })
       }
     },

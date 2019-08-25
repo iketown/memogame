@@ -16,27 +16,44 @@ export const HouseCtxProvider = props => {
   const { user } = useAuthCtx()
   const [myHouse, setMyHouse] = useState({})
   useEffect(() => {
-    // keep MY HOUSE in sync with firebase
-    const myHouseRef = fdb.ref(
-      `/currentGames/${gameId}/gameStates/${user.uid}/house`
-    )
-    myHouseRef.on("value", snapshot => {
-      setMyHouse(snapshot.val() || {})
-    })
-    return myHouseRef.off
-  }, [fdb, gameId, user.uid])
-  return <HouseCtx.Provider value={{ myHouse, setMyHouse }} {...props} />
+    if (gameId && user && user.uid) {
+      const myHouseRef = fdb.ref(
+        `/currentGames/${gameId}/gameStates/${user.uid}/house`
+      )
+      // keep MY HOUSE in sync with firebase
+      myHouseRef.on("value", snapshot => {
+        setMyHouse(snapshot.val() || {})
+      })
+      return myHouseRef.off
+    }
+  }, [fdb, gameId, user, user.uid])
+  return (
+    <HouseCtx.Provider
+      value={{ myHouse, setMyHouse, gameId, userId: user.uid }}
+      {...props}
+    />
+  )
 }
 export const useHouseCtx = () => {
+  const { fdb } = useFirebase()
+
   const ctx = useContext(HouseCtx)
   if (!ctx)
     throw new Error("useHouseCtx must be a descendant of HouseCtxProvider 😕")
-  const { myHouse, setMyHouse } = ctx
-  const addToRoomLocal = ({ roomId, itemId }) => {
-    setMyHouse(old => {
-      const newRoom = old[roomId] ? [itemId, ...old[roomId]] : [itemId]
-      return { ...old, [roomId]: newRoom }
-    })
+  const { myHouse, setMyHouse, gameId, userId } = ctx
+  const addToRoomFS = ({ roomId, itemId }) => {
+    const myHouseRef = fdb.ref(
+      `/currentGames/${gameId}/gameStates/${userId}/house`
+    )
+    const newRoom = myHouse[roomId] ? [itemId, ...myHouse[roomId]] : [itemId]
+    myHouseRef.update({ [roomId]: newRoom })
+  }
+  const removeFromRoomFS = ({ roomId, itemId }) => {
+    const myHouseRef = fdb.ref(
+      `/currentGames/${gameId}/gameStates/${userId}/house`
+    )
+    const newRoom = myHouse[roomId].filter(_itemId => _itemId !== itemId)
+    myHouseRef.update({ [roomId]: newRoom })
   }
   const removeFromRoomLocal = ({ roomId, itemId }) => {
     setMyHouse(old => ({
@@ -60,8 +77,10 @@ export const useHouseCtx = () => {
   return {
     myHouse,
     setMyHouse,
-    addToRoomLocal,
-    removeFromRoomLocal,
+    // addToRoomLocal,
+    removeFromRoomFS,
+    addToRoomFS,
+    // removeFromRoomLocal,
     reorderRoomLocal
   }
 }

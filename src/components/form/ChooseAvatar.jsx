@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import { Avatar } from "@material-ui/core"
+import { Avatar, Typography } from "@material-ui/core"
 import styled from "styled-components"
 import { Field } from "react-final-form"
 //
@@ -8,11 +8,13 @@ const AvatarDiv = styled.div`
   width: 100%;
   overflow-x: auto;
   display: flex;
+  .chooseAvatar {
+  }
 `
 const ChooseAvatar = () => {
   const getRandoms = (length = 6) =>
     Array.from({ length }, () => Math.round(Math.random() * 100000))
-  const [randomNums, setRandomNums] = useState(getRandoms(30))
+  const [randomNums, setRandomNums] = useState(getRandoms(15))
   return (
     <Field name="avatarNumber">
       {({ input }) => {
@@ -20,16 +22,22 @@ const ChooseAvatar = () => {
           input.onChange(num)
         }
         return (
-          <AvatarDiv>
-            {randomNums.map(num => (
-              <AvatarOption
-                selected={input.value === num}
-                key={num}
-                handleClick={() => handleClick(num)}
-                num={num}
-              />
-            ))}
-          </AvatarDiv>
+          <div>
+            <Typography variant="subtitle1" className="chooseAvatar">
+              Choose an Avatar:
+            </Typography>
+            <AvatarDiv>
+              {randomNums.map(num => (
+                <AvatarOption
+                  selected={input.value === num}
+                  unselected={input.value && input.value !== num}
+                  key={num}
+                  handleClick={() => handleClick(num)}
+                  num={num}
+                />
+              ))}
+            </AvatarDiv>
+          </div>
         )
       }}
     </Field>
@@ -39,17 +47,12 @@ const ChooseAvatar = () => {
 export default ChooseAvatar
 
 const SelectedWrapper = styled.div`
-  ${p =>
-    p.selected
-      ? `
-  border: 1px solid blue;
+  border: ${p => (p.selected ? "1px solid blue" : "none")};
+  opacity: ${p => (p.unselected ? 0.4 : 1)};
 `
-      : ``}
-`
-const AvatarOption = ({ num, handleClick, selected }) => (
-  <SelectedWrapper selected={selected}>
+const AvatarOption = ({ num, handleClick, selected, unselected }) => (
+  <SelectedWrapper selected={selected} unselected={unselected}>
     <Avatar
-      selected={selected}
       onClick={handleClick}
       style={{ marginRight: "4px" }}
       className="avatar"

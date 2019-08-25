@@ -4,6 +4,8 @@ import { Form, Field } from "react-final-form"
 import { Grid, Typography, Button, TextField } from "@material-ui/core"
 import { FaUser } from "react-icons/fa"
 //
+import ChooseAvatar from "./ChooseAvatar.jsx"
+import AvatarMonster from "../AvatarMonster.jsx"
 import { useFirebase } from "../../contexts/FirebaseCtx"
 import ShowMe from "../../utils/ShowMe.jsx"
 import FormTextInput from "./FormTextInput.jsx"
@@ -13,36 +15,43 @@ import { useAuthCtx } from "../../contexts/AuthCtx"
 //
 const StyledForm = styled.form`
   .center {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 `
 const SignUpForm = () => {
   const { doCreateUserWithEmailAndPassword, firestore } = useFirebase()
   const { handleCloseForm } = useDialogCtx()
   const { user } = useAuthCtx()
-  firestore
-    .collection("publicProfiles")
-    .doc(user.uid)
-    .set({})
-  function formSubmit(values) {
+  async function formSubmit(values) {
     console.log("values", values)
-    const { email, password } = values
-    return doCreateUserWithEmailAndPassword(email.trim(), password.trim())
-      .then(authUser => {
-        handleCloseForm()
-        console.log("authUser", authUser)
+    const { email, password, displayName, avatarNumber } = values
+    const authUser = await doCreateUserWithEmailAndPassword(
+      email.trim(),
+      password.trim()
+    )
+
+    console.log("authUser", authUser)
+
+    firestore
+      .collection("publicProfiles")
+      .doc(authUser.user.uid)
+      .set({
+        email: email.trim(),
+        displayName: displayName.trim(),
+        avatarNumber
       })
-      .catch(err => {
-        console.log("signup error", err)
-        return err
-      })
+    handleCloseForm()
   }
   function validate(values) {
-    const { password, passwordConf, email } = values
+    const { password, passwordConf, email, avatarNumber } = values
     const errors = {}
     if (!email) errors.email = "Email Required"
     if (!password) errors.password = "Password Required"
     if (!passwordConf) errors.passwordConf = "Password Confirmation Required"
+    if (!avatarNumber) errors.avatarNumber = "Choose a monster!"
     if (password && passwordConf && password !== passwordConf)
       errors.passwordConf = "Passwords must match!"
     return errors
@@ -55,25 +64,33 @@ const SignUpForm = () => {
           <StyledForm onSubmit={handleSubmit}>
             <Grid container spacing={2}>
               <Grid item xs={12} className="center">
-                <FaUser />
-                <Typography variant="subtitle1">SIGN UP</Typography>
+                <AvatarMonster num={values.avatarNumber} />
+                <Typography variant="subtitle1">
+                  {values.displayName || "SIGN UP"}
+                </Typography>
               </Grid>
               <Grid item xs={12}>
                 <FormTextInput name="email" label="Email" type="email" />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <FormTextInput
                   name="password"
                   label="Password"
                   type="password"
                 />
               </Grid>
-              <Grid item xs={12}>
+              <Grid item xs={12} sm={6}>
                 <FormTextInput
                   name="passwordConf"
                   label="Password Confirmation"
                   type="password"
                 />
+              </Grid>
+              <Grid item xs={12}>
+                <FormTextInput name="displayName" label="Display Name" />
+              </Grid>
+              <Grid item xs={12}>
+                <ChooseAvatar />
               </Grid>
               {submitErrors && (
                 <Grid item xs={12}>

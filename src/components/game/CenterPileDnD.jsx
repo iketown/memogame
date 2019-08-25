@@ -56,7 +56,7 @@ const CenterPileDnD = () => {
   const { storageToCenterLocal, houseToCenterLocal } = useGamePlayCtx()
   const { removeFromStorageLocal } = useStoragePileCtx()
   const { centerPile, addToCenterLocal } = useCenterPileCtx()
-  const { removeFromRoomLocal } = useHouseCtx()
+  const { removeFromRoomFS } = useHouseCtx()
   const { setExpandedRoom } = useHouseGridCtx()
   const {
     gamePlay,
@@ -78,7 +78,7 @@ const CenterPileDnD = () => {
         // )
       } else {
         setPlayDropCardSound(true)
-        removeFromRoomLocal({ roomId, itemId })
+        removeFromRoomFS({ roomId, itemId })
         addToCenterLocal({ itemId })
         houseToCenter({ itemId, gameId, roomId })
         setExpandedRoom({ roomId: false })

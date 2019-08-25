@@ -35,39 +35,6 @@ export const FirestoreProvider = props => {
     })
   }
 
-  const getGame = async gameId => {
-    const gameRef = firestore.doc(`games/${gameId}`)
-    const gameInfo = await gameRef
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          return doc.data()
-        } else {
-          console.log("no such doc.")
-        }
-      })
-      .catch(err => {
-        console.log("error!", err)
-      })
-    return { gameRef, gameInfo }
-  }
-
-  // const requestJoinGame = async gameId => {
-  //   console.log(`requesting ${user.email} to join game ${gameId}`)
-  //   const { gameRef, gameInfo } = await getGame(gameId)
-  //   if (!gameInfo.inProgress) {
-  //     gameRef.update({
-  //       memberRequests: firebase.firestore.FieldValue.arrayUnion({
-  //         uid: user.uid,
-  //         displayName
-  //       })
-  //     })
-  //   } else {
-  //     // handle this error in ui.  toaster?
-  //     console.log("cant join this list")
-  //   }
-  // }
-
   return <FirestoreCtx.Provider value={{ firestore, createGame }} {...props} />
 }
 
