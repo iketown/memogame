@@ -15,6 +15,7 @@ import {
 } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import { useGamePlayCtx } from "../../contexts/GamePlayCtx"
+import { useGameFxns } from "../../hooks/useGameFxns"
 //
 //
 
@@ -33,14 +34,9 @@ const ColoredOverlay = styled.div`
   opacity: ${p => (p.show ? 0.3 : 0)};
 `
 const HouseDropSection = ({ roomId, display }) => {
-  const { houseState, houseDispatch, setExpandedRoom } = useHouseGridCtx()
-  const { myHouse, addToRoomFS } = useHouseCtx()
-  const { removeFromStorageLocal } = useStoragePileCtx()
-  const { gamePlay, gameState } = useGameCtx()
-  const { addLogMessage } = useLogCtx()
-  const { user } = useAuthCtx()
-  const gameId = gameState && gameState.gameId
-  const { storageToHouse, playStorageToHouse, endTurn } = useFirebase()
+  const { setExpandedRoom } = useHouseGridCtx()
+  const { myHouse } = useHouseCtx()
+  const { storageToHouseFX } = useGameFxns()
   const cardsThisRoom = myHouse[roomId] || []
 
   const [{ isOver, canDrop }, dropRef] = useDrop({
@@ -48,21 +44,9 @@ const HouseDropSection = ({ roomId, display }) => {
     canDrop: () => cardsThisRoom.length < maxItemsPerRoom,
     drop: async (item, mon) => {
       console.log(`item dropped in ${roomId}`, item)
-      const { fromStorage, itemId } = item
-      if (fromStorage) {
-        // they're all from storage right now ?
-        removeFromStorageLocal(itemId)
-        addToRoomFS({ itemId, roomId })
-        setExpandedRoom({ roomId, faceUp: true })
-        endTurn({ gameId })
-        // const response = await playStorageToHouse({
-        //   itemId,
-        //   gameId,
-        //   roomId
-        // }).catch(err => console.log("error from storageToHouse", err))
-        // console.log("response from storageToHouse", response)
-        addLogMessage({ itemId, destination: "house" })
-      }
+      const { itemId } = item
+      storageToHouseFX({ itemId, roomId })
+      setExpandedRoom({ roomId, faceUp: true })
     },
     collect: mon => ({
       isOver: !!mon.isOver(),

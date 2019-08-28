@@ -3,7 +3,6 @@ import styled from "styled-components"
 import { Grid, Typography } from "@material-ui/core"
 //
 import { QuantityCircle } from "../game/CenterPileDnD.jsx"
-import { useItemCtx } from "../../contexts/ItemContext.js"
 import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
 import ShowMe from "../../utils/ShowMe.jsx"
 import { Button, Card, useMediaQuery } from "@material-ui/core"
@@ -12,6 +11,7 @@ import woodtable from "../../images/woodtable.jpg"
 import { useWidth, useWiderThan } from "../../hooks/useWidth.js"
 import { useGameCtx, useStoragePileCtx } from "../../contexts/GameCtx.js"
 import { useAuthCtx } from "../../contexts/AuthCtx.js"
+import { useAllItemsCtx } from "../../contexts/AllItemsCtx.js"
 //
 //
 const StyledGrid = styled(Grid)`
@@ -53,7 +53,7 @@ const TableImage = styled.div`
 `
 
 const StoragePile = () => {
-  const { allItems } = useItemCtx()
+  const { allItems } = useAllItemsCtx()
   const { gamePlay } = useGameCtx()
   const { storagePile = [] } = useStoragePileCtx()
   const { user } = useAuthCtx()

@@ -20,7 +20,7 @@ import { useFirebase } from "../contexts/FirebaseCtx"
 import { useGameCtx } from "../contexts/GameCtx"
 import ShowMe from "../utils/ShowMe"
 import { useAuthCtx } from "../contexts/AuthCtx"
-import { useItemCtx } from "../contexts/ItemContext"
+import { useAllItemsCtx } from "../contexts/AllItemsCtx"
 
 // const ChatBox = () => {
 //   const { chat, addChatMessage } = useChatCtx()
@@ -111,7 +111,7 @@ const StyledListItem = styled(ListItem)`
 `
 
 const LogListItem = ({ msg, handleTrash, nextEntry }) => {
-  const { itemFromItemId } = useItemCtx()
+  const { itemFromItemId } = useAllItemsCtx()
   const {
     gameState: { members }
   } = useGameCtx()

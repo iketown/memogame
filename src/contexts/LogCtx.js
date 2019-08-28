@@ -2,9 +2,9 @@ import React, { createContext, useContext, useState, useEffect } from "react"
 import { useFirebase } from "./FirebaseCtx"
 import { useAuthCtx } from "./AuthCtx"
 import { useGameCtx, useCenterPileCtx } from "./GameCtx"
-import { useItemCtx } from "./ItemContext"
 import { removeUid } from "../utils/imageUtils"
 import { doItemsMatch } from "../utils/gameLogic"
+import { useAllItemsCtx } from "./AllItemsCtx"
 const LogCtx = createContext()
 
 export const LogCtxProvider = props => {
@@ -26,7 +26,7 @@ export const LogCtxProvider = props => {
 export const useLogCtx = () => {
   const ctx = useContext(LogCtx)
   const { user } = useAuthCtx()
-  const { allItems } = useItemCtx()
+  const { allItems } = useAllItemsCtx()
   const { centerPile } = useCenterPileCtx()
   const {
     gameState: { members, gameId }

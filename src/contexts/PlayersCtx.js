@@ -11,7 +11,7 @@ export const PlayersCtxProvider = props => {
   const playersRef = firestore.collection("publicProfiles")
   playersRef.onSnapshot(querySnapshot => {
     querySnapshot.forEach(doc => {
-      console.log("doc data", doc.data())
+      // console.log("doc data", doc.data())
     })
   })
   return <PlayersCtx.Provider value={{ playerData }} {...props} />

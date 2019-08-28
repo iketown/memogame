@@ -25,6 +25,7 @@ import GamePage from "./pages/Game.page.jsx"
 import GameStart from "./pages/GameStart.page"
 import HouseGrid from "./components/house/HouseGrid.jsx"
 import { LogCtxProvider } from "./contexts/LogCtx"
+import { AllItemsCtxProvider } from "./contexts/AllItemsCtx"
 //
 //
 
@@ -36,26 +37,28 @@ const App = () => {
         <FirebaseCtxProvider>
           <AuthCtxProvider>
             <FirestoreProvider>
-              <AttrCtxProvider>
-                <ItemCtxProvider>
-                  <LogCtxProvider>
-                    <DialogCtxProvider>
-                      <DialogContainer />
-                      <NavBar />
-                      <Container>
-                        <Route path="/game/:gameId" component={GamePage} />
-                        {/* <Route path="/attributes" component={AttributeForm} />
+              <AllItemsCtxProvider>
+                {/* <AttrCtxProvider> */}
+                {/* <ItemCtxProvider> */}
+                <LogCtxProvider>
+                  <DialogCtxProvider>
+                    <DialogContainer />
+                    <NavBar />
+                    <Container>
+                      <Route path="/game/:gameId" component={GamePage} />
+                      {/* <Route path="/attributes" component={AttributeForm} />
                         <Route path="/items" component={ItemPage} /> */}
-                        <Route path="/allCards" component={Cards} />
-                        <Route path="/allgames" component={AllGames} />
-                        <Route path="/gamestart" component={GameStart} />
-                        {/* <Route path="/playresponse" component={PlayResponse} />
+                      <Route path="/allCards" component={Cards} />
+                      <Route path="/allgames" component={AllGames} />
+                      <Route path="/gamestart" component={GameStart} />
+                      {/* <Route path="/playresponse" component={PlayResponse} />
                         <Route path="/housegrid" component={HouseGrid} /> */}
-                      </Container>
-                    </DialogCtxProvider>
-                  </LogCtxProvider>
-                </ItemCtxProvider>
-              </AttrCtxProvider>
+                    </Container>
+                  </DialogCtxProvider>
+                </LogCtxProvider>
+                {/* </ItemCtxProvider> */}
+                {/* </AttrCtxProvider> */}
+              </AllItemsCtxProvider>
             </FirestoreProvider>
           </AuthCtxProvider>
         </FirebaseCtxProvider>

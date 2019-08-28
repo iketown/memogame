@@ -1,7 +1,10 @@
 import React from "react"
 import Sound from "react-sound"
 import dropCardContinue from "./dropCardContinue.mp3"
+import buzzWrong from "./buzz-wrong.mp3"
 
+//
+//
 const DropCardSound = ({ playDropCardSound, setPlayDropCardSound }) => {
   return (
     <Sound

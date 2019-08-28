@@ -13,12 +13,12 @@ import {
 //
 import { removeUid } from "../../utils/imageUtils"
 import ItemCard from "../ItemCard.jsx"
-import { useItemCtx } from "../../contexts/ItemContext.js"
 import { FaThumbsUp, FaThumbsDown } from "react-icons/fa"
 import { useGameLogic } from "../../utils/gameLogic.js"
 import { doItemsMatch } from "../../utils/gameLogic"
 import ShowMe from "../../utils/ShowMe.jsx"
 import { useGamePlayCtx } from "../../contexts/GamePlayCtx.js"
+import { useAllItemsCtx } from "../../contexts/AllItemsCtx"
 //
 //
 const TwoCardsDiv = styled.div`
@@ -38,7 +38,7 @@ const fakeMatch3 = "ORE_FRU_O_item_w1bGJEB9-"
 const nonMatch = "RED_VEG_B_item_9ug9GMsaNR"
 
 const PlayResponse = ({ _itemId1 = fakeItem1, _itemId2 = fakeMatch2 }) => {
-  const { allItems } = useItemCtx()
+  const { allItems } = useAllItemsCtx()
   const [open, setOpen] = useState(true)
   const { state, dispatch } = useGamePlayCtx()
   const vertical = "top"

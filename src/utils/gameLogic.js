@@ -1,22 +1,3 @@
-import { useItemCtx } from "../contexts/ItemContext"
-
-export const useGameLogic = () => {
-  const { allItems } = useItemCtx()
-  const doTheyMatch = (itemId1, itemId2) => {
-    if (!itemId1 || !itemId2) throw new Error("missing item", itemId1, itemId2)
-    let match = false
-    Object.entries(allItems[itemId1]).forEach(([attrId, optId]) => {
-      if (allItems[itemId2][attrId] === optId) {
-        match = true
-      }
-    })
-    console.log("doTheyMatch ?", match)
-    return match
-  }
-
-  return { doTheyMatch }
-}
-
 export function shuffle(array) {
   for (let i = array.length - 1; i > 0; i--) {
     let j = Math.floor(Math.random() * (i + 1)) // random index from 0 to i
@@ -35,8 +16,10 @@ export const doItemsMatch = (itemId1, itemId2) => {
   if (color1 === color2) matches.color = color1
   if (type1 === type2) matches.type = type1
   if (let1 === let2) matches.firstLetter = let1
-  if (!!Object.values(matches).find(val => val)) return matches // if any are true
+  if (!!Object.values(matches).find(val => val)) return matches
+  // if it is a match this will return an object showing the matches.
   return false
+  // if it is NOT a match this will return false
 }
 
 export const maxItemsPerRoom = 3

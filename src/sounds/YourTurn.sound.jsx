@@ -17,7 +17,7 @@ const YourTurnSound = () => {
   const whosTurn = useRef(false)
 
   const [soundToPlay, setSoundToPlay] = useState(false)
-
+  useEffect(() => {}, [])
   useEffect(() => {
     if (gamePlay && !!gamePlay.whosTurnItIs) {
       const newWhosTurn = gamePlay.whosTurnItIs.uid

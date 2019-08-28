@@ -5,7 +5,6 @@ import React, {
   useEffect,
   useReducer
 } from "react"
-import { useItemCtx } from "../contexts/ItemContext"
 import { useGameLogic, shuffle } from "../utils/gameLogic"
 const GameCtx = createContext()
 
@@ -229,7 +228,6 @@ const reducer = (state, action) => {
 }
 
 export const GameCtxProvider = props => {
-  const { allItems } = useItemCtx()
   const { doTheyMatch } = useGameLogic()
   // const [itemStack, setItemStack] = useState([])
   const [unplayedItems, setUnplayedItems] = useState()

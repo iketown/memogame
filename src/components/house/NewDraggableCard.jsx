@@ -7,8 +7,8 @@ import { useDrag, DragPreviewImage } from "react-dnd"
 import { ItemTypes } from "../../dnd/itemTypes"
 import { useGameCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
-import { useItemCtx } from "../../contexts/ItemContext"
 import { removeUid } from "../../utils/imageUtils"
+import { useAllItemsCtx } from "../../contexts/AllItemsCtx"
 //
 //
 const NewDraggableCard = ({ itemId, scale, index }) => {
@@ -61,16 +61,16 @@ const StyledCard = styled(Card)`
   background-size: cover;
   z-index: ${p => 200 - p.index};
   position: absolute;
-  ${p => p.cardBorder}
+  border: 5px solid white;
 `
 const BackgroundCard = styled(StyledCard)`
   top: ${p => p.index * offsetMultiplier}px;
   transform: scale(${p => 1 - p.index * 0.02}) rotate(${p => p.rotation}deg);
-  ${p => p.cardBorder}
+  border: 5px solid white;
 `
 
 export const WindowCard = ({ index, itemId, scale = 1, dragMe }) => {
-  const { allItems, cardBorder } = useItemCtx()
+  const { allItems } = useAllItemsCtx()
   const mdUp = useWiderThan("md")
   const { imagesvg, rotation } = useMemo(() => {
     const imagesvg = index < 5 && itemId ? allItems[removeUid(itemId)].card : ""
@@ -81,7 +81,6 @@ export const WindowCard = ({ index, itemId, scale = 1, dragMe }) => {
   const windowHeight = mdUp ? 90 : 65
   const cardProps = {
     heightwidth: `${windowHeight * scale}px`,
-    cardBorder,
     index,
     imagesvg,
     rotation,

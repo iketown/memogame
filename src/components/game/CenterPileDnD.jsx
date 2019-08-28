@@ -19,6 +19,7 @@ import { useGamePlayCtx } from "../../contexts/GamePlayCtx"
 import { useLogCtx } from "../../contexts/LogCtx"
 import { doItemsMatch } from "../../utils/gameLogic"
 import DropCardSound from "../../sounds/DropCard.sound"
+import { useGameFxns } from "../../hooks/useGameFxns"
 //
 //
 
@@ -57,12 +58,19 @@ const CenterPileDnD = () => {
   const { removeFromStorageLocal } = useStoragePileCtx()
   const { centerPile, addToCenterLocal } = useCenterPileCtx()
   const { removeFromRoomFS } = useHouseCtx()
+  const { removeFromRoomFX, storageToCenterFX, houseToCenterFX } = useGameFxns()
   const { setExpandedRoom } = useHouseGridCtx()
   const {
     gamePlay,
     gameState: { gameId }
   } = useGameCtx()
   const [playDropCardSound, setPlayDropCardSound] = useState(false)
+  const rightAnswerSound = () => {
+    setPlayDropCardSound("right")
+  }
+  const wrongAnswerSound = () => {
+    setPlayDropCardSound("wrong")
+  }
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     canDrop: () => true,
@@ -70,17 +78,10 @@ const CenterPileDnD = () => {
       console.log("item dropped in center", item)
       const { fromStorage, itemId, roomId } = item
       if (fromStorage) {
-        removeFromStorageLocal(itemId)
-        addToCenterLocal({ itemId })
-        playStorageToCenter({ gameId, itemId })
-        // storageToCenter({ itemId, gameId }).then(res =>
-        //   console.log("storageToCenter response")
-        // )
+        storageToCenterFX({ itemId })
       } else {
         setPlayDropCardSound(true)
-        removeFromRoomFS({ roomId, itemId })
-        addToCenterLocal({ itemId })
-        houseToCenter({ itemId, gameId, roomId })
+        houseToCenterFX({ roomId, itemId })
         setExpandedRoom({ roomId: false })
       }
       addLogMessage({ itemId, destination: "center" })

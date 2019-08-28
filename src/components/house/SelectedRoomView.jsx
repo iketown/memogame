@@ -25,8 +25,9 @@ import { useWiderThan } from "../../hooks/useWidth"
 import { useGameCtx, useHouseCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import { useFirebase } from "../../contexts/FirebaseCtx"
-import { useItemCtx } from "../../contexts/ItemContext"
 import { removeUid } from "../../utils/imageUtils"
+import { useGameFxns } from "../../hooks/useGameFxns"
+import { useAllItemsCtx } from "../../contexts/AllItemsCtx"
 //
 
 const roomImages = {
@@ -115,8 +116,8 @@ const MakeDraggable = ({ draggableId, index, children }) => {
 
 const SelectedRoomView = () => {
   const { expandedRoom, setExpandedRoom } = useHouseGridCtx()
-  const { houseToHouse } = useFirebase()
-  const { myHouse, reorderRoomLocal } = useHouseCtx()
+  const { myHouse } = useHouseCtx()
+  const { reorderRoomFX } = useGameFxns()
   const {
     gameState: { gameId }
   } = useGameCtx()
@@ -131,18 +132,7 @@ const SelectedRoomView = () => {
     const { index: sourceIndex } = source
     const { index: destIndex } = destination
     if (sourceIndex === destIndex) return null
-    reorderRoomLocal({ itemId, roomId, sourceIndex, destIndex })
-    const objForFirebase = {
-      gameId,
-      itemId,
-      roomId,
-      sourceIndex,
-      destIndex
-    }
-    console.log("objForFirebase", objForFirebase)
-    const houseToHouseResponse = await houseToHouse(objForFirebase)
-    console.log("houseToHouseResponse", houseToHouseResponse)
-    // { itemId, roomId, fromIndex, toIndex }
+    reorderRoomFX({ itemId, roomId, sourceIndex, destIndex })
   }
   return (
     <DragDropContext onDragEnd={onDragEnd}>
@@ -215,21 +205,15 @@ const StyledSorterCard = styled(Card)`
   height: ${p => p.width}rem;
   background-image: url(${p => p.image});
   background-size: cover;
-  ${p => p.cardBorder}
+  border: 5px solid white;
   padding: 5px;
   margin: 8px;
 `
 const SorterCard = ({ itemId, faceUp }) => {
-  const { allItems, cardBorder } = useItemCtx()
+  const { allItems } = useAllItemsCtx()
   const image = faceUp ? allItems[removeUid(itemId)].card : brain
   const mdUp = useWiderThan("md")
-  return (
-    <StyledSorterCard
-      cardBorder={cardBorder}
-      width={mdUp ? 6.5 : 4.5}
-      image={image}
-    />
-  )
+  return <StyledSorterCard width={mdUp ? 6.5 : 4.5} image={image} />
 }
 
 const DnDCard = ({ faceUp, itemId, roomId }) => {

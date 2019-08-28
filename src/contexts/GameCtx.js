@@ -3,8 +3,8 @@ import firebase from "firebase/app"
 import { useFirestore } from "./FirestoreCtx"
 import { useAuthCtx } from "./AuthCtx"
 import { useFirebase } from "./FirebaseCtx"
-import { useItemCtx } from "./ItemContext"
 import { shuffle, doItemsMatch } from "../utils/gameLogic"
+import { useAllItemsCtx } from "./AllItemsCtx"
 
 const GameCtx = createContext()
 
@@ -187,7 +187,7 @@ export const useStoragePileCtx = () => {
 export const GameCtxProvider = props => {
   const { firestore } = useFirestore()
   const { fdb } = useFirebase()
-  const { allItems } = useItemCtx()
+  const { allItems } = useAllItemsCtx()
   const { user } = useAuthCtx()
   const [gameState, setGameState] = useState({})
   const [gamePlay, setGamePlay] = useState({})
@@ -220,9 +220,6 @@ export const GameCtxProvider = props => {
   function createRTDBGame() {
     const gamePlayRef = fdb.ref(`/currentGames/${gameId}`)
     const { gameName, startedBy, members } = gameState
-    const allItemKeys = Object.keys(allItems)
-    const randomItem =
-      allItemKeys[Math.floor(allItemKeys.length * Math.random())]
 
     const gameStates = members.reduce((obj, member) => {
       const storagePile = randomListOfItemIds(member.uid)
@@ -362,6 +359,7 @@ export const useGameCtx = () => {
     gameState,
     setGamePlay,
     gamePlay,
+    gameId,
     requestJoinGame,
     removeRequest,
     handleGameRequest,
