@@ -2,13 +2,13 @@ import React, { useState } from "react"
 import { Form, Field } from "react-final-form"
 import { Grid, TextField, Typography, Button } from "@material-ui/core"
 //
-import { useFirestore } from "../contexts/FirestoreCtx"
+import { useFirebase } from "../contexts/FirebaseCtx"
 
 //
 //
 const GameStart = ({ history }) => {
   const [gameName, setGameName] = useState("")
-  const { createGame } = useFirestore()
+  const { createGame } = useFirebase()
   const handleCreateGame = () => {
     createGame({ gameName })
       .then(({ id }) => {

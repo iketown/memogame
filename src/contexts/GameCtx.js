@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
 import firebase from "firebase/app"
-import { useFirestore } from "./FirestoreCtx"
 import { useAuthCtx } from "./AuthCtx"
 import { useFirebase } from "./FirebaseCtx"
 import { shuffle, doItemsMatch } from "../utils/gameLogic"
@@ -185,7 +184,7 @@ export const useStoragePileCtx = () => {
 // ⭐ 🌟 end STORAGE PILE CONTEXT 🌟 ⭐ //
 
 export const GameCtxProvider = props => {
-  const { firestore } = useFirestore()
+  const { firestore } = useFirebase()
   const { fdb } = useFirebase()
   const { allItems } = useAllItemsCtx()
   const { user } = useAuthCtx()
@@ -264,18 +263,12 @@ export const useGameCtx = () => {
   const ctx = useContext(GameCtx)
   const { user } = useAuthCtx()
   const displayName = (user && user.displayName) || (user && user.email)
-
+  const { firestore } = useFirebase()
   if (!ctx)
     throw new Error("useGameCtx must be a descendant of GameCtxProvider 😕")
-  const {
-    gameState,
-    setGamePlay,
-    firestore,
-    gameId,
-    gamePlay,
-    createRTDBGame
-  } = ctx
+  const { gameState, setGamePlay, gameId, gamePlay, createRTDBGame } = ctx
   //
+
   const _getGameFirestore = async () => {
     const gameRef = firestore.doc(`games/${gameId}`)
     const gameInfo = await gameRef

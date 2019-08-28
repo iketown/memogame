@@ -62,11 +62,6 @@ const NavBar = props => {
         <Typography variant="h6" style={{ flexGrow: 1 }}>
           MEMOGA.ME
         </Typography>
-        {/* <ButtonLink to="/attributes">Attributes</ButtonLink> */}
-        {/* <ButtonLink to="/items">Items</ButtonLink> */}
-        {/* <ButtonLink to="/allcards">Cards</ButtonLink> */}
-        {/* <ButtonLink to="/playresponse">PlayResponse</ButtonLink> */}
-        {/* <ButtonLink to="/housegrid">House Grid</ButtonLink> */}
 
         {!!user && signedInMenuItems}
         {!user && signedOutMenuItems}

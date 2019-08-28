@@ -1,23 +1,15 @@
 import React from "react"
 import { Grid, Typography } from "@material-ui/core"
 //
-import {
-  useGameCtx,
-  useCenterPileCtx,
-  useHouseCtx,
-  useStoragePileCtx
-} from "../../contexts/GameCtx"
+import { useGameCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import YoureNotInThisGameYet from "./gameAdmin/YoureNotInThisGameYet.jsx"
-import ShowMe from "../../utils/ShowMe.jsx"
 import HouseGrid from "../house/HouseGrid.jsx"
 import GameStarter from "./gameAdmin/GameStarter.jsx"
-import PlayResponse from "./PlayResponse"
-import ShowGameStates from "../ShowGameStates"
 //
 //
 const GameContent = ({ gameId }) => {
-  const { gameState, gamePlay } = useGameCtx()
+  const { gameState } = useGameCtx()
 
   const { user } = useAuthCtx()
   const members = gameState && gameState.members

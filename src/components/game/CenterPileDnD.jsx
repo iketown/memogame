@@ -13,11 +13,9 @@ import {
 } from "../../contexts/GameCtx"
 import { Typography } from "@material-ui/core"
 import { useFirebase } from "../../contexts/FirebaseCtx"
-import { WindowCard } from "../house/NewDraggableCard.jsx"
+import { WindowCard } from "../house/DraggableCard"
 import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
-import { useGamePlayCtx } from "../../contexts/GamePlayCtx"
 import { useLogCtx } from "../../contexts/LogCtx"
-import { doItemsMatch } from "../../utils/gameLogic"
 import DropCardSound from "../../sounds/DropCard.sound"
 import { useGameFxns } from "../../hooks/useGameFxns"
 //
@@ -54,7 +52,6 @@ const CenterPileDnD = () => {
   const mdUp = useWiderThan("md")
   const { storageToCenter, houseToCenter, playStorageToCenter } = useFirebase()
   const { addLogMessage } = useLogCtx()
-  const { storageToCenterLocal, houseToCenterLocal } = useGamePlayCtx()
   const { removeFromStorageLocal } = useStoragePileCtx()
   const { centerPile, addToCenterLocal } = useCenterPileCtx()
   const { removeFromRoomFS } = useHouseCtx()

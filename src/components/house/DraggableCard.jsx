@@ -11,7 +11,7 @@ import { removeUid } from "../../utils/imageUtils"
 import { useAllItemsCtx } from "../../contexts/AllItemsCtx"
 //
 //
-const NewDraggableCard = ({ itemId, scale, index }) => {
+const DraggableCard = ({ itemId, scale, index }) => {
   const { gamePlay } = useGameCtx()
   const { user } = useAuthCtx()
   const isMyTurn =
@@ -48,7 +48,7 @@ const NewDraggableCard = ({ itemId, scale, index }) => {
   )
 }
 
-export default NewDraggableCard
+export default DraggableCard
 
 const offsetMultiplier = 2
 const StyledCard = styled(Card)`

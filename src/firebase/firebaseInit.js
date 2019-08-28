@@ -31,14 +31,8 @@ class Firebase {
     }
     this.auth = firebase.auth()
     this.fxns = firebase.functions()
-    // this.playCard = app.functions().httpsCallable("playCard")
     this.endTurn = firebase.functions().httpsCallable("endTurn")
-    // this.changeHouse = app.functions().httpsCallable("changeHouse")
-    // this.storageToCenter = app.functions().httpsCallable("storageToCenter")
-    // this.storageToHouse = app.functions().httpsCallable("storageToHouse")
     this.houseToCenter = firebase.functions().httpsCallable("houseToCenter")
-    // this.houseToHouse = app.functions().httpsCallable("houseToHouse")
-    // this.fsdb = app.firestore()
     this.app = firebase
     this.fdb = firebase.database()
     this.firestore = firebase.firestore()

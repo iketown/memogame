@@ -70,9 +70,6 @@ const LogBox = () => {
     return gameLogRef.off
   }, [fdb, gameId])
 
-  const handleAddToLog = () => {
-    doAddToLog({ gameId, text, uid: user.uid })
-  }
   const handleTrash = logId => {
     doRemoveLog({ gameId, logId })
   }

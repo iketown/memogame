@@ -1,14 +1,10 @@
-import React, { useState, useMemo } from "react"
+import React, { useMemo } from "react"
 import styled from "styled-components"
 import { Card } from "@material-ui/core"
 //
 import brain from "../../images/newCards/brain.svg"
-import { useWidth, useWiderThan } from "../../hooks/useWidth"
-import { houseDimensions } from "./HouseGrid"
+import { useWiderThan } from "../../hooks/useWidth"
 import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
-import ShowMe from "../../utils/ShowMe"
-import { useGameCtx } from "../../contexts/GameCtx"
-import { useAuthCtx } from "../../contexts/AuthCtx"
 //
 //
 
@@ -49,8 +45,7 @@ const HouseWindow = ({
   enlarge,
   cardsThisRoom
 }) => {
-  const { houseState, expandedRoom, setExpandedRoom } = useHouseGridCtx()
-  const { house } = houseState
+  const { expandedRoom, setExpandedRoom } = useHouseGridCtx()
   const rotations = useMemo(() => {
     return Array.from({ length: 3 }, _ => (Math.random() - 0.5) * 14)
   }, [])

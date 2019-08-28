@@ -6,7 +6,7 @@ import { QuantityCircle } from "../game/CenterPileDnD.jsx"
 import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
 import ShowMe from "../../utils/ShowMe.jsx"
 import { Button, Card, useMediaQuery } from "@material-ui/core"
-import NewDraggableCard, { WindowCard } from "./NewDraggableCard.jsx"
+import DraggableCard, { WindowCard } from "./DraggableCard"
 import woodtable from "../../images/woodtable.jpg"
 import { useWidth, useWiderThan } from "../../hooks/useWidth.js"
 import { useGameCtx, useStoragePileCtx } from "../../contexts/GameCtx.js"
@@ -74,7 +74,7 @@ const StoragePile = () => {
         <StorageTable width={mdUp ? 11 : 9}>
           {!!storagePile && (
             <>
-              <NewDraggableCard scale={1.5} itemId={storagePile[0]} index={1} />
+              <DraggableCard scale={1.5} itemId={storagePile[0]} index={1} />
               {storagePile.slice(1).map((itemId, index) => (
                 <WindowCard
                   scale={1.5}

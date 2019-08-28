@@ -16,7 +16,7 @@ import ShowMe from "../../utils/ShowMe"
 import FormTextInput from "./FormTextInput"
 import ChooseAvatar from "./ChooseAvatar"
 import AvatarMonster from "../AvatarMonster"
-import { useFirestore } from "../../contexts/FirestoreCtx"
+import { useFirebase } from "../../contexts/FirebaseCtx"
 
 //
 //
@@ -28,7 +28,7 @@ const StyledHeader = styled.header`
 `
 const EditProfile = () => {
   const { user, publicProfile } = useAuthCtx()
-  const { firestore } = useFirestore()
+  const { firestore } = useFirebase()
   if (!user) return null
 
   const handleSubmit = async values => {

@@ -4,7 +4,6 @@ import { Grid, Avatar, Typography } from "@material-ui/core"
 //
 import CenterPileDnD from "./CenterPileDnD.jsx"
 import { useGameCtx } from "../../contexts/GameCtx.js"
-import ShowMe from "../../utils/ShowMe.jsx"
 import { useAuthCtx } from "../../contexts/AuthCtx.js"
 //
 //
@@ -18,7 +17,6 @@ const StyledBox = styled(Grid)`
 `
 const OtherPlayersView = () => {
   const { gamePlay } = useGameCtx()
-  const { user } = useAuthCtx()
   const gameStates = gamePlay && gamePlay.gameStates
 
   return (
@@ -114,7 +112,6 @@ const PlayerDisplay = ({ playerId, playerState }) => {
           </Typography>
         </div>
       </StyledDisplay>
-      {/* <ShowMe obj={playerState} name="playerState" /> */}
     </>
   )
 }
