@@ -10,10 +10,13 @@ import { FirebaseCtxProvider } from "./contexts/FirebaseCtx"
 import { AuthCtxProvider } from "./contexts/AuthCtx"
 import DialogContainer from "./contexts/DialogContainer.jsx"
 import AllGames from "./components/game/AllGames"
+import MyGames from "./pages/MyGames.page.jsx"
 import GamePage from "./pages/Game.page.jsx"
 import GameStart from "./pages/GameStart.page"
 import { LogCtxProvider } from "./contexts/LogCtx"
 import { AllItemsCtxProvider } from "./contexts/AllItemsCtx"
+import { SnackbarProvider } from "notistack"
+
 //
 //
 
@@ -22,23 +25,26 @@ const App = () => {
   return (
     <Router>
       <ThemeProvider theme={theme}>
-        <FirebaseCtxProvider>
-          <AuthCtxProvider>
-            <AllItemsCtxProvider>
-              <LogCtxProvider>
-                <DialogCtxProvider>
-                  <DialogContainer />
-                  <NavBar />
-                  <Container>
-                    <Route path="/game/:gameId" component={GamePage} />
-                    <Route path="/allgames" component={AllGames} />
-                    <Route path="/gamestart" component={GameStart} />
-                  </Container>
-                </DialogCtxProvider>
-              </LogCtxProvider>
-            </AllItemsCtxProvider>
-          </AuthCtxProvider>
-        </FirebaseCtxProvider>
+        <SnackbarProvider dense preventDuplicate>
+          <FirebaseCtxProvider>
+            <AuthCtxProvider>
+              <AllItemsCtxProvider>
+                <LogCtxProvider>
+                  <DialogCtxProvider>
+                    <DialogContainer />
+                    <NavBar />
+                    <Container>
+                      <Route path="/game/:gameId" component={GamePage} />
+                      <Route path="/mygames" component={MyGames} />
+                      <Route path="/allgames" component={AllGames} />
+                      <Route path="/gamestart" component={GameStart} />
+                    </Container>
+                  </DialogCtxProvider>
+                </LogCtxProvider>
+              </AllItemsCtxProvider>
+            </AuthCtxProvider>
+          </FirebaseCtxProvider>
+        </SnackbarProvider>
       </ThemeProvider>
     </Router>
   )

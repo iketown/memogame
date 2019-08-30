@@ -1,20 +1,25 @@
-import React, { createContext, useContext, useState } from "react"
+import React, { createContext, useContext, useState, useEffect } from "react"
 import { useGameCtx } from "./GameCtx"
 import { useFirebase } from "./FirebaseCtx"
 
 const PlayersCtx = createContext()
 
 export const PlayersCtxProvider = props => {
-  const { gamePlay } = useGameCtx()
+  const { gameState } = useGameCtx()
+  const [players, setPlayers] = useState({})
   const { firestore } = useFirebase()
-  const [playerData, setPlayerData] = useState(null)
-  const playersRef = firestore.collection("publicProfiles")
-  playersRef.onSnapshot(querySnapshot => {
-    querySnapshot.forEach(doc => {
-      // console.log("doc data", doc.data())
-    })
-  })
-  return <PlayersCtx.Provider value={{ playerData }} {...props} />
+  useEffect(() => {
+    if (gameState && gameState.memberUIDs) {
+      gameState.memberUIDs.forEach(uid => {
+        const memberRef = firestore.collection("publicProfiles").doc(uid)
+        memberRef.onSnapshot(doc => {
+          setPlayers(old => ({ ...old, [doc.id]: doc.data() }))
+        })
+      })
+    }
+  }, [firestore, gameState, gameState.memberUIDs])
+
+  return <PlayersCtx.Provider value={{ players }} {...props} />
 }
 
 export const usePlayersCtx = () => {
@@ -24,6 +29,6 @@ export const usePlayersCtx = () => {
       "usePlayersCtx must be a descendant of PlayersCtxProvider 😕"
     )
 
-  const { playerData } = ctx
-  return { playerData }
+  const { players } = ctx
+  return { players }
 }

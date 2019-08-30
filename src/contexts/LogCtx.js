@@ -5,6 +5,7 @@ import { useGameCtx, useCenterPileCtx } from "./GameCtx"
 import { removeUid } from "../utils/imageUtils"
 import { doItemsMatch } from "../utils/gameLogic"
 import { useAllItemsCtx } from "./AllItemsCtx"
+import { usePlayersCtx } from "./PlayersCtx"
 const LogCtx = createContext()
 
 export const LogCtxProvider = props => {
@@ -26,7 +27,8 @@ export const LogCtxProvider = props => {
 export const useLogCtx = () => {
   const ctx = useContext(LogCtx)
   const { user } = useAuthCtx()
-  const { allItems } = useAllItemsCtx()
+  const { players } = usePlayersCtx()
+  const { itemFromItemId } = useAllItemsCtx()
   const { centerPile } = useCenterPileCtx()
   const {
     gameState: { members, gameId }
@@ -38,17 +40,28 @@ export const useLogCtx = () => {
   const addLogMessage = ({ itemId, destination }) => {
     // Frank puts Purple Eggplant on center
     // Henry moves card into house
+    const name = user.displayName
+    const itemName = itemFromItemId(itemId).name
+    console.log("name item destination", name, itemName, destination)
+    let text
+    if (destination === "house") {
+      text = `${name} puts ${itemName} in house`
+    }
+    if (destination === "center") {
+      text = `${name} plays ${itemName}`
+    }
     const topCardId = centerPile && centerPile[0]
     const valid =
       destination === "center" ? doItemsMatch(topCardId, itemId) : true
-    const member = members.find(mem => mem.uid === user.uid)
     // avatar link would be nice here.
-    const itemName = itemId ? allItems[removeUid(itemId)].name : "card"
-    const text = `${member.displayName} puts ${itemName} ${
-      itemId ? "on" : "into"
-    } ${destination}`
-    console.log("logText", text)
-    doAddToLog({ text, gameId, uid: user.uid, valid, destination, itemId })
+
+    doAddToLog({
+      gameId,
+      uid: user.uid,
+      player: players[user.uid],
+      valid,
+      text
+    })
   }
   return { chat, setChat, addLogMessage }
 }

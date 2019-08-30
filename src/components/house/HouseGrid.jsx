@@ -11,7 +11,6 @@ import { useWiderThan } from "../../hooks/useWidth"
 import { HouseGridCtxProvider } from "../../contexts/HouseGridCtx"
 import StoragePile from "./StoragePile"
 import HouseDropSection from "./HouseDropSection"
-import ChatBox from "../ChatBox"
 import YourTurnSound from "../../sounds/YourTurn.sound.jsx"
 //
 
@@ -142,7 +141,6 @@ const HouseGrid = () => {
           <Grid item xs={6}>
             <OtherPlayersView />
             <StoragePile />
-            <ChatBox />
           </Grid>
         </Grid>
       </HouseGridCtxProvider>

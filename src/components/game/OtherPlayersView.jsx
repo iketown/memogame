@@ -5,6 +5,7 @@ import { Grid, Avatar, Typography } from "@material-ui/core"
 import CenterPileDnD from "./CenterPileDnD.jsx"
 import { useGameCtx } from "../../contexts/GameCtx.js"
 import { useAuthCtx } from "../../contexts/AuthCtx.js"
+import { usePlayersCtx } from "../../contexts/PlayersCtx.js"
 //
 //
 const StyledBox = styled(Grid)`
@@ -18,7 +19,7 @@ const StyledBox = styled(Grid)`
 const OtherPlayersView = () => {
   const { gamePlay } = useGameCtx()
   const gameStates = gamePlay && gamePlay.gameStates
-
+  const { players } = usePlayersCtx()
   return (
     <StyledBox container spacing={2}>
       <Grid item xs={12} md={6} className="center">
@@ -31,6 +32,7 @@ const OtherPlayersView = () => {
             .map(([playerId, playerState]) => (
               <PlayerDisplay
                 key={playerId}
+                publicProfile={players[playerId]}
                 playerId={playerId}
                 playerState={playerState}
               />
@@ -43,8 +45,9 @@ const OtherPlayersView = () => {
 export default OtherPlayersView
 
 const StyledDisplay = styled.div`
+  position: relative;
   display: grid;
-  grid-template-areas: "avatar storage total" "avatar house total";
+  grid-template-areas: "username username total" "avatar storage total" "avatar house total";
   grid-template-columns: 46px 1fr 3rem;
   align-items: center;
   grid-template-rows: repeat(2, 19px);
@@ -53,6 +56,10 @@ const StyledDisplay = styled.div`
   padding: 10px;
   box-shadow: 1px 1px 2px #7d7d7d;
   border-radius: 8px;
+  .name-display {
+    grid-area: username;
+    color: ${p => (p.myTurn ? "blue" : "gainsboro")};
+  }
   .avatar {
     grid-area: avatar;
   }
@@ -67,7 +74,7 @@ const StyledDisplay = styled.div`
     text-align: center;
   }
 `
-const PlayerDisplay = ({ playerId, playerState }) => {
+const PlayerDisplay = ({ playerId, playerState, publicProfile }) => {
   const houseCount =
     (playerState &&
       playerState.house &&
@@ -83,9 +90,16 @@ const PlayerDisplay = ({ playerId, playerState }) => {
   return (
     <>
       <StyledDisplay myTurn={myTurn}>
+        {publicProfile && (
+          <Typography variant="caption" className="name-display">
+            {publicProfile.displayName}
+          </Typography>
+        )}
         <Avatar
           className="avatar"
-          src={`https://api.adorable.io/avatars/95/${playerId}.png`}
+          src={`https://api.adorable.io/avatars/95/${
+            publicProfile ? publicProfile.avatarNumber : playerId
+          }.png`}
         />
         <div className="storage">
           <Typography component="b" variant="subtitle1">

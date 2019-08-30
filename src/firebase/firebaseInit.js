@@ -181,20 +181,21 @@ class Firebase {
   }
 
   //// ⭐   Game Admin API   ⭐ ////
-  doCreateGame = ({ maxMembers = 3, gameName }) => {
-    const uid = this.auth.currentUser.uid
-    const displayName =
-      this.auth.currentUser.displayName || this.auth.currentUser.email
-    console.log("uid", uid)
-    if (!uid) return null
-    const pendingGamesRef = this.fdb.ref(`/pendingGames`)
-    pendingGamesRef.push().set({
+  doCreateGame = ({ gameName }) => {
+    const user = this.auth.currentUser
+    if (!user) {
+      console.log("trying to create a game when not signed in")
+      return null
+    }
+    const displayName = (user && user.displayName) || (user && user.email)
+    const gamesRef = this.firestore.collection("games")
+    return gamesRef.add({
       gameName,
-      members: [{ uid, displayName }],
+      members: [{ uid: user.uid, displayName }],
+      memberUIDs: [user.uid],
       memberRequests: [],
-      maxMembers,
-      startedBy: uid,
       guestList: [],
+      startedBy: user.uid,
       inProgress: false
     })
   }
@@ -219,13 +220,16 @@ class Firebase {
     const game = await this.getPendingGameValues(gameId)
     let newMembers = [...game.members]
     let newRequests = [...game.memberRequests]
+    let memberUIDs = [...game.memberUIDs]
     const requestingMember = newRequests.find(mem => mem.uid === uid)
-    console.log("requestingMember", requestingMember)
-    if (approved && requestingMember) newMembers.push(requestingMember)
+    if (approved && requestingMember) {
+      newMembers.push(requestingMember)
+      memberUIDs.push(uid)
+    }
     const memberRequests = newRequests.filter(mem => mem.uid !== uid)
     this.savePendingGameValues({
       gameId,
-      values: { ...game, members: newMembers, memberRequests }
+      values: { ...game, members: newMembers, memberRequests, memberUIDs }
     })
   }
   doExitFromGame = async ({ gameId, uid }) => {

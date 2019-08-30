@@ -17,6 +17,7 @@ import FormTextInput from "./FormTextInput"
 import ChooseAvatar from "./ChooseAvatar"
 import AvatarMonster from "../AvatarMonster"
 import { useFirebase } from "../../contexts/FirebaseCtx"
+import { useDialogCtx } from "../../contexts/DialogCtx"
 
 //
 //
@@ -29,10 +30,12 @@ const StyledHeader = styled.header`
 const EditProfile = () => {
   const { user, publicProfile } = useAuthCtx()
   const { firestore } = useFirebase()
+  const { dispatch } = useDialogCtx()
   if (!user) return null
 
   const handleSubmit = async values => {
     const { displayName, email, avatarNumber } = values
+
     user.updateProfile({
       displayName,
       email
@@ -49,6 +52,7 @@ const EditProfile = () => {
         { merge: true }
       )
       .catch(err => console.log("error in profile", err))
+    dispatch({ type: "CLOSE_FORM" })
   }
 
   return (

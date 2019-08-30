@@ -8,9 +8,9 @@ import { useFirebase } from "../contexts/FirebaseCtx"
 //
 const GameStart = ({ history }) => {
   const [gameName, setGameName] = useState("")
-  const { createGame } = useFirebase()
+  const { doCreateGame } = useFirebase()
   const handleCreateGame = () => {
-    createGame({ gameName })
+    doCreateGame({ gameName })
       .then(({ id }) => {
         history.push(`/game/${id}`)
       })

@@ -9,6 +9,7 @@ import {
 } from "../contexts/GameCtx"
 import { ChatCtxProvider } from "../contexts/ChatCtx"
 import GameContent from "../components/game/GameContent.jsx"
+import SnackbarHandler from "../components/SnackBarHandler.jsx"
 import { GamePlayCtxProvider } from "../contexts/GamePlayCtx.js"
 import { PlayersCtxProvider } from "../contexts/PlayersCtx"
 //
@@ -18,7 +19,6 @@ const Game = props => {
   const { gameId } = props.match.params
 
   if (!user) return <div>must sign in</div>
-  if (!gameId) return <div>no game id</div>
 
   return (
     <GameCtxProvider gameId={gameId}>
@@ -27,8 +27,8 @@ const Game = props => {
           <StoragePileCtxProvider gameId={gameId}>
             <CenterPileCtxProvider gameId={gameId}>
               <GamePlayCtxProvider gameId={gameId}>
-                {/* // playersctxprovider */}
                 <ChatCtxProvider gameId={gameId}>
+                  <SnackbarHandler gameId={gameId} />
                   <GameContent gameId={gameId} />
                 </ChatCtxProvider>
               </GamePlayCtxProvider>

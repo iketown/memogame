@@ -1,16 +1,18 @@
 import React from "react"
 import { Grid, Typography } from "@material-ui/core"
 //
+import ShowMe from "../../utils/ShowMe.jsx"
 import { useGameCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import YoureNotInThisGameYet from "./gameAdmin/YoureNotInThisGameYet.jsx"
 import HouseGrid from "../house/HouseGrid.jsx"
 import GameStarter from "./gameAdmin/GameStarter.jsx"
+import { usePlayersCtx } from "../../contexts/PlayersCtx"
 //
 //
 const GameContent = ({ gameId }) => {
   const { gameState } = useGameCtx()
-
+  const { players } = usePlayersCtx()
   const { user } = useAuthCtx()
   const members = gameState && gameState.members
   if (!members) return <div>no members</div>

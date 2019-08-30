@@ -31,7 +31,6 @@ const StyledDiv = styled.div`
 `
 const NavBar = props => {
   // const { user } = useFirebase()
-  console.log("navbar props", props)
   const { user, publicProfile } = useAuthCtx()
 
   const { state, dispatch: dialogDispatch } = useDialogCtx()
@@ -91,6 +90,9 @@ const UserMenuButton = ({ history }) => {
     await doSignOut()
     history.push("/")
   }
+  const handleMyGames = () => {
+    history.push("/mygames")
+  }
   if (!user) return <div />
 
   return (
@@ -104,7 +106,7 @@ const UserMenuButton = ({ history }) => {
             <ListItemText />
             {user.email}
           </MenuItem>
-          <MenuItem>hey</MenuItem>
+          <MenuItem onClick={handleMyGames}>My Games</MenuItem>
           <MenuItem onClick={handleEditProfile}>Edit Profile</MenuItem>
           <MenuItem onClick={handleSignOut}>Sign Out</MenuItem>
         </MenuList>

@@ -41,24 +41,6 @@ export const useFirebase = () => {
     houseToHouse
   } = ctx
 
-  const createGame = ({ gameName }) => {
-    const user = auth.currentUser
-    if (!user) {
-      console.log("trying to create a game when not signed in")
-      return null
-    }
-    const displayName = (user && user.displayName) || (user && user.email)
-    const gamesRef = firestore.collection("games")
-    return gamesRef.add({
-      gameName,
-      members: [{ uid: user.uid, displayName }],
-      memberRequests: [],
-      guestList: [],
-      startedBy: user.uid,
-      inProgress: false
-    })
-  }
-
   return {
     doCreateUserWithEmailAndPassword,
     doSignInWithUserAndPassword,
@@ -71,7 +53,6 @@ export const useFirebase = () => {
     doStartGame,
     doAddToLog,
     doRemoveLog,
-    createGame,
     playStorageToCenter,
     playStorageToHouse,
     fdb,

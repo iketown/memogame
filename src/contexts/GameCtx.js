@@ -15,16 +15,14 @@ export const HouseCtxProvider = props => {
   const { user } = useAuthCtx()
   const [myHouse, setMyHouse] = useState({})
   useEffect(() => {
-    if (gameId && user && user.uid) {
-      const myHouseRef = fdb.ref(
-        `/currentGames/${gameId}/gameStates/${user.uid}/house`
-      )
-      // keep MY HOUSE in sync with firebase
-      myHouseRef.on("value", snapshot => {
-        setMyHouse(snapshot.val() || {})
-      })
-      return myHouseRef.off
-    }
+    const myHouseRef = fdb.ref(
+      `/currentGames/${gameId}/gameStates/${user.uid}/house`
+    )
+    // keep MY HOUSE in sync with firebase
+    myHouseRef.on("value", snapshot => {
+      setMyHouse(snapshot.val() || {})
+    })
+    // return myHouseRef.off
   }, [fdb, gameId, user, user.uid])
   return (
     <HouseCtx.Provider
@@ -76,10 +74,8 @@ export const useHouseCtx = () => {
   return {
     myHouse,
     setMyHouse,
-    // addToRoomLocal,
     removeFromRoomFS,
     addToRoomFS,
-    // removeFromRoomLocal,
     reorderRoomLocal
   }
 }
@@ -93,7 +89,6 @@ const CenterPileCtx = createContext()
 export const CenterPileCtxProvider = props => {
   const { fdb } = useFirebase()
   const gameId = props.gameId
-  const { user } = useAuthCtx()
   const [centerPile, setCenterPile] = useState([])
   useEffect(() => {
     // keep CENTER PILE in sync with firebase
@@ -101,7 +96,7 @@ export const CenterPileCtxProvider = props => {
     centerPileRef.on("value", snapshot => {
       setCenterPile(snapshot.val() || [])
     })
-    return centerPileRef.off
+    // return centerPileRef.off
   }, [fdb, gameId])
   return (
     <CenterPileCtx.Provider value={{ centerPile, setCenterPile }} {...props} />
@@ -151,7 +146,7 @@ export const StoragePileCtxProvider = props => {
       if (snapshot.val()) setStoragePile(snapshot.val())
       else setStoragePile([])
     })
-    return storagePileRef.off
+    // return storagePileRef.off
   }, [fdb, gameId, user.uid])
   return (
     <StoragePileCtx.Provider
@@ -187,19 +182,20 @@ export const GameCtxProvider = props => {
   const { firestore } = useFirebase()
   const { fdb } = useFirebase()
   const { allItems } = useAllItemsCtx()
-  const { user } = useAuthCtx()
   const [gameState, setGameState] = useState({})
   const [gamePlay, setGamePlay] = useState({})
 
   const gameId = props.gameId
+
   useEffect(() => {
     const gameRef = firestore.doc(`/games/${gameId}`)
-    gameRef.onSnapshot(doc => {
+    const unsubscribe = gameRef.onSnapshot(doc => {
       const values = doc.data()
       if (values) {
         setGameState({ ...values, gameId })
       }
     })
+    // return unsubscribe
   }, [firestore, gameId])
 
   useEffect(() => {
@@ -208,7 +204,7 @@ export const GameCtxProvider = props => {
       console.log("setting gameplay values")
       setGamePlay(snapshot.val())
     })
-    return gamePlayRef.off
+    // return gamePlayRef.off
   }, [fdb, gameId])
 
   function randomListOfItemIds(uid) {
@@ -244,6 +240,7 @@ export const GameCtxProvider = props => {
       gameStates
     })
   }
+  if (!gameId) return null
   return (
     <GameCtx.Provider
       value={{
@@ -339,12 +336,15 @@ export const useGameCtx = () => {
     )
     // add person to members if approved
     const newMembers = [...gameInfo.members]
+    const newMemberUIDs = [...gameInfo.memberUIDs]
     if (approvedBool) {
       newMembers.push(requester)
+      newMemberUIDs.push(requestingUID)
     }
     gameRef.update({
       memberRequests: newRequests,
-      members: newMembers
+      members: newMembers,
+      memberUIDs: newMemberUIDs
     })
   }
 

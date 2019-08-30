@@ -12,6 +12,7 @@ import { useWidth, useWiderThan } from "../../hooks/useWidth.js"
 import { useGameCtx, useStoragePileCtx } from "../../contexts/GameCtx.js"
 import { useAuthCtx } from "../../contexts/AuthCtx.js"
 import { useAllItemsCtx } from "../../contexts/AllItemsCtx.js"
+import { usePlayersCtx } from "../../contexts/PlayersCtx.js"
 //
 //
 const StyledGrid = styled(Grid)`
@@ -54,6 +55,7 @@ const TableImage = styled.div`
 
 const StoragePile = () => {
   const { allItems } = useAllItemsCtx()
+  const { players } = usePlayersCtx()
   const { gamePlay } = useGameCtx()
   const { storagePile = [] } = useStoragePileCtx()
   const { user } = useAuthCtx()
@@ -61,10 +63,9 @@ const StoragePile = () => {
   if (!gamePlay) return <div>waiting for game</div>
   const myturn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
-  const othersTurnText =
-    gamePlay &&
-    gamePlay.whosTurnItIs &&
-    `${gamePlay.whosTurnItIs.displayName}'s`
+      ? true
+      : undefined
+
   if (!allItems) return null
   // const storagePile = houseState && houseState.storagePile
 
@@ -94,7 +95,7 @@ const StoragePile = () => {
       </Grid>
       <Grid item xs={12} md={6} className="quantity-display">
         <Typography variant="h4" className="yourturn">
-          {myturn ? "YOUR" : othersTurnText} turn
+          {/* {myturn ? "YOUR" : othersTurnText} turn */}
         </Typography>
         <div className="center" />
       </Grid>

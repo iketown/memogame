@@ -2,52 +2,19 @@ import React, { useState, useEffect } from "react"
 import styled from "styled-components"
 import moment from "moment"
 import {
-  Grid,
   List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  ListSubheader,
-  Avatar,
-  TextField,
-  Button,
   ListItemSecondaryAction,
   IconButton
 } from "@material-ui/core"
-import { FaUser, FaTrash, FaTrashAlt, FaSadCry } from "react-icons/fa"
-import { useChatCtx } from "../contexts/ChatCtx"
+import { FaTrashAlt } from "react-icons/fa"
 import { useFirebase } from "../contexts/FirebaseCtx"
 import { useGameCtx } from "../contexts/GameCtx"
-import ShowMe from "../utils/ShowMe"
-import { useAuthCtx } from "../contexts/AuthCtx"
 import { useAllItemsCtx } from "../contexts/AllItemsCtx"
-
-// const ChatBox = () => {
-//   const { chat, addChatMessage } = useChatCtx()
-//   const [text, setText] = useState("")
-//   const handleSend = () => {
-//     addChatMessage(text)
-//     setText("")
-//   }
-//   return (
-//     <List>
-//       <ListSubheader title="chat" />
-//       {chat.map((msg, index) => (
-//         <ListItem key={(msg, index)}>
-//           <ListItemText
-//             primary={msg.text}
-//             secondary={moment(msg.timeStamp).fromNow()}
-//           />
-//         </ListItem>
-//       ))}
-//       <ListItem />
-//       <ListItem>
-//         <TextField value={text} onChange={e => setText(e.target.value)} />
-//         <Button onClick={handleSend}>send</Button>
-//       </ListItem>
-//     </List>
-//   )
-// }
+import { usePlayersCtx } from "../contexts/PlayersCtx"
+import AvatarMonster from "./AvatarMonster"
 
 const StyledBox = styled.div`
   max-height: 10rem;
@@ -55,24 +22,23 @@ const StyledBox = styled.div`
 `
 
 const LogBox = () => {
-  const { doAddToLog, doRemoveLog, fdb } = useFirebase()
-  const { user } = useAuthCtx()
+  const { doRemoveLog, fdb } = useFirebase()
   const {
     gameState: { gameId }
   } = useGameCtx()
-  const [text, setText] = useState("")
   const [log, setLog] = useState()
+
   useEffect(() => {
     const gameLogRef = fdb.ref(`/currentGames/${gameId}/gameLog`)
     gameLogRef.on("value", snapshot => {
       setLog(snapshot.val())
     })
-    return gameLogRef.off
   }, [fdb, gameId])
 
   const handleTrash = logId => {
     doRemoveLog({ gameId, logId })
   }
+
   const logList = (log && Object.entries(log).reverse()) || []
   return (
     <StyledBox>
@@ -109,10 +75,12 @@ const StyledListItem = styled(ListItem)`
 
 const LogListItem = ({ msg, handleTrash, nextEntry }) => {
   const { itemFromItemId } = useAllItemsCtx()
+  const { players } = usePlayersCtx()
   const {
     gameState: { members }
   } = useGameCtx()
-  const person = members.find(mem => mem.uid === msg.uid)
+  const personX = members.find(mem => mem.uid === msg.uid)
+  const person = players && players[msg.uid]
   const samePersonAsNext = nextEntry && nextEntry.uid === msg.uid
   const [timeText, setTimeText] = useState(moment(msg.timeStamp).fromNow())
   useEffect(() => {
@@ -131,7 +99,7 @@ const LogListItem = ({ msg, handleTrash, nextEntry }) => {
     )
   }
   const { valid } = msg
-  const personText = person.displayName
+  const personText = person && person.displayName
   const toCenter = msg.destination === "center"
   const verb = toCenter ? "plays" : "puts"
   let textString = "card in house"
@@ -173,12 +141,7 @@ const LogListItem = ({ msg, handleTrash, nextEntry }) => {
     <StyledListItem dense>
       {!samePersonAsNext && (
         <ListItemAvatar>
-          <Avatar
-            className="avatar"
-            src={`https://api.adorable.io/avatars/95/${person.uid}.png`}
-          >
-            {/* <FaUser /> */}
-          </Avatar>
+          <AvatarMonster num={person && person.avatarNumber} />
         </ListItemAvatar>
       )}
       <ListItemText

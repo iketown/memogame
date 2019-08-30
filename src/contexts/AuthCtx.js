@@ -30,7 +30,6 @@ export const AuthCtxProvider = props => {
     }
   }, [firestore, user])
   auth.onAuthStateChanged(authUser => {
-    console.log("authUser in onAuthStateChanged", authUser)
     if (authUser) {
       setUser(authUser)
     } else {

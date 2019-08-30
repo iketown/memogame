@@ -13,7 +13,7 @@ export const ChatCtxProvider = props => {
     chatRef.on("value", snapshot => {
       setChat(snapshot.val() || [])
     })
-    return chatRef.off
+    // return chatRef.off
   }, [fdb, gameId])
   return <ChatCtx.Provider value={{ chat, setChat, gameId }} {...props} />
 }
