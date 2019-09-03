@@ -1,11 +1,18 @@
 import React from "react"
+import moment from "moment"
 import { useFirebase } from "../contexts/FirebaseCtx"
-import { useGameCtx } from "../contexts/GameCtx"
+import { useGameCtx, usePointsCtx } from "../contexts/GameCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { doItemsMatch, shuffle } from "../utils/gameLogic"
 import { useLogCtx } from "../contexts/LogCtx"
 export const useGameFxns = () => {
   const { gameId, gamePlay } = useGameCtx()
+  const {
+    setPointsDisplay,
+    pointsClimber,
+    resetPointsClimber,
+    incrementPointsClimber
+  } = usePointsCtx()
   const { user } = useAuthCtx()
   const { fdb } = useFirebase()
   const { addLogMessage } = useLogCtx()
@@ -35,13 +42,36 @@ export const useGameFxns = () => {
     })
     return { storageRef, storageValue }
   }
+  async function _pointsRefAndValue() {
+    const pointsRef = fdb.ref(
+      `/currentGames/${gameId}/gameStates/${user.uid}/points`
+    )
+    const pointsValue = await pointsRef
+      .once("value")
+      .then(snap => snap.val() || 0)
+    return { pointsRef, pointsValue }
+  }
+  const addPoints = async (quantity = 1) => {
+    const { pointsRef, pointsValue } = await _pointsRefAndValue()
+    return pointsRef.set(pointsValue + quantity)
+  }
   function _endTurn() {
-    const { members } = gamePlay
-    const myIndex = members.findIndex(mem => mem.uid === user.uid)
-    if (myIndex < 0) throw new Error(`my index is ${myIndex}??`)
-    const nextIndex = (myIndex + 1) % members.length
-    const nextPerson = members[nextIndex]
+    const { memberUIDs } = gamePlay
+    const myIndex = memberUIDs.findIndex(memUid => memUid === user.uid)
+
+    if (myIndex === -1) throw new Error(`not found in this game ???`)
+    const nextIndex = (myIndex + 1) % memberUIDs.length
+    const nextPerson = {
+      uid: memberUIDs[nextIndex],
+      startTime: moment().toISOString(),
+      lastCheckIn: null // next person will update lastCheckIn as soon as they know its their turn.
+    }
     fdb.ref(`/currentGames/${gameId}/whosTurnItIs`).set(nextPerson)
+  }
+  function _updateTurnTimer() {
+    return fdb.ref(`/currentGames/${gameId}/whosTurnItIs`).update({
+      lastCheckIn: moment().toISOString()
+    })
   }
   async function addPileToStorage(pile) {
     const { storageRef, storageValue } = await _storageRefAndValue()
@@ -59,22 +89,52 @@ export const useGameFxns = () => {
     console.log("myHouseValue", myHouseValue)
     return myHouseRef.set(myHouseValue)
   }
-  async function addToCenterFX({ itemId }) {
+  async function addToCenterFX({ itemId, fromHouse }) {
     const { centerRef, centerValue } = await _centerRefAndValue()
-    // validate here
+    // validate
     const [topCard, ...underCards] = centerValue
     const isValid = doItemsMatch(topCard, itemId)
-    console.log("isValid?", isValid)
     if (isValid) {
       // UI respond to valid card
+      let pointsThisPlay = 1
+      if (fromHouse) {
+        pointsThisPlay = pointsClimber
+        incrementPointsClimber()
+      } else {
+        resetPointsClimber()
+      }
+      setPointsDisplay(pointsThisPlay)
+      addPoints(pointsThisPlay)
       const newCenter = [itemId, ...centerValue]
+      _updateTurnTimer()
       return centerRef.set(newCenter)
     } else {
       // UI respond to inValid card
       await addPileToStorage(underCards)
+      addPoints(-centerValue.length)
       const newCenter = [itemId]
-      return centerRef.set(newCenter)
+      resetPointsClimber()
+      centerRef.set(newCenter)
+      return _endTurn()
     }
+  }
+  async function togglePauseGame() {
+    const whoseTurnRef = fdb.ref(`/currentGames/${gameId}/whosTurnItIs`)
+    let value
+    whoseTurnRef.once("value", snapshot => {
+      value = snapshot.val()
+    })
+    const { paused } = value
+    console.log("paused", paused)
+    if (paused) {
+      whoseTurnRef.update({
+        paused: false,
+        lastCheckIn: moment().toISOString()
+      })
+    }
+    whoseTurnRef.update({
+      paused: !paused
+    })
   }
   async function addToRoomFX({ roomId, itemId }) {
     const { myHouseRef, myHouseValue } = await _myHouseRefAndValue()
@@ -89,15 +149,16 @@ export const useGameFxns = () => {
     console.log("storageValue", storageValue)
     const newStorageVal = storageValue.filter(_itemId => _itemId !== itemId)
     storageRef.set(newStorageVal)
-    _endTurn()
+    // _endTurn()
   }
   function storageToCenterFX({ itemId }) {
     removeFromStorageFX({ itemId })
     addToCenterFX({ itemId })
   }
+
   function houseToCenterFX({ roomId, itemId }) {
     removeFromRoomFX({ roomId, itemId })
-    addToCenterFX({ itemId })
+    addToCenterFX({ itemId, fromHouse: true })
   }
   function storageToHouseFX({ roomId, itemId }) {
     removeFromStorageFX({ itemId })
@@ -114,17 +175,32 @@ export const useGameFxns = () => {
     newRoom.splice(destIndex, 0, movingId)
     myHouseRef.update({ [roomId]: newRoom })
   }
+  async function emptyRoomToStorageFX({ roomId }) {
+    const [
+      { myHouseRef, myHouseValue },
+      { storageRef, storageValue }
+    ] = await Promise.all([_myHouseRefAndValue(), _storageRefAndValue()])
+    const movingCards = myHouseValue[roomId] || []
+    myHouseValue[roomId] = []
+    myHouseRef.set(myHouseValue)
+    return storageRef.set([...storageValue, ...movingCards])
+  }
   async function moveCenterToStorageFX() {
     // after putting down a wrong card
   }
+  // memoize all these?   useCallback?
   return {
     storageToCenterFX,
     houseToCenterFX,
     removeFromRoomFX,
     storageToHouseFX,
+    emptyRoomToStorageFX,
     addToRoomFX,
     addToCenterFX,
     removeFromStorageFX,
-    reorderRoomFX
+    reorderRoomFX,
+    _updateTurnTimer,
+    _endTurn,
+    togglePauseGame
   }
 }

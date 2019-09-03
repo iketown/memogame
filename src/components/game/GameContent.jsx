@@ -14,9 +14,9 @@ const GameContent = ({ gameId }) => {
   const { gameState } = useGameCtx()
   const { players } = usePlayersCtx()
   const { user } = useAuthCtx()
-  const members = gameState && gameState.members
-  if (!members) return <div>no members</div>
-  const youAreAMember = members.find(mem => mem.uid === user.uid)
+  const memberUIDs = gameState && gameState.memberUIDs
+  if (!memberUIDs) return <div>no members</div>
+  const youAreAMember = memberUIDs.includes(user.uid)
   const thisIsYourGame = gameState && gameState.startedBy === user.uid
   const gameMemberView = (
     <Grid container spacing={2}>

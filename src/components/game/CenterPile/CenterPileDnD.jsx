@@ -1,23 +1,22 @@
 import React, { useState } from "react"
 import { useDrop } from "react-dnd"
 import styled from "styled-components"
-import felt from "../../images/felt.jpg"
+import moment from "moment"
+import { Button } from "@material-ui/core"
 //
-import { ItemTypes } from "../../dnd/itemTypes"
-import { useWiderThan } from "../../hooks/useWidth"
-import {
-  useGameCtx,
-  useCenterPileCtx,
-  useStoragePileCtx,
-  useHouseCtx
-} from "../../contexts/GameCtx"
+import PointsFloatingText from "./PointsFloatingText"
+import felt from "../../../images/felt.jpg"
+import { ItemTypes } from "../../../dnd/itemTypes"
+import { useWiderThan } from "../../../hooks/useWidth"
+import { useCenterPileCtx, usePointsCtx } from "../../../contexts/GameCtx"
 import { Typography } from "@material-ui/core"
-import { useFirebase } from "../../contexts/FirebaseCtx"
-import { WindowCard } from "../house/DraggableCard"
-import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
-import { useLogCtx } from "../../contexts/LogCtx"
-import DropCardSound from "../../sounds/DropCard.sound"
-import { useGameFxns } from "../../hooks/useGameFxns"
+import { WindowCard } from "../../house/DraggableCard"
+import { useHouseGridCtx } from "../../../contexts/HouseGridCtx"
+import { useLogCtx } from "../../../contexts/LogCtx"
+import DropCardSound from "../../../sounds/DropCard.sound"
+import { useGameFxns } from "../../../hooks/useGameFxns"
+import PointsReactTransGroup from "./PointsReactTransGroup"
+import { doItemsMatch } from "../../../utils/gameLogic"
 //
 //
 
@@ -50,25 +49,14 @@ const TableHalo = styled.div`
 `
 const CenterPileDnD = () => {
   const mdUp = useWiderThan("md")
-  const { storageToCenter, houseToCenter, playStorageToCenter } = useFirebase()
   const { addLogMessage } = useLogCtx()
-  const { removeFromStorageLocal } = useStoragePileCtx()
-  const { centerPile, addToCenterLocal } = useCenterPileCtx()
-  const { removeFromRoomFS } = useHouseCtx()
-  const { removeFromRoomFX, storageToCenterFX, houseToCenterFX } = useGameFxns()
+  const { centerPile } = useCenterPileCtx()
+  const { storageToCenterFX, houseToCenterFX } = useGameFxns()
   const { setExpandedRoom } = useHouseGridCtx()
-  const {
-    gamePlay,
-    gameState: { gameId }
-  } = useGameCtx()
   const [playDropCardSound, setPlayDropCardSound] = useState(false)
-  const rightAnswerSound = () => {
-    setPlayDropCardSound("right")
-  }
-  const wrongAnswerSound = () => {
-    setPlayDropCardSound("wrong")
-  }
-  const [{ isOver, canDrop }, dropRef] = useDrop({
+  const [pointsView, setPointsView] = useState(false)
+
+  const [{ isOver }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     canDrop: () => true,
     drop: (item, monitor) => {
@@ -89,23 +77,30 @@ const CenterPileDnD = () => {
     })
   })
   return (
-    <StyleTable isOver={isOver} width={mdUp ? 11 : 9} ref={dropRef}>
-      <DropCardSound
-        playDropCardSound={playDropCardSound}
-        setPlayDropCardSound={setPlayDropCardSound}
-      />
-      <Typography variant="h5">CENTER</Typography>
-      {centerPile.map((itemId, index) => (
-        <WindowCard
-          scale={1.5}
-          index={index + 2}
-          key={itemId}
-          itemId={itemId}
+    <>
+      <StyleTable isOver={isOver} width={mdUp ? 11 : 9} ref={dropRef}>
+        <DropCardSound
+          playDropCardSound={playDropCardSound}
+          setPlayDropCardSound={setPlayDropCardSound}
         />
-      ))}
-      {isOver && <TableHalo />}
-      <QuantityCircle background="#024e02" quantity={centerPile.length} />
-    </StyleTable>
+        <Typography variant="h5">CENTER</Typography>
+        {centerPile.map((itemId, index) => (
+          <WindowCard
+            scale={1.5}
+            index={index + 2}
+            key={itemId}
+            itemId={itemId}
+          />
+        ))}
+        {isOver && <TableHalo />}
+        <QuantityCircle background="#024e02" quantity={centerPile.length} />
+        <PointsReactTransGroup
+          pointsView={pointsView}
+          setPointsView={setPointsView}
+        />
+      </StyleTable>
+      <div></div>
+    </>
   )
 }
 

@@ -9,9 +9,14 @@ import OtherPlayersView from "../game/OtherPlayersView.jsx"
 import houseImage from "../../images/handDrawnHouse.svg"
 import { useWiderThan } from "../../hooks/useWidth"
 import { HouseGridCtxProvider } from "../../contexts/HouseGridCtx"
+import { usePointsCtx } from "../../contexts/GameCtx"
 import StoragePile from "./StoragePile"
 import HouseDropSection from "./HouseDropSection"
 import YourTurnSound from "../../sounds/YourTurn.sound.jsx"
+import { TurnTimerCtxProvider } from "../../contexts/TurnTimerCtx"
+import PointsFloatingText from "../game/CenterPile/PointsFloatingText"
+import PointsReactTransGroup from "../game/CenterPile/PointsReactTransGroup"
+import ShowMe from "../../utils/ShowMe.jsx"
 //
 
 export const houseDimensions = {
@@ -113,7 +118,7 @@ const windowArr = [
 const HouseGrid = () => {
   const mdUp = useWiderThan("md")
   const [expanded, setExpanded] = useState(false)
-
+  const { pointsClimber } = usePointsCtx()
   return (
     <DndProvider backend={HTML5Backend}>
       <HouseGridCtxProvider>
@@ -141,6 +146,10 @@ const HouseGrid = () => {
           <Grid item xs={6}>
             <OtherPlayersView />
             <StoragePile />
+            <br />
+            <br />
+            <br />
+            <ShowMe obj={pointsClimber} name="pointsClimber" noModal />
           </Grid>
         </Grid>
       </HouseGridCtxProvider>

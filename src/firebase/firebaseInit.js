@@ -110,6 +110,10 @@ class Firebase {
     return storagePileRef.set(storagePile)
   }
 
+  endTurnRTDB = async ({ gameId }) => {
+    this._endTurn({ gameId })
+  }
+
   _endTurn = async ({ gameId }) => {
     const uid = this.auth.currentUser.uid
     if (!uid || !gameId) return { error: { message: "missing uid or gameId" } }
@@ -191,7 +195,7 @@ class Firebase {
     const gamesRef = this.firestore.collection("games")
     return gamesRef.add({
       gameName,
-      members: [{ uid: user.uid, displayName }],
+      // members: [{ uid: user.uid, displayName }],
       memberUIDs: [user.uid],
       memberRequests: [],
       guestList: [],
@@ -207,10 +211,14 @@ class Firebase {
     const displayName =
       this.auth.currentUser.displayName || this.auth.currentUser.email
     const game = await this.getPendingGameValues(gameId)
-    let { members, maxMembers, memberRequests = [] } = game
-    const iAmInThisGame = members.find(mem => mem.uid === uid)
+    let { memberUIDs, maxMembers, memberRequests = [] } = game
+    const iAmInThisGame = memberUIDs.includes(uid)
     const iAlreadyRequested = memberRequests.find(mem => mem.uid === uid)
-    if (members.length < maxMembers && !iAmInThisGame && !iAlreadyRequested) {
+    if (
+      memberUIDs.length < maxMembers &&
+      !iAmInThisGame &&
+      !iAlreadyRequested
+    ) {
       memberRequests.push({ uid, displayName })
     }
     this.savePendingGameValues({ gameId, values: { ...game, memberRequests } })
@@ -218,18 +226,18 @@ class Firebase {
   doHandleGameRequest = async ({ gameId, uid, approved }) => {
     console.log("gameId, uid, approved", gameId, uid, approved)
     const game = await this.getPendingGameValues(gameId)
-    let newMembers = [...game.members]
+    // let newMembers = [...game.members]
     let newRequests = [...game.memberRequests]
     let memberUIDs = [...game.memberUIDs]
     const requestingMember = newRequests.find(mem => mem.uid === uid)
     if (approved && requestingMember) {
-      newMembers.push(requestingMember)
+      // newMembers.push(requestingMember)
       memberUIDs.push(uid)
     }
     const memberRequests = newRequests.filter(mem => mem.uid !== uid)
     this.savePendingGameValues({
       gameId,
-      values: { ...game, members: newMembers, memberRequests, memberUIDs }
+      values: { ...game, memberRequests, memberUIDs }
     })
   }
   doExitFromGame = async ({ gameId, uid }) => {

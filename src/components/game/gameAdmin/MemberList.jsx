@@ -8,18 +8,22 @@ import {
   ListItemAvatar,
   ListItemText
 } from "@material-ui/core"
+
 import { FaUser } from "react-icons/fa"
+import { usePlayersCtx } from "../../../contexts/PlayersCtx"
 //
 //
 //
 const MemberList = ({ members }) => {
+  const { players } = usePlayersCtx()
+  console.log("players", players)
   return (
     <Card>
       <CardHeader title="Players" />
       <CardContent>
         <List dense>
-          {members.map(mem => (
-            <ListItem key={mem.uid} dense>
+          {Object.entries(players).map(([uid, mem]) => (
+            <ListItem key={uid} dense>
               <ListItemAvatar>
                 <FaUser />
               </ListItemAvatar>

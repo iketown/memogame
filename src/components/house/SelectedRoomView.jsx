@@ -1,15 +1,16 @@
-import React from "react"
+import React, { useEffect } from "react"
 import styled from "styled-components"
 import {
   CardContent,
   Card,
-  CardHeader,
   CardActions,
   Button,
   Typography
 } from "@material-ui/core"
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd"
 import { useDrag } from "react-dnd"
+import useCountDown from "react-countdown-hook"
+
 //
 import kitchen from "../../images/rooms/kitchen.jpg"
 import garage from "../../images/rooms/garage.jpg"
@@ -24,10 +25,11 @@ import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
 import { useWiderThan } from "../../hooks/useWidth"
 import { useGameCtx, useHouseCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
-import { useFirebase } from "../../contexts/FirebaseCtx"
 import { removeUid } from "../../utils/imageUtils"
 import { useGameFxns } from "../../hooks/useGameFxns"
 import { useAllItemsCtx } from "../../contexts/AllItemsCtx"
+import AutoCloseButton from "../AutoCloseButton"
+import EmptyRoomButton from "./EmptyRoomButton"
 //
 
 const roomImages = {
@@ -50,7 +52,7 @@ const StyledSelectedRoom = styled.div`
   justify-content: center;
   align-items: center;
   .card {
-    height: 100%;
+    height: 105%;
     width: 100%;
     position: absolute;
     top: 0;
@@ -98,11 +100,6 @@ const MakeDroppable = ({ droppableId, children }) => {
 }
 
 const MakeDraggable = ({ draggableId, index, children }) => {
-  const { gamePlay } = useGameCtx()
-  const { user } = useAuthCtx()
-  const isMyTurn =
-    gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
-
   return (
     <Draggable draggableId={draggableId} index={index}>
       {({ dragHandleProps, draggableProps, innerRef }) => (
@@ -113,20 +110,31 @@ const MakeDraggable = ({ draggableId, index, children }) => {
     </Draggable>
   )
 }
-
+const initialTime = 6 * 1000
 const SelectedRoomView = () => {
   const { expandedRoom, setExpandedRoom } = useHouseGridCtx()
   const { myHouse } = useHouseCtx()
   const { reorderRoomFX } = useGameFxns()
-  const {
-    gameState: { gameId }
-  } = useGameCtx()
+  const [timeLeft, start] = useCountDown(initialTime, 1000)
+  // start the timer when the expanded room opens
+  useEffect(() => {
+    if (expandedRoom && expandedRoom.faceUp) {
+      start()
+    }
+  }, [expandedRoom, start])
+  // close the window when the timer gets to zero
+  useEffect(() => {
+    if (timeLeft === 0) {
+      setExpandedRoom({ open: false, roomId: "" })
+    }
+  }, [setExpandedRoom, timeLeft])
+
   if (!expandedRoom || !expandedRoom.roomId) return null
   const { roomId, faceUp } = expandedRoom
   const thisRoom = myHouse[roomId] || []
 
   async function onDragEnd(result) {
-    console.log("result", result)
+    start()
     const { source, destination, draggableId: itemId } = result
     if (!destination) return null
     const { index: sourceIndex } = source
@@ -137,7 +145,7 @@ const SelectedRoomView = () => {
   return (
     <DragDropContext onDragEnd={onDragEnd}>
       <SelectedRoomCard
-        {...{ roomId, thisRoom, faceUp, setExpandedRoom }}
+        {...{ roomId, thisRoom, faceUp, setExpandedRoom, timeLeft, start }}
         enableBeautifulDragDrop={!!faceUp}
       />
     </DragDropContext>
@@ -149,8 +157,13 @@ const SelectedRoomCard = ({
   thisRoom,
   faceUp,
   setExpandedRoom,
-  enableBeautifulDragDrop
+  enableBeautifulDragDrop,
+  timeLeft,
+  start
 }) => {
+  function handleCloseRoom() {
+    setExpandedRoom({ open: false, roomId: "" })
+  }
   const cardContents = (
     <>
       <Typography variant="h5">{roomId.toUpperCase()}</Typography>
@@ -175,13 +188,18 @@ const SelectedRoomCard = ({
         })}
       </CardContent>
       <CardActions>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => setExpandedRoom({ open: false, roomId: "" })}
-        >
-          ok
-        </Button>
+        {enableBeautifulDragDrop ? (
+          <AutoCloseButton
+            start={start}
+            timeLeft={timeLeft}
+            handleCloseRoom={handleCloseRoom}
+          />
+        ) : (
+          <Button variant="contained" color="primary" onClick={handleCloseRoom}>
+            close
+          </Button>
+        )}
+        <EmptyRoomButton roomId={roomId} handleCloseRoom={handleCloseRoom} />
       </CardActions>
     </>
   )
@@ -219,11 +237,12 @@ const SorterCard = ({ itemId, faceUp }) => {
 const DnDCard = ({ faceUp, itemId, roomId }) => {
   // this is a card from the house.   does not end the turn.
   const { gamePlay } = useGameCtx()
+  const { houseToCenterFX } = useGameFxns()
   const { user } = useAuthCtx()
   const isMyTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
 
-  const [{ isDragging }, dragRef, preview] = useDrag({
+  const [{ isDragging }, dragRef] = useDrag({
     item: { type: ItemTypes.CARD, itemId, fromStorage: false, roomId },
     collect: monitor => ({
       isDragging: !!monitor.isDragging()
@@ -236,6 +255,11 @@ const DnDCard = ({ faceUp, itemId, roomId }) => {
       style={{
         opacity: isDragging ? 0.5 : 1,
         transform: `rotate(${isDragging ? 10 : 0}deg)`
+      }}
+      onDoubleClick={() => {
+        isMyTurn
+          ? houseToCenterFX({ roomId, itemId })
+          : console.log("not your turn")
       }}
     >
       <SorterCard faceUp={faceUp} key={itemId} itemId={itemId}>

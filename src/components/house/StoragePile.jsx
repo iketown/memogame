@@ -1,18 +1,16 @@
 import React from "react"
 import styled from "styled-components"
-import { Grid, Typography } from "@material-ui/core"
+import { Grid } from "@material-ui/core"
 //
-import { QuantityCircle } from "../game/CenterPileDnD.jsx"
-import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
-import ShowMe from "../../utils/ShowMe.jsx"
-import { Button, Card, useMediaQuery } from "@material-ui/core"
+import { QuantityCircle } from "../game/CenterPile/CenterPileDnD"
 import DraggableCard, { WindowCard } from "./DraggableCard"
 import woodtable from "../../images/woodtable.jpg"
-import { useWidth, useWiderThan } from "../../hooks/useWidth.js"
+import { useWiderThan } from "../../hooks/useWidth.js"
 import { useGameCtx, useStoragePileCtx } from "../../contexts/GameCtx.js"
 import { useAuthCtx } from "../../contexts/AuthCtx.js"
 import { useAllItemsCtx } from "../../contexts/AllItemsCtx.js"
 import { usePlayersCtx } from "../../contexts/PlayersCtx.js"
+import MyTurnDisplay from "./MyTurnDisplay.jsx"
 //
 //
 const StyledGrid = styled(Grid)`
@@ -75,7 +73,9 @@ const StoragePile = () => {
         <StorageTable width={mdUp ? 11 : 9}>
           {!!storagePile && (
             <>
+              {/* only the top card is draggable */}
               <DraggableCard scale={1.5} itemId={storagePile[0]} index={1} />
+              {/* the remaining cards are images */}
               {storagePile.slice(1).map((itemId, index) => (
                 <WindowCard
                   scale={1.5}
@@ -94,10 +94,7 @@ const StoragePile = () => {
         </StorageTable>
       </Grid>
       <Grid item xs={12} md={6} className="quantity-display">
-        <Typography variant="h4" className="yourturn">
-          {/* {myturn ? "YOUR" : othersTurnText} turn */}
-        </Typography>
-        <div className="center" />
+        {myturn && <MyTurnDisplay />}
       </Grid>
     </StyledGrid>
   )

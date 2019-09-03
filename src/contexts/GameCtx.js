@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react"
 import firebase from "firebase/app"
+import moment from "moment"
 import { useAuthCtx } from "./AuthCtx"
 import { useFirebase } from "./FirebaseCtx"
 import { shuffle, doItemsMatch } from "../utils/gameLogic"
@@ -178,6 +179,52 @@ export const useStoragePileCtx = () => {
 }
 // ⭐ 🌟 end STORAGE PILE CONTEXT 🌟 ⭐ //
 
+// ⭐ 🌟 POINTS CONTEXT 🌟 ⭐ //
+const PointsCtx = createContext()
+export const PointsCtxProvider = props => {
+  // points display is the momentary number that shows
+  // when a valid card is laid down.  (it turns itself back to false)
+  const [pointsDisplay, setPointsDisplay] = useState(false)
+  // pointsClimber keeps track of how many points the next card is worth (if you play consecutive cards from house, each value is 1 more than the previous)
+  const [pointsClimber, setPointsClimber] = useState(1)
+
+  return (
+    <PointsCtx.Provider
+      value={{
+        pointsDisplay,
+        setPointsDisplay,
+        pointsClimber,
+        setPointsClimber
+      }}
+      {...props}
+    />
+  )
+}
+export const usePointsCtx = () => {
+  const ctx = useContext(PointsCtx)
+  if (!ctx) throw new Error("usePointsCtx must be a descendant of PointsCtx 😕")
+  const {
+    pointsDisplay,
+    setPointsDisplay,
+    pointsClimber,
+    setPointsClimber
+  } = ctx
+  const incrementPointsClimber = () => {
+    setPointsClimber(old => old + 1)
+  }
+  const resetPointsClimber = () => {
+    setPointsClimber(1)
+  }
+  return {
+    pointsDisplay,
+    setPointsDisplay,
+    pointsClimber,
+    incrementPointsClimber,
+    resetPointsClimber
+  }
+}
+// ⭐ 🌟 END POINTS CONTEXT 🌟 ⭐ //
+
 export const GameCtxProvider = props => {
   const { firestore } = useFirebase()
   const { fdb } = useFirebase()
@@ -214,11 +261,11 @@ export const GameCtxProvider = props => {
   }
   function createRTDBGame() {
     const gamePlayRef = fdb.ref(`/currentGames/${gameId}`)
-    const { gameName, startedBy, members } = gameState
+    const { gameName, startedBy, memberUIDs } = gameState
 
-    const gameStates = members.reduce((obj, member) => {
-      const storagePile = randomListOfItemIds(member.uid)
-      obj[member.uid] = {
+    const gameStates = memberUIDs.reduce((obj, uid) => {
+      const storagePile = randomListOfItemIds(uid)
+      obj[uid] = {
         storagePile,
         house: {
           attic: [],
@@ -234,8 +281,9 @@ export const GameCtxProvider = props => {
     gamePlayRef.set({
       gameName,
       startedBy,
-      members,
-      whosTurnItIs: members[0],
+      memberUIDs,
+      // members,
+      whosTurnItIs: { uid: memberUIDs[0], startTime: moment().toISOString() },
       centerPile: [],
       gameStates
     })
@@ -335,15 +383,15 @@ export const useGameCtx = () => {
       mem => mem.uid !== requestingUID
     )
     // add person to members if approved
-    const newMembers = [...gameInfo.members]
+    // const newMembers = [...gameInfo.members]
     const newMemberUIDs = [...gameInfo.memberUIDs]
     if (approvedBool) {
-      newMembers.push(requester)
+      // newMembers.push(requester)
       newMemberUIDs.push(requestingUID)
     }
     gameRef.update({
       memberRequests: newRequests,
-      members: newMembers,
+      // members: newMembers,
       memberUIDs: newMemberUIDs
     })
   }

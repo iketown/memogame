@@ -78,7 +78,7 @@ const SnackBarHandler = ({ gameId, enqueueSnackbar, closeSnackbar }) => {
     }
   }, [enqueueSnackbar, fdb, gameId])
 
-  return <div>snack bar handler</div>
+  return <div></div>
 }
 
 export default withSnackbar(SnackBarHandler)

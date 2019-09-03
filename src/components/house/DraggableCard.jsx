@@ -9,10 +9,13 @@ import { useGameCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import { removeUid } from "../../utils/imageUtils"
 import { useAllItemsCtx } from "../../contexts/AllItemsCtx"
+import { useGameFxns } from "../../hooks/useGameFxns"
 //
 //
 const DraggableCard = ({ itemId, scale, index }) => {
+  // draggableCard is the top card in the storage pile.
   const { gamePlay } = useGameCtx()
+  const { storageToCenterFX } = useGameFxns()
   const { user } = useAuthCtx()
   const isMyTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
@@ -21,30 +24,28 @@ const DraggableCard = ({ itemId, scale, index }) => {
   } = useGameCtx()
   const [{ isDragging }, dragRef, preview] = useDrag({
     item: { type: ItemTypes.CARD, itemId, fromStorage: true },
-    end: async (item, mon) => {
-      // console.log("drop result", mon.getDropResult())
-      // const endTurnResponse = await endTurn({ gameId })
-      // console.log("end turn resonse", endTurnResponse)
-      // end the turn here.
-    },
+    end: async (item, mon) => {},
     collect: mon => ({
       isDragging: !!mon.isDragging()
     }),
     canDrag: isMyTurn
   })
   return (
-    <>
-      <div
-        ref={dragRef}
-        style={{
-          opacity: isDragging ? 0.5 : 1,
-          zIndex: 200,
-          cursor: isDragging ? "grabbing" : isMyTurn ? "grab" : "not-allowed"
-        }}
-      >
-        <WindowCard index={index} itemId={itemId} scale={scale} dragMe />
-      </div>
-    </>
+    <div
+      onDoubleClick={
+        isMyTurn
+          ? () => storageToCenterFX({ itemId })
+          : () => console.log("not your turn")
+      }
+      ref={dragRef}
+      style={{
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: 200,
+        cursor: isDragging ? "grabbing" : isMyTurn ? "grab" : "not-allowed"
+      }}
+    >
+      <WindowCard index={index} itemId={itemId} scale={scale} dragMe />
+    </div>
   )
 }
 

@@ -5,13 +5,15 @@ import {
   GameCtxProvider,
   HouseCtxProvider,
   CenterPileCtxProvider,
-  StoragePileCtxProvider
+  StoragePileCtxProvider,
+  PointsCtxProvider
 } from "../contexts/GameCtx"
 import { ChatCtxProvider } from "../contexts/ChatCtx"
 import GameContent from "../components/game/GameContent.jsx"
 import SnackbarHandler from "../components/SnackBarHandler.jsx"
 import { GamePlayCtxProvider } from "../contexts/GamePlayCtx.js"
 import { PlayersCtxProvider } from "../contexts/PlayersCtx"
+import { TurnTimerCtxProvider } from "../contexts/TurnTimerCtx"
 //
 //
 const Game = props => {
@@ -22,20 +24,24 @@ const Game = props => {
 
   return (
     <GameCtxProvider gameId={gameId}>
-      <PlayersCtxProvider>
-        <HouseCtxProvider gameId={gameId}>
-          <StoragePileCtxProvider gameId={gameId}>
-            <CenterPileCtxProvider gameId={gameId}>
-              <GamePlayCtxProvider gameId={gameId}>
-                <ChatCtxProvider gameId={gameId}>
-                  <SnackbarHandler gameId={gameId} />
-                  <GameContent gameId={gameId} />
-                </ChatCtxProvider>
-              </GamePlayCtxProvider>
-            </CenterPileCtxProvider>
-          </StoragePileCtxProvider>
-        </HouseCtxProvider>
-      </PlayersCtxProvider>
+      <PointsCtxProvider>
+        <TurnTimerCtxProvider gameId={gameId}>
+          <PlayersCtxProvider>
+            <HouseCtxProvider gameId={gameId}>
+              <StoragePileCtxProvider gameId={gameId}>
+                <CenterPileCtxProvider gameId={gameId}>
+                  <GamePlayCtxProvider gameId={gameId}>
+                    <ChatCtxProvider gameId={gameId}>
+                      <SnackbarHandler gameId={gameId} />
+                      <GameContent gameId={gameId} />
+                    </ChatCtxProvider>
+                  </GamePlayCtxProvider>
+                </CenterPileCtxProvider>
+              </StoragePileCtxProvider>
+            </HouseCtxProvider>
+          </PlayersCtxProvider>
+        </TurnTimerCtxProvider>
+      </PointsCtxProvider>
     </GameCtxProvider>
   )
 }

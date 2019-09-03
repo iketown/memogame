@@ -2,10 +2,12 @@ import React from "react"
 import styled from "styled-components"
 import { Grid, Avatar, Typography } from "@material-ui/core"
 //
-import CenterPileDnD from "./CenterPileDnD.jsx"
+import CenterPileDnD from "./CenterPile/CenterPileDnD.jsx"
 import { useGameCtx } from "../../contexts/GameCtx.js"
 import { useAuthCtx } from "../../contexts/AuthCtx.js"
 import { usePlayersCtx } from "../../contexts/PlayersCtx.js"
+import { useTurnTimer, useOthersTurnTimer } from "../../hooks/useTurnTimer"
+import ScrollingPointsDisplay from "./ScrollingPointsDisplay.jsx"
 //
 //
 const StyledBox = styled(Grid)`
@@ -47,7 +49,7 @@ export default OtherPlayersView
 const StyledDisplay = styled.div`
   position: relative;
   display: grid;
-  grid-template-areas: "username username total" "avatar storage total" "avatar house total";
+  grid-template-areas: "username username username" "avatar storage total" "avatar house total" "timer timer timer";
   grid-template-columns: 46px 1fr 3rem;
   align-items: center;
   grid-template-rows: repeat(2, 19px);
@@ -73,8 +75,12 @@ const StyledDisplay = styled.div`
     grid-area: total;
     text-align: center;
   }
+  .timer {
+    grid-area: timer;
+  }
 `
 const PlayerDisplay = ({ playerId, playerState, publicProfile }) => {
+  const points = (playerState && playerState.points) || 0
   const houseCount =
     (playerState &&
       playerState.house &&
@@ -87,45 +93,63 @@ const PlayerDisplay = ({ playerId, playerState, publicProfile }) => {
     (playerState.storagePile && playerState.storagePile.length) || 0
   const { gamePlay } = useGameCtx()
   const myTurn = gamePlay && gamePlay.whosTurnItIs.uid === playerId
+  const secondsLeft = useOthersTurnTimer({ playerId })
   return (
-    <>
-      <StyledDisplay myTurn={myTurn}>
-        {publicProfile && (
-          <Typography variant="caption" className="name-display">
-            {publicProfile.displayName}
-          </Typography>
-        )}
-        <Avatar
-          className="avatar"
-          src={`https://api.adorable.io/avatars/95/${
-            publicProfile ? publicProfile.avatarNumber : playerId
-          }.png`}
-        />
-        <div className="storage">
-          <Typography component="b" variant="subtitle1">
-            {storageCount}
-          </Typography>{" "}
-          <Typography component="span" variant="caption" color="textSecondary">
-            in storage
-          </Typography>
-        </div>
-        <div className="house">
-          <Typography component="b" variant="subtitle1">
-            {houseCount}
-          </Typography>{" "}
-          <Typography component="span" variant="caption" color="textSecondary">
-            in house
-          </Typography>
-        </div>
-        <div className="total">
-          <Typography variant="h5" style={{ marginBottom: "-10px" }}>
-            {houseCount + storageCount}
-          </Typography>
-          <Typography variant="overline" color="textSecondary">
-            TOTAL
-          </Typography>
-        </div>
-      </StyledDisplay>
-    </>
+    <StyledDisplay myTurn={myTurn}>
+      {publicProfile && (
+        <Typography variant="caption" className="name-display">
+          {publicProfile.displayName}
+        </Typography>
+      )}
+      <Avatar
+        className="avatar"
+        src={`https://api.adorable.io/avatars/95/${
+          publicProfile ? publicProfile.avatarNumber : playerId
+        }.png`}
+      />
+      <div className="storage">
+        <Typography component="b" variant="subtitle1">
+          {storageCount}
+        </Typography>{" "}
+        <Typography component="span" variant="caption" color="textSecondary">
+          in storage
+        </Typography>
+      </div>
+      <div className="house">
+        <Typography component="b" variant="subtitle1">
+          {houseCount}
+        </Typography>{" "}
+        <Typography component="span" variant="caption" color="textSecondary">
+          in house
+        </Typography>
+      </div>
+      <ScrollingPointsDisplay points={points} className="total" />
+
+      {!!secondsLeft && <TimerBoxes secondsLeft={secondsLeft} />}
+    </StyledDisplay>
+  )
+}
+
+const StyledTimerDiv = styled.div`
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  grid-gap: 1px;
+`
+const StyledTimerBox = styled.div`
+  /* border: 1px solid gainsboro; */
+  transition: 1s opacity;
+  opacity: ${p => (p.visible ? 1 : 0)};
+  background: green;
+  height: 4px;
+  width: 4px;
+`
+const TimerBoxes = ({ secondsLeft }) => {
+  return (
+    <StyledTimerDiv className="timer">
+      {Array.from({ length: 24 }, x => x).map((x, index) => (
+        <StyledTimerBox visible={index < secondsLeft} key={index} />
+      ))}
+    </StyledTimerDiv>
   )
 }

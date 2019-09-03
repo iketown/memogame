@@ -76,10 +76,7 @@ const StyledListItem = styled(ListItem)`
 const LogListItem = ({ msg, handleTrash, nextEntry }) => {
   const { itemFromItemId } = useAllItemsCtx()
   const { players } = usePlayersCtx()
-  const {
-    gameState: { members }
-  } = useGameCtx()
-  const personX = members.find(mem => mem.uid === msg.uid)
+
   const person = players && players[msg.uid]
   const samePersonAsNext = nextEntry && nextEntry.uid === msg.uid
   const [timeText, setTimeText] = useState(moment(msg.timeStamp).fromNow())
