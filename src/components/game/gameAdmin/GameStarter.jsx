@@ -19,6 +19,7 @@ import { FaUser, FaCaretDown, FaCaretUp } from "react-icons/fa"
 import RequestList from "./RequestList"
 import MemberList from "./MemberList"
 import ShowMe from "../../../utils/ShowMe.jsx"
+import { useFirebase } from "../../../contexts/FirebaseCtx"
 //
 //
 const StyledDiv = styled.div`
@@ -32,6 +33,7 @@ const GameStarter = () => {
     openGameToNewPlayers,
     setGameInProgress
   } = useGameCtx()
+  const { handleWinGame } = useFirebase()
   const [expanded, setExpanded] = useState(false)
 
   function handleStartGame() {
@@ -59,6 +61,13 @@ const GameStarter = () => {
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <MemberList members={gameState.members} />
+            </Grid>
+            <Grid item xs={12}>
+              <Button
+                onClick={() => handleWinGame({ gameId: gameState.gameId })}
+              >
+                Cheat WIN
+              </Button>
             </Grid>
             {gameState.memberRequests && gameState.memberRequests.length ? (
               <Grid item xs={12}>

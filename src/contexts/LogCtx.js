@@ -42,7 +42,6 @@ export const useLogCtx = () => {
     // Henry moves card into house
     const name = user.displayName
     const itemName = itemFromItemId(itemId).name
-    console.log("name item destination", name, itemName, destination)
     let text
     if (destination === "house") {
       text = `${name} puts ${itemName} in house`

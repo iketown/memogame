@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react"
+import { useState, useEffect } from "react"
 import moment from "moment"
 import { useGameFxns } from "./useGameFxns"
 import { useTurnTimerCtx } from "../contexts/TurnTimerCtx"
 import { useGameCtx } from "../contexts/GameCtx"
 
-const defaultSecondsPerTurn = 1500
+const defaultSecondsPerTurn = 15
 
 //
 //
@@ -61,7 +61,6 @@ export const useOthersTurnTimer = ({
         const newTimeUpAt = moment(gamePlay.whosTurnItIs.lastCheckIn)
           .add(secondsPerTurn, "seconds")
           .toISOString()
-        console.log("setting TimeUpAt val", newTimeUpAt)
         setTimeUpAt(newTimeUpAt)
       }
     }

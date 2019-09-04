@@ -9,8 +9,8 @@ export const PlayersCtxProvider = props => {
   const [players, setPlayers] = useState({})
   const { firestore } = useFirebase()
   useEffect(() => {
-    if (gameState && gameState.memberUIDs) {
-      gameState.memberUIDs.forEach(uid => {
+    if (gameState && (gameState.memberUIDs || gameState.memberRequests)) {
+      ;[...gameState.memberUIDs, ...gameState.memberRequests].forEach(uid => {
         const memberRef = firestore.collection("publicProfiles").doc(uid)
         memberRef.onSnapshot(doc => {
           setPlayers(old => ({ ...old, [doc.id]: doc.data() }))

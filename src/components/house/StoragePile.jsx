@@ -9,7 +9,6 @@ import { useWiderThan } from "../../hooks/useWidth.js"
 import { useGameCtx, useStoragePileCtx } from "../../contexts/GameCtx.js"
 import { useAuthCtx } from "../../contexts/AuthCtx.js"
 import { useAllItemsCtx } from "../../contexts/AllItemsCtx.js"
-import { usePlayersCtx } from "../../contexts/PlayersCtx.js"
 import MyTurnDisplay from "./MyTurnDisplay.jsx"
 //
 //
@@ -53,7 +52,6 @@ const TableImage = styled.div`
 
 const StoragePile = () => {
   const { allItems } = useAllItemsCtx()
-  const { players } = usePlayersCtx()
   const { gamePlay } = useGameCtx()
   const { storagePile = [] } = useStoragePileCtx()
   const { user } = useAuthCtx()

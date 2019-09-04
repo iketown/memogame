@@ -20,7 +20,6 @@ export const ChatCtxProvider = props => {
 
 export const useChatCtx = () => {
   const ctx = useContext(ChatCtx)
-  const { user } = useAuthCtx()
   const { addToChat } = useFirebase()
   if (!ctx)
     throw new Error("useChatCtx must be a descendant of ChatCtxProvider 😕")

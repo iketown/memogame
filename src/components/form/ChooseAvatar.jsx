@@ -14,7 +14,7 @@ const AvatarDiv = styled.div`
 const ChooseAvatar = () => {
   const getRandoms = (length = 6) =>
     Array.from({ length }, () => Math.round(Math.random() * 100000))
-  const [randomNums, setRandomNums] = useState(getRandoms(15))
+  const [randomNums] = useState(getRandoms(15))
   return (
     <Field name="avatarNumber">
       {({ input }) => {

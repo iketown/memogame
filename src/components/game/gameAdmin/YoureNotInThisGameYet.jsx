@@ -14,8 +14,7 @@ const YoureNotInThisGameYet = ({ gameId }) => {
   const { gameState, requestJoinGame, removeRequest } = useGameCtx()
   const { user } = useAuthCtx()
   const alreadyRequestedThisGame =
-    gameState.memberRequests &&
-    gameState.memberRequests.find(req => req.uid === user.uid)
+    gameState.memberRequests && gameState.memberRequests.includes(user.uid)
   if (alreadyRequestedThisGame) {
     return (
       <CenterStyle>

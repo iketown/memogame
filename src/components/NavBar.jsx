@@ -8,32 +8,21 @@ import {
   MenuItem,
   MenuList,
   ListItemText,
-  Typography,
-  Avatar
+  Typography
 } from "@material-ui/core"
 import AvatarMonster from "./AvatarMonster.jsx"
 import BrainGears from "../images/BrainGears.jsx"
-import styled from "styled-components"
 import { withRouter } from "react-router-dom"
 import { useFirebase } from "../contexts/FirebaseCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { useDialogCtx } from "../contexts/DialogCtx"
-import { FaUser } from "react-icons/fa"
 import ButtonLink from "./navigation/ButtonLink.jsx"
 
-const StyledDiv = styled.div`
-  position: fixed;
-  top: 0;
-  width: 100%;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-`
 const NavBar = props => {
   // const { user } = useFirebase()
   const { user, publicProfile } = useAuthCtx()
 
-  const { state, dispatch: dialogDispatch } = useDialogCtx()
+  const { dispatch: dialogDispatch } = useDialogCtx()
   const handleAuth = formType => () => {
     dialogDispatch({ type: "OPEN_FORM", formType })
   }
@@ -41,7 +30,9 @@ const NavBar = props => {
     <>
       <ButtonLink to="/gamestart">Start a Game</ButtonLink>
       <UserMenuButton history={props.history} />
-      <span>{publicProfile && publicProfile.displayName}</span>
+      <span style={{ marginLeft: "8px" }}>
+        {publicProfile && publicProfile.displayName}
+      </span>
     </>
   )
   const signedOutMenuItems = (

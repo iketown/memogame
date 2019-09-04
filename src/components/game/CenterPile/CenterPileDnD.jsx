@@ -1,10 +1,7 @@
 import React, { useState } from "react"
 import { useDrop } from "react-dnd"
 import styled from "styled-components"
-import moment from "moment"
-import { Button } from "@material-ui/core"
 //
-import PointsFloatingText from "./PointsFloatingText"
 import felt from "../../../images/felt.jpg"
 import { ItemTypes } from "../../../dnd/itemTypes"
 import { useWiderThan } from "../../../hooks/useWidth"
@@ -12,11 +9,8 @@ import { useCenterPileCtx, usePointsCtx } from "../../../contexts/GameCtx"
 import { Typography } from "@material-ui/core"
 import { WindowCard } from "../../house/DraggableCard"
 import { useHouseGridCtx } from "../../../contexts/HouseGridCtx"
-import { useLogCtx } from "../../../contexts/LogCtx"
-import DropCardSound from "../../../sounds/DropCard.sound"
 import { useGameFxns } from "../../../hooks/useGameFxns"
 import PointsReactTransGroup from "./PointsReactTransGroup"
-import { doItemsMatch } from "../../../utils/gameLogic"
 //
 //
 
@@ -49,11 +43,9 @@ const TableHalo = styled.div`
 `
 const CenterPileDnD = () => {
   const mdUp = useWiderThan("md")
-  const { addLogMessage } = useLogCtx()
   const { centerPile } = useCenterPileCtx()
   const { storageToCenterFX, houseToCenterFX } = useGameFxns()
   const { setExpandedRoom } = useHouseGridCtx()
-  const [playDropCardSound, setPlayDropCardSound] = useState(false)
   const [pointsView, setPointsView] = useState(false)
 
   const [{ isOver }, dropRef] = useDrop({
@@ -65,11 +57,9 @@ const CenterPileDnD = () => {
       if (fromStorage) {
         storageToCenterFX({ itemId })
       } else {
-        setPlayDropCardSound(true)
         houseToCenterFX({ roomId, itemId })
         setExpandedRoom({ roomId: false })
       }
-      addLogMessage({ itemId, destination: "center" })
     },
     collect: mon => ({
       isOver: !!mon.isOver(),
@@ -79,10 +69,10 @@ const CenterPileDnD = () => {
   return (
     <>
       <StyleTable isOver={isOver} width={mdUp ? 11 : 9} ref={dropRef}>
-        <DropCardSound
+        {/* <DropCardSound
           playDropCardSound={playDropCardSound}
           setPlayDropCardSound={setPlayDropCardSound}
-        />
+        /> */}
         <Typography variant="h5">CENTER</Typography>
         {centerPile.map((itemId, index) => (
           <WindowCard

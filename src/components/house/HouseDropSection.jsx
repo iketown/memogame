@@ -6,14 +6,7 @@ import { ItemTypes } from "../../dnd/itemTypes"
 import HouseWindow from "./HouseWindow.jsx"
 import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
 import { maxItemsPerRoom } from "../../utils/gameLogic"
-import { useFirebase } from "../../contexts/FirebaseCtx"
-import { useLogCtx } from "../../contexts/LogCtx"
-import {
-  useGameCtx,
-  useHouseCtx,
-  useStoragePileCtx
-} from "../../contexts/GameCtx"
-import { useAuthCtx } from "../../contexts/AuthCtx"
+import { useHouseCtx } from "../../contexts/GameCtx"
 import { useGameFxns } from "../../hooks/useGameFxns"
 //
 //

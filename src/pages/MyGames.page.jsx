@@ -10,9 +10,7 @@ import {
   ListItemSecondaryAction,
   IconButton
 } from "@material-ui/core"
-import { FaForward, FaArrowRight } from "react-icons/fa"
-
-const brianUid = "ljXT8umqmAW0pS9GpVKhXyGmC422"
+import { FaArrowRight, FaTimes } from "react-icons/fa"
 
 const MyGamesPage = () => {
   const { user } = useAuthCtx()
@@ -20,21 +18,23 @@ const MyGamesPage = () => {
   console.log("uid", user && user.uid)
   const { firestore } = useFirebase()
   useEffect(() => {
-    const myGamesRef = firestore
-      .collection(`games`)
-      .where("memberUIDs", "array-contains", brianUid)
-    myGamesRef
-      .get()
-      .then(querySnapshot => {
-        const _myGames = []
-        querySnapshot.forEach(doc => {
-          _myGames.push({ id: doc.id, ...doc.data() })
-          console.log("my game", doc.id, doc.data())
+    if (user && user.uid) {
+      const myGamesRef = firestore
+        .collection(`games`)
+        .where("memberUIDs", "array-contains", user.uid)
+      myGamesRef
+        .get()
+        .then(querySnapshot => {
+          const _myGames = []
+          querySnapshot.forEach(doc => {
+            _myGames.push({ id: doc.id, ...doc.data() })
+            console.log("my game", doc.id, doc.data())
+          })
+          setMyGames(_myGames)
         })
-        setMyGames(_myGames)
-      })
-      .catch(err => console.log("error getting docs", err))
-  }, [firestore])
+        .catch(err => console.log("error getting docs", err))
+    }
+  }, [firestore, user])
   return (
     <div>
       my games
@@ -51,13 +51,21 @@ const MyGamesPage = () => {
 export default MyGamesPage
 
 const GameListItem = ({ game }) => {
+  const { user } = useAuthCtx()
+  const { deleteGame } = useFirebase()
+  const myGame = user && game.startedBy === user.uid
   return (
     <ListItem>
       <ListItemText
         primary={game.gameName}
-        secondary={game.members.map(mem => mem.displayName)}
+        secondary={game.inProgress && "in progress"}
       />
       <ListItemSecondaryAction>
+        {myGame && (
+          <IconButton onClick={() => deleteGame({ gameId: game.id })}>
+            <FaTimes />
+          </IconButton>
+        )}
         <Link to={`/game/${game.id}`}>
           <IconButton>
             <FaArrowRight />

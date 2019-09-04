@@ -16,7 +16,6 @@ import { usePlayersCtx } from "../../../contexts/PlayersCtx"
 //
 const MemberList = ({ members }) => {
   const { players } = usePlayersCtx()
-  console.log("players", players)
   return (
     <Card>
       <CardHeader title="Players" />

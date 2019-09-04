@@ -6,12 +6,13 @@ import {
   HouseCtxProvider,
   CenterPileCtxProvider,
   StoragePileCtxProvider,
-  PointsCtxProvider
+  PointsCtxProvider,
+  SoundCtxProvider
 } from "../contexts/GameCtx"
+import GameSounds from "../sounds/GameSounds.jsx"
 import { ChatCtxProvider } from "../contexts/ChatCtx"
 import GameContent from "../components/game/GameContent.jsx"
 import SnackbarHandler from "../components/SnackBarHandler.jsx"
-import { GamePlayCtxProvider } from "../contexts/GamePlayCtx.js"
 import { PlayersCtxProvider } from "../contexts/PlayersCtx"
 import { TurnTimerCtxProvider } from "../contexts/TurnTimerCtx"
 //
@@ -30,12 +31,13 @@ const Game = props => {
             <HouseCtxProvider gameId={gameId}>
               <StoragePileCtxProvider gameId={gameId}>
                 <CenterPileCtxProvider gameId={gameId}>
-                  <GamePlayCtxProvider gameId={gameId}>
-                    <ChatCtxProvider gameId={gameId}>
+                  <ChatCtxProvider gameId={gameId}>
+                    <SoundCtxProvider>
                       <SnackbarHandler gameId={gameId} />
+                      <GameSounds />
                       <GameContent gameId={gameId} />
-                    </ChatCtxProvider>
-                  </GamePlayCtxProvider>
+                    </SoundCtxProvider>
+                  </ChatCtxProvider>
                 </CenterPileCtxProvider>
               </StoragePileCtxProvider>
             </HouseCtxProvider>

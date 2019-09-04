@@ -13,13 +13,18 @@ import { useGameCtx } from "../contexts/GameCtx"
 //
 const YourTurnSound = () => {
   const { user } = useAuthCtx()
-  const { gamePlay } = useGameCtx()
+  const { gamePlay, gameState } = useGameCtx()
   const whosTurn = useRef(false)
 
   const [soundToPlay, setSoundToPlay] = useState(false)
   useEffect(() => {}, [])
   useEffect(() => {
-    if (gamePlay && !!gamePlay.whosTurnItIs) {
+    if (
+      gamePlay &&
+      !!gamePlay.whosTurnItIs &&
+      gameState &&
+      gameState.inProgress
+    ) {
       const newWhosTurn = gamePlay.whosTurnItIs.uid
       if (newWhosTurn !== whosTurn.current) {
         // the turn has changed
@@ -34,7 +39,7 @@ const YourTurnSound = () => {
         whosTurn.current = newWhosTurn //
       }
     }
-  }, [gamePlay, user.uid])
+  }, [gamePlay, gameState, user.uid])
 
   return (
     <>

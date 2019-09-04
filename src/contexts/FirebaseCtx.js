@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react"
+import React, { createContext, useContext } from "react"
 import Firebase from "../firebase/firebaseInit"
 
 const FirebaseCtx = createContext()
@@ -16,6 +16,7 @@ export const useFirebase = () => {
     doSignInWithUserAndPassword,
     doSignOut,
     doCreateGame,
+    doRematch,
     doCancelGame,
     doRequestToJoinGame,
     doHandleGameRequest,
@@ -23,6 +24,8 @@ export const useFirebase = () => {
     doStartGame,
     doAddToLog,
     doRemoveLog,
+    deleteGame,
+    handleWinGame,
     playStorageToCenter,
     playStorageToHouse,
     fdb,
@@ -46,6 +49,7 @@ export const useFirebase = () => {
     doSignInWithUserAndPassword,
     doSignOut,
     doCreateGame,
+    doRematch,
     doCancelGame,
     doRequestToJoinGame,
     doHandleGameRequest,
@@ -53,6 +57,8 @@ export const useFirebase = () => {
     doStartGame,
     doAddToLog,
     doRemoveLog,
+    deleteGame,
+    handleWinGame,
     playStorageToCenter,
     playStorageToHouse,
     fdb,

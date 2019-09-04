@@ -11,7 +11,6 @@ export const TurnTimerCtxProvider = props => {
     const timerRef = fdb.ref(`/currentGames/${gameId}/whosTurnItIs`)
     timerRef.on("value", snapshot => {
       const value = snapshot.val()
-      console.log("value in turntimer", snapshot.val())
       if (value) {
         setLastCheckIn(value.lastCheckIn)
       }
@@ -46,5 +45,3 @@ export const useTimerStarter = () => {
   const { handleStart } = ctx
   return { handleStart }
 }
-
-// when you play something from your house, timeleft should go up / restart at 20?

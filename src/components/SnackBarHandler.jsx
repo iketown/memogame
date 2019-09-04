@@ -24,44 +24,18 @@ const SnackBarHandler = ({ gameId, enqueueSnackbar, closeSnackbar }) => {
   const { players } = usePlayersCtx()
   const { user } = useAuthCtx()
   const { itemFromItemId } = useAllItemsCtx()
-  const [latestLog, setLatestLog] = useState({})
-  const handleNewLog = useCallback(
-    logObj => {
-      console.log("handleNewLog called", logObj)
-      const { destination, itemId, text, timeStamp, uid, valid } = logObj
-      const howLongAgo = Math.abs(moment(timeStamp).diff(moment(), "seconds"))
-      const player = players[uid]
-      const card = itemFromItemId(itemId)
-      if (uid !== user.uid && howLongAgo < 10 && player && card) {
-        const variant =
-          destination === "house" ? "info" : valid ? "success" : "error"
-        enqueueSnackbar(
-          `${player.displayName} happened ${howLongAgo} seconds ago`,
-          {
-            variant
-          }
-        )
-      }
-    },
-    [enqueueSnackbar, itemFromItemId, players, user.uid]
-  )
+
   useEffect(() => {
     if (gameId) {
       const gameLogRef = fdb.ref(`/currentGames/${gameId}/gameLog`)
       gameLogRef.on("child_added", (snapshot, prevKey) => {
-        const {
-          destination,
-          itemId,
-          text,
-          timeStamp,
-          uid,
-          valid,
-          player
-        } = snapshot.val()
+        const { text, timeStamp, player } = snapshot.val()
         const howLongAgo = Math.abs(moment(timeStamp).diff(moment(), "seconds"))
         if (howLongAgo < 5) {
           console.log("player", player)
           enqueueSnackbar(text, {
+            anchorOrigin: { horizontal: "right", vertical: "bottom" },
+            autoHideDuration: 3000,
             children: key => (
               <Card style={{ background: "white" }}>
                 <CardHeader

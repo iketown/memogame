@@ -1,12 +1,12 @@
-import React from "react"
 import moment from "moment"
 import { useFirebase } from "../contexts/FirebaseCtx"
-import { useGameCtx, usePointsCtx } from "../contexts/GameCtx"
+import { useGameCtx, usePointsCtx, useSoundCtx } from "../contexts/GameCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { doItemsMatch, shuffle } from "../utils/gameLogic"
 import { useLogCtx } from "../contexts/LogCtx"
 export const useGameFxns = () => {
   const { gameId, gamePlay } = useGameCtx()
+  const { dropCardSound } = useSoundCtx()
   const {
     setPointsDisplay,
     pointsClimber,
@@ -63,8 +63,7 @@ export const useGameFxns = () => {
     const nextIndex = (myIndex + 1) % memberUIDs.length
     const nextPerson = {
       uid: memberUIDs[nextIndex],
-      startTime: moment().toISOString(),
-      lastCheckIn: null // next person will update lastCheckIn as soon as they know its their turn.
+      startTime: moment().toISOString()
     }
     fdb.ref(`/currentGames/${gameId}/whosTurnItIs`).set(nextPerson)
   }
@@ -92,8 +91,9 @@ export const useGameFxns = () => {
   async function addToCenterFX({ itemId, fromHouse }) {
     const { centerRef, centerValue } = await _centerRefAndValue()
     // validate
-    const [topCard, ...underCards] = centerValue
+    const [topCard] = centerValue
     const isValid = doItemsMatch(topCard, itemId)
+    addLogMessage({ itemId, destination: "center" }) // logMessage checks validity on its own
     if (isValid) {
       // UI respond to valid card
       let pointsThisPlay = 1
@@ -107,10 +107,13 @@ export const useGameFxns = () => {
       addPoints(pointsThisPlay)
       const newCenter = [itemId, ...centerValue]
       _updateTurnTimer()
+      dropCardSound({ valid: true })
       return centerRef.set(newCenter)
     } else {
       // UI respond to inValid card
-      await addPileToStorage(underCards)
+      dropCardSound({ valid: false })
+
+      await addPileToStorage(centerValue)
       addPoints(-centerValue.length)
       const newCenter = [itemId]
       resetPointsClimber()
@@ -137,6 +140,7 @@ export const useGameFxns = () => {
     })
   }
   async function addToRoomFX({ roomId, itemId }) {
+    addLogMessage({ destination: "house", itemId })
     const { myHouseRef, myHouseValue } = await _myHouseRefAndValue()
     const newHouse = { ...myHouseValue }
     newHouse[roomId] = newHouse[roomId]
@@ -146,7 +150,6 @@ export const useGameFxns = () => {
   }
   async function removeFromStorageFX({ itemId }) {
     const { storageRef, storageValue } = await _storageRefAndValue()
-    console.log("storageValue", storageValue)
     const newStorageVal = storageValue.filter(_itemId => _itemId !== itemId)
     storageRef.set(newStorageVal)
     // _endTurn()
@@ -185,9 +188,7 @@ export const useGameFxns = () => {
     myHouseRef.set(myHouseValue)
     return storageRef.set([...storageValue, ...movingCards])
   }
-  async function moveCenterToStorageFX() {
-    // after putting down a wrong card
-  }
+
   // memoize all these?   useCallback?
   return {
     storageToCenterFX,

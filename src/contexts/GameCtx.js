@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useEffect, useState } from "react"
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useMemo
+} from "react"
 import firebase from "firebase/app"
 import moment from "moment"
 import { useAuthCtx } from "./AuthCtx"
@@ -7,6 +13,35 @@ import { shuffle, doItemsMatch } from "../utils/gameLogic"
 import { useAllItemsCtx } from "./AllItemsCtx"
 
 const GameCtx = createContext()
+
+// ⭐ 🌟 SOUNDS CONTEXT 🌟 ⭐ //
+
+const SoundCtx = createContext()
+export const SoundCtxProvider = props => {
+  const [playDropCardSound, setPlayDropCardSound] = useState(false)
+
+  return (
+    <SoundCtx.Provider
+      value={{ playDropCardSound, setPlayDropCardSound }}
+      {...props}
+    />
+  )
+}
+export const useSoundCtx = () => {
+  const ctx = useContext(SoundCtx)
+  if (!ctx)
+    throw new Error("useSoundCtx must be a descendant of SoundCtxProvider 😕")
+  const { playDropCardSound, setPlayDropCardSound } = ctx
+  const dropCardSound = ({ valid }) => {
+    setPlayDropCardSound(valid ? "valid" : "invalid")
+  }
+  const cancelDropCardSound = () => {
+    setPlayDropCardSound(false)
+  }
+
+  return { dropCardSound, cancelDropCardSound, playDropCardSound }
+}
+// ⭐ 🌟 END SOUNDS CONTEXT 🌟 ⭐ //
 
 // ⭐ 🌟 HOUSE CONTEXT 🌟 ⭐ //
 const HouseCtx = createContext()
@@ -248,7 +283,6 @@ export const GameCtxProvider = props => {
   useEffect(() => {
     const gamePlayRef = fdb.ref(`/currentGames/${gameId}`)
     gamePlayRef.on("value", snapshot => {
-      console.log("setting gameplay values")
       setGamePlay(snapshot.val())
     })
     // return gamePlayRef.off
@@ -288,6 +322,45 @@ export const GameCtxProvider = props => {
       gameStates
     })
   }
+  const totalCards = useMemo(() => {
+    if (!gamePlay) return null
+    // return null
+    const centerCards = gamePlay.centerCardPile
+
+    const storageCards =
+      gamePlay.gameStates &&
+      Object.values(gamePlay.gameStates).reduce((arr, state) => {
+        if (state.storagePile) {
+          arr.push(...state.storagePile)
+        }
+        return arr
+      }, [])
+
+    const houseCards =
+      gamePlay.gameStates &&
+      Object.values(gamePlay.gameStates).reduce((arr, state) => {
+        if (state.house) {
+          Object.values(state.house).forEach(room => arr.push(...room))
+        }
+        return arr
+      }, [])
+    if (gamePlay.gameStates) {
+      Object.values(gamePlay.gameStates).forEach(gameState => {
+        const { house, storagePile } = gameState
+        if (house) {
+          Object.values(house).forEach(room => {
+            houseCards.concat(room)
+          })
+        }
+        storageCards.concat(...storagePile)
+      })
+    }
+
+    const center = (centerCards && centerCards.length) || 0
+    const houses = (houseCards && houseCards.length) || 0
+    const storage = (storageCards && storageCards.length) || 0
+    return { center, houses, storage, total: center + houses + storage }
+  }, [gamePlay])
   if (!gameId) return null
   return (
     <GameCtx.Provider
@@ -297,7 +370,8 @@ export const GameCtxProvider = props => {
         gamePlay,
         firestore,
         gameId,
-        createRTDBGame
+        createRTDBGame,
+        totalCards
       }}
       {...props}
     />
@@ -311,7 +385,14 @@ export const useGameCtx = () => {
   const { firestore } = useFirebase()
   if (!ctx)
     throw new Error("useGameCtx must be a descendant of GameCtxProvider 😕")
-  const { gameState, setGamePlay, gameId, gamePlay, createRTDBGame } = ctx
+  const {
+    gameState,
+    setGamePlay,
+    gameId,
+    gamePlay,
+    createRTDBGame,
+    totalCards
+  } = ctx
   //
 
   const _getGameFirestore = async () => {
@@ -336,10 +417,7 @@ export const useGameCtx = () => {
     const { gameRef, gameInfo } = await _getGameFirestore()
     if (!gameInfo.inProgress) {
       gameRef.update({
-        memberRequests: firebase.firestore.FieldValue.arrayUnion({
-          uid: user.uid,
-          displayName
-        })
+        memberRequests: firebase.firestore.FieldValue.arrayUnion(user.uid)
       })
     } else {
       console.log("cant join this list")
@@ -349,16 +427,15 @@ export const useGameCtx = () => {
     console.log(`removing ${user.email} from request list - ${gameId}`)
     const { gameRef, gameInfo } = await _getGameFirestore()
     gameRef.update({
-      memberRequests: firebase.firestore.FieldValue.arrayRemove({
-        uid: user.uid,
-        displayName
-      })
+      memberRequests: firebase.firestore.FieldValue.arrayRemove(user.uid)
     })
   }
   const setGameInProgress = async () => {
     const { gameRef } = await _getGameFirestore()
+    const startedAt = moment().toISOString()
     gameRef.update({
-      inProgress: true
+      inProgress: true,
+      startedAt
     })
   }
   const openGameToNewPlayers = async () => {
@@ -367,20 +444,30 @@ export const useGameCtx = () => {
       inProgress: false
     })
   }
+  const removeFromGame = async ({ uid }) => {
+    const { gameRef, gameInfo } = await _getGameFirestore()
+    const newMemberRequests = [...gameInfo.memberRequests, uid]
+    const newMemberUIDs = gameInfo.memberUIDs.filter(_uid => _uid !== uid)
+    return gameRef.update({
+      memberRequests: newMemberRequests,
+      memberUIDs: newMemberUIDs
+    })
+  }
   const handleGameRequest = async ({ requestingUID, approvedBool }) => {
     const { gameRef, gameInfo } = await _getGameFirestore()
     if (gameInfo.startedBy !== user.uid) {
       console.log("not your game", gameInfo.startedBy, user.uid)
       return null
     }
-    const requester = gameInfo.memberRequests.find(
-      mem => mem.uid === requestingUID
-    )
-    if (!requester) return "sorry, person not found"
+    const requester = gameInfo.memberRequests.find(uid => uid === requestingUID)
+    if (!requester) {
+      console.log("person not found")
+      return "sorry, person not found"
+    }
 
     // remove person from request list
     const newRequests = gameInfo.memberRequests.filter(
-      mem => mem.uid !== requestingUID
+      uid => uid !== requestingUID
     )
     // add person to members if approved
     // const newMembers = [...gameInfo.members]
@@ -404,8 +491,10 @@ export const useGameCtx = () => {
     requestJoinGame,
     removeRequest,
     handleGameRequest,
+    removeFromGame,
     createRTDBGame,
     setGameInProgress,
-    openGameToNewPlayers
+    openGameToNewPlayers,
+    totalCards
   }
 }

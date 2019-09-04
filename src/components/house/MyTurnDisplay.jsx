@@ -1,8 +1,9 @@
 import React from "react"
 import styled from "styled-components"
-import { Typography } from "@material-ui/core"
+import { Typography, Button } from "@material-ui/core"
 import TurnTimerStack from "./TurnTimerStack"
 import { useTurnTimer } from "../../hooks/useTurnTimer"
+import { useGameFxns } from "../../hooks/useGameFxns"
 
 const YourTurnDiv = styled.div`
   display: flex;
@@ -21,6 +22,7 @@ const YourTurnDiv = styled.div`
 `
 const MyTurnDisplay = () => {
   const { secondsLeft } = useTurnTimer()
+  const { _endTurn } = useGameFxns()
   return (
     <div
       style={{
@@ -37,6 +39,15 @@ const MyTurnDisplay = () => {
           <b>TURN</b>
         </div>
         <div className="seconds">{secondsLeft}</div>
+        <br />
+        <Button
+          onClick={_endTurn}
+          size="small"
+          color="secondary"
+          variant="contained"
+        >
+          End Turn
+        </Button>
       </YourTurnDiv>
       <TurnTimerStack secondsLeft={secondsLeft} />
     </div>

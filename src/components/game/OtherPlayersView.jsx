@@ -29,8 +29,14 @@ const OtherPlayersView = () => {
       </Grid>
       <Grid item xs={12} md={6}>
         {gameStates &&
+          gamePlay.memberUIDs &&
           Object.entries(gameStates)
-            // .filter(([playerId]) => playerId !== user.uid)
+            .sort((a, b) => {
+              return gamePlay.memberUIDs.indexOf(a[0]) <
+                gamePlay.memberUIDs.indexOf(b[0])
+                ? -1
+                : 1
+            })
             .map(([playerId, playerState]) => (
               <PlayerDisplay
                 key={playerId}

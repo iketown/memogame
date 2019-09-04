@@ -1,6 +1,5 @@
-import React, { useState, useEffect } from "react"
+import React, { useEffect } from "react"
 import { CSSTransition, TransitionGroup } from "react-transition-group"
-import { Button } from "@material-ui/core"
 import styled from "styled-components"
 //
 import { usePointsCtx } from "../../../contexts/GameCtx"

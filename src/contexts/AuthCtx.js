@@ -20,7 +20,6 @@ export const AuthCtxProvider = props => {
       const myPublicProfileRef = firestore.doc(`/publicProfiles/${user.uid}`)
       const unsubscribe = myPublicProfileRef.onSnapshot(doc => {
         if (doc.data()) {
-          console.log("public profile info", doc.data())
           setPublicProfile(doc.data())
         } else {
           console.log("no public profile for ", user)

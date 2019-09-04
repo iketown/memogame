@@ -4,19 +4,15 @@ import { Grid } from "@material-ui/core"
 import { DndProvider } from "react-dnd"
 import HTML5Backend from "react-dnd-html5-backend"
 //
-import SelectedRoomView from "./SelectedRoomView"
+import NewSelectedRoomView from "./SelectedRoomView/NewSelectedRoomView.jsx"
 import OtherPlayersView from "../game/OtherPlayersView.jsx"
 import houseImage from "../../images/handDrawnHouse.svg"
 import { useWiderThan } from "../../hooks/useWidth"
 import { HouseGridCtxProvider } from "../../contexts/HouseGridCtx"
-import { usePointsCtx } from "../../contexts/GameCtx"
 import StoragePile from "./StoragePile"
 import HouseDropSection from "./HouseDropSection"
-import YourTurnSound from "../../sounds/YourTurn.sound.jsx"
-import { TurnTimerCtxProvider } from "../../contexts/TurnTimerCtx"
-import PointsFloatingText from "../game/CenterPile/PointsFloatingText"
-import PointsReactTransGroup from "../game/CenterPile/PointsReactTransGroup"
-import ShowMe from "../../utils/ShowMe.jsx"
+import { useGameCtx } from "../../contexts/GameCtx"
+import GameOver from "./GameOver.jsx"
 //
 
 export const houseDimensions = {
@@ -118,7 +114,8 @@ const windowArr = [
 const HouseGrid = () => {
   const mdUp = useWiderThan("md")
   const [expanded, setExpanded] = useState(false)
-  const { pointsClimber } = usePointsCtx()
+  const { gameState } = useGameCtx()
+  const gameOver = gameState.completed
   return (
     <DndProvider backend={HTML5Backend}>
       <HouseGridCtxProvider>
@@ -131,7 +128,7 @@ const HouseGrid = () => {
               expanded={expanded}
               onClick={() => setExpanded(false)}
             >
-              <SelectedRoomView />
+              <NewSelectedRoomView />
               {windowArr.map(({ roomId, display }) => (
                 <HouseDropSection
                   setExpanded={setExpanded}
@@ -141,15 +138,16 @@ const HouseGrid = () => {
                 />
               ))}
             </StyleHouseGrid>
-            <YourTurnSound />
           </Grid>
           <Grid item xs={6}>
-            <OtherPlayersView />
-            <StoragePile />
-            <br />
-            <br />
-            <br />
-            <ShowMe obj={pointsClimber} name="pointsClimber" noModal />
+            {gameOver ? (
+              <GameOver />
+            ) : (
+              <>
+                <OtherPlayersView />
+                <StoragePile />
+              </>
+            )}
           </Grid>
         </Grid>
       </HouseGridCtxProvider>
