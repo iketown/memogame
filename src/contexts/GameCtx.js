@@ -3,7 +3,8 @@ import React, {
   useContext,
   useEffect,
   useState,
-  useMemo
+  useMemo,
+  useRef
 } from "react"
 import firebase from "firebase/app"
 import moment from "moment"
@@ -84,6 +85,8 @@ export const useHouseCtx = () => {
 
   // card must be in house for x seconds before it can be played.
   const houseRestrictionSeconds = 15
+
+  const houseTimeoutRef = useRef()
   const addToHouseTimer = itemId => {
     // key is itemId
     // value is when the timer restriction is over.
@@ -93,7 +96,8 @@ export const useHouseCtx = () => {
         .add(houseRestrictionSeconds, "seconds")
         .endOf("second")
     }))
-    setTimeout(
+    clearTimeout(houseTimeoutRef.current)
+    houseTimeoutRef.current = setTimeout(
       () => removeFromHouseTimer(itemId),
       houseRestrictionSeconds * 1000
     )
@@ -352,7 +356,9 @@ export const GameCtxProvider = props => {
             houseCards.concat(room)
           })
         }
-        storageCards.concat(...storagePile)
+        if (storagePile && storagePile.length) {
+          storageCards.concat(...storagePile)
+        }
       })
     }
 
@@ -381,7 +387,6 @@ export const GameCtxProvider = props => {
 export const useGameCtx = () => {
   const ctx = useContext(GameCtx)
   const { user } = useAuthCtx()
-  const displayName = (user && user.displayName) || (user && user.email)
   const { firestore } = useFirebase()
   if (!ctx)
     throw new Error("useGameCtx must be a descendant of GameCtxProvider 😕")
@@ -453,6 +458,10 @@ export const useGameCtx = () => {
       memberUIDs: newMemberUIDs
     })
   }
+  const changeGameParameter = async ({ key, value }) => {
+    const { gameRef, gameInfo } = await _getGameFirestore()
+    gameRef.update({ [key]: value })
+  }
   const handleGameRequest = async ({ requestingUID, approvedBool }) => {
     const { gameRef, gameInfo } = await _getGameFirestore()
     if (gameInfo.startedBy !== user.uid) {
@@ -495,6 +504,7 @@ export const useGameCtx = () => {
     createRTDBGame,
     setGameInProgress,
     openGameToNewPlayers,
-    totalCards
+    totalCards,
+    changeGameParameter
   }
 }

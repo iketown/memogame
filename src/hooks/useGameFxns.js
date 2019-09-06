@@ -4,7 +4,9 @@ import {
   useGameCtx,
   usePointsCtx,
   useSoundCtx,
-  useHouseCtx
+  useHouseCtx,
+  useCenterPileCtx,
+  useStoragePileCtx
 } from "../contexts/GameCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { doItemsMatch, shuffle, pointsRequiredToWin } from "../utils/gameLogic"
@@ -25,6 +27,7 @@ export const useGameFxns = () => {
   const { fdb, handleWinGame } = useFirebase()
   const { addLogMessage } = useLogCtx()
   const { cardsInMyHouse, addToHouseTimer } = useHouseCtx()
+  const { storagePile } = useStoragePileCtx()
   // internal fxns
   async function _myHouseRefAndValue() {
     const myHouseRef = fdb.ref(
@@ -118,11 +121,11 @@ export const useGameFxns = () => {
       }
       setPointsDisplay(pointsThisPlay)
       addPoints(pointsThisPlay)
-      console.log("cards in my house", cardsInMyHouse)
       const newCenter = [itemId, ...centerValue]
       _updateTurnTimer()
       dropCardSound({ valid: true })
-      return centerRef.set(newCenter)
+      await centerRef.set(newCenter)
+      _checkIfDone(fromHouse ? "house" : "storage")
     } else {
       // UI respond to inValid card
       dropCardSound({ valid: false })
@@ -131,8 +134,19 @@ export const useGameFxns = () => {
       const newCenter = [itemId]
       resetPointsClimber()
       centerRef.set(newCenter)
-      return _endTurn()
+      _endTurn()
     }
+  }
+  function _checkIfDone(fromWhere) {
+    // this accounts for the fact that it isn't updated yet..  want the
+    // ui to respond to a 'WIN' right away...
+    let newHouse = cardsInMyHouse
+    let newStorage = storagePile.length
+    if (fromWhere === "house") newHouse--
+    if (fromWhere === "storage") newStorage--
+    console.log("house", newHouse)
+    console.log("storage", newStorage)
+    if (newHouse + newStorage === 0) handleWinGame()
   }
   async function togglePauseGame() {
     const whoseTurnRef = fdb.ref(`/currentGames/${gameId}/whosTurnItIs`)

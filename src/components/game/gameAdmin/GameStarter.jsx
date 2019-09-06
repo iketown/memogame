@@ -15,7 +15,7 @@ import {
 import styled from "styled-components"
 //
 import { useGameCtx } from "../../../contexts/GameCtx"
-import { FaUser, FaCaretDown, FaCaretUp } from "react-icons/fa"
+import { FaUser, FaCaretDown, FaCaretUp, FaPlus, FaMinus } from "react-icons/fa"
 import RequestList from "./RequestList"
 import MemberList from "./MemberList"
 import ShowMe from "../../../utils/ShowMe.jsx"
@@ -32,7 +32,8 @@ const GameStarter = () => {
     gamePlay,
     createRTDBGame,
     openGameToNewPlayers,
-    setGameInProgress
+    setGameInProgress,
+    changeGameParameter
   } = useGameCtx()
   const { handleWinGame } = useFirebase()
   const [expanded, setExpanded] = useState(false)
@@ -45,6 +46,10 @@ const GameStarter = () => {
   }
   function toggleExpanded() {
     setExpanded(old => !old)
+  }
+  const changeSecondsPerTurn = delta => () => {
+    const current = (gameState && gameState.secondsPerTurn) || 15
+    changeGameParameter({ key: "secondsPerTurn", value: current + delta })
   }
   //
   const gameIsInProgress = gameState && gameState.inProgress
@@ -78,6 +83,17 @@ const GameStarter = () => {
             ) : (
               ""
             )}
+            <Grid item xs={12}>
+              <div>
+                sec per turn: {gameState && gameState.secondsPerTurn}{" "}
+                <IconButton onClick={changeSecondsPerTurn(1)}>
+                  <FaPlus />
+                </IconButton>
+                <IconButton onClick={changeSecondsPerTurn(-1)}>
+                  <FaMinus />
+                </IconButton>
+              </div>
+            </Grid>
             <Grid item xs={12} style={{ textAlign: "center" }}>
               {gameIsInProgress ? (
                 <>
@@ -98,6 +114,7 @@ const GameStarter = () => {
                   Start Game
                 </Button>
               )}
+
               <ShowMe obj={gamePlayNoLog} name="gamePlayNoLog" />
               <ShowMe obj={gameState} name="gameState" />
             </Grid>

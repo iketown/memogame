@@ -4,11 +4,11 @@ import { useGameFxns } from "./useGameFxns"
 import { useTurnTimerCtx } from "../contexts/TurnTimerCtx"
 import { useGameCtx } from "../contexts/GameCtx"
 
-const defaultSecondsPerTurn = 30
-
 //
 //
-export const useTurnTimer = (secondsPerTurn = defaultSecondsPerTurn) => {
+export const useTurnTimer = () => {
+  const { gameState } = useGameCtx()
+  const secondsPerTurn = (gameState && gameState.secondsPerTurn) || 30
   const { _updateTurnTimer, _endTurn } = useGameFxns()
   const { lastCheckIn } = useTurnTimerCtx()
   const [timeUpAt, setTimeUpAt] = useState()
@@ -45,16 +45,13 @@ export const useTurnTimer = (secondsPerTurn = defaultSecondsPerTurn) => {
   return { secondsLeft }
 }
 
-export const useOthersTurnTimer = ({
-  playerId,
-  secondsPerTurn = defaultSecondsPerTurn
-}) => {
-  const { gamePlay } = useGameCtx()
+export const useOthersTurnTimer = ({ playerId }) => {
+  const { gamePlay, gameState } = useGameCtx()
   const [timeUpAt, setTimeUpAt] = useState()
   const [secondsLeft, setSecondsLeft] = useState(0)
   const doCounter =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === playerId
-
+  const secondsPerTurn = (gameState && gameState.secondsPerTurn) || 30
   useEffect(() => {
     if (doCounter) {
       if (gamePlay.whosTurnItIs.lastCheckIn) {

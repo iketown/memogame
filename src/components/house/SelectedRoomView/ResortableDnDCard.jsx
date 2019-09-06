@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react"
 import styled from "styled-components"
 import { IconButton } from "@material-ui/core"
 import { useDrag } from "react-dnd"
-import { FaArrowCircleUp, FaArrowCircleDown } from "react-icons/fa"
+import { FaArrowCircleUp, FaArrowCircleDown, FaEye } from "react-icons/fa"
 import moment from "moment"
 //
 import SorterCard from "./SorterCard"
@@ -70,9 +70,19 @@ const DnDCard = ({ faceUp, itemId, roomId }) => {
   const { gamePlay } = useGameCtx()
   const { houseToCenterFX } = useGameFxns()
   const { user } = useAuthCtx()
-  const { myHouseTimer } = useHouseCtx()
-  const [secondsLeft, setSecondsLeft] = useState(false)
+  const { myHouseTimer, addToHouseTimer } = useHouseCtx()
+
+  const [peek, setPeek] = useState(faceUp)
   const timerRef = useRef()
+  const handlePeek = () => {
+    clearInterval(timerRef.current)
+    setPeek(true)
+    setTimeout(() => setPeek(false), 1500)
+    addToHouseTimer(itemId)
+  }
+
+  // this shit is a mess 👇  make a timer hook or use the lib.
+  const [secondsLeft, setSecondsLeft] = useState(false)
   useEffect(() => {
     if (myHouseTimer[itemId]) {
       timerRef.current = setInterval(() => {
@@ -81,15 +91,20 @@ const DnDCard = ({ faceUp, itemId, roomId }) => {
         )
         setSecondsLeft(_secondsLeft)
       }, 1000)
-    } else {
-      clearInterval(timerRef.current)
-      setSecondsLeft(false)
     }
   }, [itemId, myHouseTimer])
+  useEffect(() => {
+    if (secondsLeft < 0) {
+      setSecondsLeft(false)
+      clearInterval(timerRef.current)
+    }
+  }, [secondsLeft])
+  // this shit is a mess 👆
+
   const isMyTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
 
-  const canPlay = isMyTurn && !faceUp && !secondsLeft
+  const canPlay = isMyTurn && !faceUp && !myHouseTimer[itemId]
   const [{ isDragging }, dragRef] = useDrag({
     item: { type: ItemTypes.CARD, itemId, fromStorage: false, roomId },
     collect: monitor => ({
@@ -107,18 +122,34 @@ const DnDCard = ({ faceUp, itemId, roomId }) => {
       onDoubleClick={() => {
         canPlay
           ? houseToCenterFX({ roomId, itemId })
-          : console.log("cant play that now")
+          : console.log("cant play that now", `${secondsLeft} seconds left`)
       }}
     >
       <SorterCard
         restricted={!!myHouseTimer[itemId]}
+        handlePeek={handlePeek}
+        peek={peek}
         secondsLeft={secondsLeft}
-        faceUp={faceUp}
+        faceUp={faceUp || peek}
         key={itemId}
         itemId={itemId}
       >
         {itemId}
       </SorterCard>
+      {!faceUp && !peek && (
+        <PeekButtonDiv>
+          <IconButton onClick={handlePeek} variant="contained" color="primary">
+            <FaEye />
+          </IconButton>
+        </PeekButtonDiv>
+      )}
     </div>
   )
 }
+
+const PeekButtonDiv = styled.div`
+  position: absolute;
+  top: 50%;
+  left: -39px;
+  transform: translateY(-50%);
+`

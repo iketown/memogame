@@ -17,6 +17,7 @@ import {
   drum,
   grapes,
   glasses,
+  goldfish,
   guitar,
   hat,
   lion,
@@ -51,14 +52,14 @@ const items = {
     name: "airplane",
     card: airplane
   },
-  ORE_SCH_R: {
-    id: "ORE_SCH_R",
-    firstLetter: "R",
-    color__id: "orange",
-    type__id: "school",
-    name: "ruler",
-    card: ruler
-  },
+  // ORE_SCH_R: {
+  //   id: "ORE_SCH_R",
+  //   firstLetter: "R",
+  //   color__id: "orange",
+  //   type__id: "school",
+  //   name: "ruler",
+  //   card: ruler
+  // },
   ORE_CLO_S: {
     id: "ORE_CLO_S",
     firstLetter: "S",
@@ -67,14 +68,14 @@ const items = {
     name: "shirt",
     card: shirt
   },
-  ORE_MUS_M: {
-    id: "ORE_MUS_M",
-    firstLetter: "M",
-    color__id: "orange",
-    type__id: "music",
-    name: "maracas",
-    card: maracas
-  },
+  // ORE_MUS_M: {
+  //   id: "ORE_MUS_M",
+  //   firstLetter: "M",
+  //   color__id: "orange",
+  //   type__id: "music",
+  //   name: "maracas",
+  //   card: maracas
+  // },
   ORE_ANI_L: {
     id: "ORE_ANI_L",
     firstLetter: "L",
@@ -100,14 +101,14 @@ const items = {
     name: "motorcycle",
     card: motorcycle
   },
-  YEW_SCH_P: {
-    id: "YEW_SCH_P",
-    firstLetter: "P",
-    color__id: "yellow",
-    type__id: "school",
-    name: "pencil",
-    card: pencil
-  },
+  // YEW_SCH_P: {
+  //   id: "YEW_SCH_P",
+  //   firstLetter: "P",
+  //   color__id: "yellow",
+  //   type__id: "school",
+  //   name: "pencil",
+  //   card: pencil
+  // },
   YEW_CLO_S: {
     id: "YEW_CLO_S",
     firstLetter: "S",
@@ -116,14 +117,14 @@ const items = {
     name: "shoe",
     card: shoe
   },
-  YEW_MUS_T: {
-    id: "YEW_MUS_T",
-    firstLetter: "T",
-    color__id: "yellow",
-    type__id: "music",
-    name: "trumpet",
-    card: trumpet
-  },
+  // YEW_MUS_T: {
+  //   id: "YEW_MUS_T",
+  //   firstLetter: "T",
+  //   color__id: "yellow",
+  //   type__id: "music",
+  //   name: "trumpet",
+  //   card: trumpet
+  // },
   YEW_PRO_B: {
     id: "YEW_PRO_B",
     firstLetter: "B",
@@ -132,14 +133,22 @@ const items = {
     name: "banana",
     card: banana
   },
-  YEW_TOY_B: {
-    id: "YEW_TOY_B",
-    firstLetter: "B",
+  YEW_ANI_G: {
+    id: "YEW_ANI_G",
+    firstLetter: "G",
     color__id: "yellow",
-    type__id: "toys",
-    name: "ball",
-    card: ball
+    type__id: "animal",
+    name: "fish",
+    card: goldfish
   },
+  // YEW_TOY_B: {
+  //   id: "YEW_TOY_B",
+  //   firstLetter: "B",
+  //   color__id: "yellow",
+  //   type__id: "toys",
+  //   name: "ball",
+  //   card: ball
+  // },
   // RED
   RED_TRA_C: {
     id: "RED_TRA_C",
@@ -157,14 +166,14 @@ const items = {
     name: "dress",
     card: dress
   },
-  RED_MUS_P: {
-    id: "RED_MUS_P",
-    firstLetter: "P",
-    color__id: "red",
-    type__id: "music",
-    name: "piano",
-    card: piano
-  },
+  // RED_MUS_P: {
+  //   id: "RED_MUS_P",
+  //   firstLetter: "P",
+  //   color__id: "red",
+  //   type__id: "music",
+  //   name: "piano",
+  //   card: piano
+  // },
   RED_ANI_B: {
     id: "RED_ANI_B",
     firstLetter: "B",
@@ -190,14 +199,14 @@ const items = {
     name: "boat",
     card: boat
   },
-  GRN_SCH_S: {
-    id: "GRN_SCH_S",
-    firstLetter: "S",
-    color__id: "green",
-    type__id: "school",
-    name: "stapler",
-    card: stapler
-  },
+  // GRN_SCH_S: {
+  //   id: "GRN_SCH_S",
+  //   firstLetter: "S",
+  //   color__id: "green",
+  //   type__id: "school",
+  //   name: "stapler",
+  //   card: stapler
+  // },
   GRN_CLO_G: {
     id: "GRN_CLO_G",
     firstLetter: "G",
@@ -222,14 +231,14 @@ const items = {
     name: "spinach",
     card: spinach
   },
-  GRN_TOY_D: {
-    id: "GRN_TOY_D",
-    firstLetter: "D",
-    color__id: "green",
-    type__id: "toys",
-    name: "doll",
-    card: doll
-  },
+  // GRN_TOY_D: {
+  //   id: "GRN_TOY_D",
+  //   firstLetter: "D",
+  //   color__id: "green",
+  //   type__id: "toys",
+  //   name: "doll",
+  //   card: doll
+  // },
   //grey
   GRY_TRA_T: {
     id: "GRY_TRA_T",
@@ -239,14 +248,14 @@ const items = {
     name: "train",
     card: train
   },
-  GRY_SCH_C: {
-    id: "GRY_SCH_C",
-    firstLetter: "C",
-    color__id: "grey",
-    type__id: "school",
-    name: "calculator",
-    card: calculator
-  },
+  // GRY_SCH_C: {
+  //   id: "GRY_SCH_C",
+  //   firstLetter: "C",
+  //   color__id: "grey",
+  //   type__id: "school",
+  //   name: "calculator",
+  //   card: calculator
+  // },
   GRY_CLO_P: {
     id: "GRY_CLO_P",
     firstLetter: "P",
@@ -255,14 +264,14 @@ const items = {
     name: "pants",
     card: pants
   },
-  GRY_MUS_B: {
-    id: "GRY_MUS_B",
-    firstLetter: "B",
-    color__id: "grey",
-    type__id: "music",
-    name: "banjo",
-    card: banjo
-  },
+  // GRY_MUS_B: {
+  //   id: "GRY_MUS_B",
+  //   firstLetter: "B",
+  //   color__id: "grey",
+  //   type__id: "music",
+  //   name: "banjo",
+  //   card: banjo
+  // },
   GRY_ANI_D: {
     id: "GRY_ANI_D",
     firstLetter: "D",
@@ -271,23 +280,23 @@ const items = {
     name: "dolphin",
     card: dolphin
   },
-  GRY_TOY_R: {
-    id: "GRY_TOY_R",
-    firstLetter: "R",
-    color__id: "grey",
-    type__id: "toy",
-    name: "robot",
-    card: robot
-  },
+  // GRY_TOY_R: {
+  //   id: "GRY_TOY_R",
+  //   firstLetter: "R",
+  //   color__id: "grey",
+  //   type__id: "toy",
+  //   name: "robot",
+  //   card: robot
+  // },
   // PURPLE
-  PUE_SCH_P: {
-    id: "PUE_SCH_P",
-    firstLetter: "P",
-    color__id: "purple",
-    type__id: "school",
-    name: "paperclip",
-    card: paperclip
-  },
+  // PUE_SCH_P: {
+  //   id: "PUE_SCH_P",
+  //   firstLetter: "P",
+  //   color__id: "purple",
+  //   type__id: "school",
+  //   name: "paperclip",
+  //   card: paperclip
+  // },
   PUE_CLO_T: {
     id: "PUE_CLO_T",
     firstLetter: "T",
@@ -296,14 +305,14 @@ const items = {
     name: "tie",
     card: tie
   },
-  PUE_MUS_D: {
-    id: "PUE_MUS_D",
-    firstLetter: "D",
-    color__id: "purple",
-    type__id: "music",
-    name: "drum",
-    card: drum
-  },
+  // PUE_MUS_D: {
+  //   id: "PUE_MUS_D",
+  //   firstLetter: "D",
+  //   color__id: "purple",
+  //   type__id: "music",
+  //   name: "drum",
+  //   card: drum
+  // },
   PUE_ANI_O: {
     id: "PUE_ANI_O",
     firstLetter: "O",
@@ -320,14 +329,14 @@ const items = {
     name: "grapes",
     card: grapes
   },
-  PUE_TOY_P: {
-    id: "PUE_TOY_P",
-    firstLetter: "P",
-    color__id: "purple",
-    type__id: "toys",
-    name: "pail",
-    card: pail
-  },
+  // PUE_TOY_P: {
+  //   id: "PUE_TOY_P",
+  //   firstLetter: "P",
+  //   color__id: "purple",
+  //   type__id: "toys",
+  //   name: "pail",
+  //   card: pail
+  // },
   //BROWN
   BRN_TRA_T: {
     id: "BRN_TRA_T",
@@ -337,14 +346,14 @@ const items = {
     name: "truck",
     card: truck
   },
-  BRN_SCH_D: {
-    id: "BRN_SCH_D",
-    firstLetter: "D",
-    color__id: "brown",
-    type__id: "school",
-    name: "desk",
-    card: desk
-  },
+  // BRN_SCH_D: {
+  //   id: "BRN_SCH_D",
+  //   firstLetter: "D",
+  //   color__id: "brown",
+  //   type__id: "school",
+  //   name: "desk",
+  //   card: desk
+  // },
   BRN_CLO_H: {
     id: "BRN_CLO_H",
     firstLetter: "H",
@@ -353,14 +362,14 @@ const items = {
     name: "hat",
     card: hat
   },
-  BRN_MUS_G: {
-    id: "BRN_MUS_G",
-    firstLetter: "G",
-    color__id: "brown",
-    type__id: "music",
-    name: "guitar",
-    card: guitar
-  },
+  // BRN_MUS_G: {
+  //   id: "BRN_MUS_G",
+  //   firstLetter: "G",
+  //   color__id: "brown",
+  //   type__id: "music",
+  //   name: "guitar",
+  //   card: guitar
+  // },
   BRN_ANI_M: {
     id: "BRN_ANI_M",
     firstLetter: "M",

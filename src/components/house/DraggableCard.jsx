@@ -30,6 +30,7 @@ const DraggableCard = ({ itemId, scale, index }) => {
     }),
     canDrag: isMyTurn
   })
+  if (!itemId) return null
   return (
     <div
       onDoubleClick={
