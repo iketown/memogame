@@ -156,8 +156,8 @@ const HouseGrid = () => {
             <>
               <OtherPlayersView />
               <StoragePile />
-              <ShowMe obj={players} name="players" noModal />
-              <ExpandedRoomView />
+              {/* <ShowMe obj={players} name="players" noModal />
+              <ExpandedRoomView /> */}
             </>
           </Grid>
         </Grid>
