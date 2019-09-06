@@ -81,22 +81,25 @@ class Firebase {
 
   doRematch = async ({ oldGameId, gameName, memberUIDs, rematchNumber }) => {
     const oldGameRef = this.firestore.doc(`/games/${oldGameId}`)
+    const [strippedGameId] = oldGameId.split("-rematch")
 
-    const rematchLoc = `${oldGameId}-rematch${rematchNumber}`
+    const rematchLoc = `${strippedGameId}-rematch${rematchNumber}`
     oldGameRef.update({ rematchLoc })
     const user = this.auth.currentUser
     const gamesRef = this.firestore.doc(`games/${rematchLoc}`)
 
-    const response = await gamesRef.set({
-      gameName,
-      memberUIDs,
-      memberRequests: [],
-      startedBy: user.uid,
-      rematchNumber,
-      inProgress: false,
-      completed: false
-    })
-    console.log("newGameLoc", rematchLoc)
+    return gamesRef
+      .set({
+        gameName,
+        memberUIDs,
+        memberRequests: [],
+        startedAt: moment().toISOString(),
+        startedBy: user.uid,
+        rematchNumber,
+        inProgress: false,
+        completed: false
+      })
+      .then(() => ({ newLoc: rematchLoc }))
   }
 
   doRequestToJoinGame = async gameId => {

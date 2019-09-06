@@ -1,9 +1,17 @@
 import moment from "moment"
 import { useFirebase } from "../contexts/FirebaseCtx"
-import { useGameCtx, usePointsCtx, useSoundCtx } from "../contexts/GameCtx"
+import {
+  useGameCtx,
+  usePointsCtx,
+  useSoundCtx,
+  useHouseCtx
+} from "../contexts/GameCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
-import { doItemsMatch, shuffle } from "../utils/gameLogic"
+import { doItemsMatch, shuffle, pointsRequiredToWin } from "../utils/gameLogic"
 import { useLogCtx } from "../contexts/LogCtx"
+
+//
+//
 export const useGameFxns = () => {
   const { gameId, gamePlay } = useGameCtx()
   const { dropCardSound } = useSoundCtx()
@@ -14,8 +22,9 @@ export const useGameFxns = () => {
     incrementPointsClimber
   } = usePointsCtx()
   const { user } = useAuthCtx()
-  const { fdb } = useFirebase()
+  const { fdb, handleWinGame } = useFirebase()
   const { addLogMessage } = useLogCtx()
+  const { cardsInMyHouse, addToHouseTimer } = useHouseCtx()
   // internal fxns
   async function _myHouseRefAndValue() {
     const myHouseRef = fdb.ref(
@@ -26,6 +35,7 @@ export const useGameFxns = () => {
     })
     return { myHouseRef, myHouseValue }
   }
+
   async function _centerRefAndValue() {
     const centerRef = fdb.ref(`/currentGames/${gameId}/centerCardPile`)
     const centerValue = await centerRef.once("value").then(snapshot => {
@@ -53,7 +63,10 @@ export const useGameFxns = () => {
   }
   const addPoints = async (quantity = 1) => {
     const { pointsRef, pointsValue } = await _pointsRefAndValue()
-    return pointsRef.set(pointsValue + quantity)
+    await pointsRef.set(pointsValue + quantity)
+    if (pointsValue + quantity >= pointsRequiredToWin) {
+      handleWinGame({ gameId })
+    }
   }
   function _endTurn() {
     const { memberUIDs } = gamePlay
@@ -105,6 +118,7 @@ export const useGameFxns = () => {
       }
       setPointsDisplay(pointsThisPlay)
       addPoints(pointsThisPlay)
+      console.log("cards in my house", cardsInMyHouse)
       const newCenter = [itemId, ...centerValue]
       _updateTurnTimer()
       dropCardSound({ valid: true })
@@ -112,7 +126,6 @@ export const useGameFxns = () => {
     } else {
       // UI respond to inValid card
       dropCardSound({ valid: false })
-
       await addPileToStorage(centerValue)
       addPoints(-centerValue.length)
       const newCenter = [itemId]
@@ -139,15 +152,24 @@ export const useGameFxns = () => {
       paused: !paused
     })
   }
+  // async function setHouseTimer(itemId, time = moment().toISOString()) {
+  //   const houseTimerRef = fdb.ref(
+  //     `/currentGames/${gameId}/gameStates/${user.uid}/houseTimer`
+  //   )
+  //   houseTimerRef.update({ [itemId]: time })
+  // }
   async function addToRoomFX({ roomId, itemId }) {
     addLogMessage({ destination: "house", itemId })
+    // setHouseTimer(itemId)
     const { myHouseRef, myHouseValue } = await _myHouseRefAndValue()
     const newHouse = { ...myHouseValue }
     newHouse[roomId] = newHouse[roomId]
       ? [...newHouse[roomId], itemId] // add it to the bottom
       : [itemId]
+    addToHouseTimer(itemId)
     return myHouseRef.set(newHouse)
   }
+
   async function removeFromStorageFX({ itemId }) {
     const { storageRef, storageValue } = await _storageRefAndValue()
     const newStorageVal = storageValue.filter(_itemId => _itemId !== itemId)

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useCallback, useRef } from "react"
 import styled from "styled-components"
 import {
   CardContent,
@@ -7,9 +7,8 @@ import {
   Button,
   Typography
 } from "@material-ui/core"
-import useCountDown from "react-countdown-hook"
 import { useDrop } from "react-dnd"
-
+import Timer from "react-compound-timer"
 //
 import { ItemTypes } from "../../../dnd/itemTypes"
 import ResortableDnDCard from "./ResortableDnDCard.jsx"
@@ -81,24 +80,49 @@ const StyledSelectedRoom = styled.div`
   }
 `
 
-const initialTime = 8 * 1000
-
-const SelectedRoomView = () => {
+const TimerContainer = () => {
   const { expandedRoom, setExpandedRoom } = useHouseGridCtx()
-  const { myHouse } = useHouseCtx()
-  const [timeLeft, start] = useCountDown(initialTime, 1000)
-  // start the timer when the expanded room opens
-  useEffect(() => {
-    if (expandedRoom && expandedRoom.faceUp) {
-      start()
-    }
-  }, [expandedRoom, start])
-  // close the window when the timer gets to zero
-  useEffect(() => {
-    if (timeLeft === 0) {
+  const handleCloseRoom = () => {
+    setExpandedRoom({ open: false, roomId: "" })
+  }
+  const handleAutoCloseRoom = () => {
+    if (expandedRoom.faceUp) {
       setExpandedRoom({ open: false, roomId: "" })
+    } else {
+      // only close room when cards are faceUp.
     }
-  }, [setExpandedRoom, timeLeft])
+  }
+  if (!expandedRoom || !expandedRoom.roomId) return null
+  return (
+    // <ClickOutsider close={handleCloseRoom}>
+    <Timer
+      initialTime={10.5 * 1000}
+      direction="backward"
+      checkpoints={[{ time: 0, callback: handleAutoCloseRoom }]}
+    >
+      {({ resume, start, reset, getTime, stop }) => {
+        const resetClock = () => {
+          console.log("resetting")
+          reset()
+          start()
+        }
+        return (
+          <SelectedRoomView
+            handleCloseRoom={handleCloseRoom}
+            resetClock={resetClock}
+          />
+        )
+      }}
+    </Timer>
+    // </ClickOutsider>
+  )
+}
+
+const SelectedRoomView = ({ handleCloseRoom, resetClock }) => {
+  const { myHouse } = useHouseCtx()
+
+  const { expandedRoom, setExpandedRoom } = useHouseGridCtx()
+
   const { storageToHouseFX } = useGameFxns()
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
@@ -113,10 +137,10 @@ const SelectedRoomView = () => {
       const { itemId, fromStorage } = item
       if (fromStorage) {
         storageToHouseFX({ itemId, roomId })
+        resetClock()
         // if dropped on facedown, make it faceup
         setExpandedRoom({ open: true, roomId, faceUp: true })
         // reset timer
-        start()
       }
     },
     collect: mon => ({
@@ -124,16 +148,28 @@ const SelectedRoomView = () => {
       canDrop: !!mon.canDrop()
     })
   })
-  if (!expandedRoom || !expandedRoom.roomId) return null
+  // useEffect(() => {
+  //   resetClock()
+  // }, [expandedRoom, resetClock])
+  // if (!expandedRoom || !expandedRoom.roomId) return null
   const { roomId, faceUp } = expandedRoom
   const thisRoom = myHouse[roomId] || []
 
   return (
-    <SelectedRoomCard
-      isOver={isOver && canDrop}
-      dropRef={dropRef}
-      {...{ roomId, thisRoom, faceUp, setExpandedRoom, timeLeft, start }}
-    />
+    <>
+      <SelectedRoomCard
+        handleCloseRoom={handleCloseRoom}
+        isOver={isOver && canDrop}
+        dropRef={dropRef}
+        {...{
+          roomId,
+          thisRoom,
+          faceUp,
+          setExpandedRoom,
+          resetClock
+        }}
+      />
+    </>
   )
 }
 
@@ -141,15 +177,11 @@ const SelectedRoomCard = ({
   roomId,
   thisRoom,
   faceUp,
-  setExpandedRoom,
-  timeLeft,
-  start,
+  resetClock,
   dropRef,
-  isOver
+  isOver,
+  handleCloseRoom
 }) => {
-  function handleCloseRoom() {
-    setExpandedRoom({ open: false, roomId: "" })
-  }
   const cardContents = (
     <>
       <Typography variant="h5">{roomId.toUpperCase()}</Typography>
@@ -167,14 +199,20 @@ const SelectedRoomCard = ({
               itemId={itemId}
               roomId={roomId}
               disableButtons={!faceUp}
-              restartTimer={start}
+              resetClock={resetClock}
             />
           )
         })}
       </CardContent>
       <CardActions>
+        {/* <ShowMe obj={myHouseTimer} name="myHouseTimer" /> */}
         <Button variant="contained" color="primary" onClick={handleCloseRoom}>
-          close {timeLeft / 1000}
+          <span style={{ marginRight: "5px" }}>close</span>
+          {faceUp && (
+            <span>
+              <Timer.Seconds />
+            </span>
+          )}
         </Button>
         <EmptyRoomButton roomId={roomId} handleCloseRoom={handleCloseRoom} />
       </CardActions>
@@ -187,4 +225,4 @@ const SelectedRoomCard = ({
   )
 }
 
-export default SelectedRoomView
+export default TimerContainer

@@ -15,6 +15,7 @@ import GameStart from "./pages/GameStart.page"
 import { LogCtxProvider } from "./contexts/LogCtx"
 import { AllItemsCtxProvider } from "./contexts/AllItemsCtx"
 import { SnackbarProvider } from "notistack"
+import SpinningPageLoader from "./components/SpinningPageLoader"
 
 //
 //
@@ -36,6 +37,7 @@ const App = () => {
                       <Route path="/game/:gameId" component={GamePage} />
                       <Route path="/mygames" component={MyGames} />
                       <Route path="/gamestart" component={GameStart} />
+                      <Route path="/loader" component={SpinningPageLoader} />
                     </Container>
                   </DialogCtxProvider>
                 </LogCtxProvider>

@@ -15,10 +15,10 @@ import ButtonLink from "../navigation/ButtonLink.jsx"
 import { useFirebase } from "../../contexts/FirebaseCtx"
 import AvatarMonster from "../AvatarMonster"
 import { useAuthCtx } from "../../contexts/AuthCtx"
-
+import { withRouter } from "react-router-dom"
 //
 
-const GameOver = () => {
+const GameOver = ({ history }) => {
   const { gameState, gamePlay } = useGameCtx()
   const { user } = useAuthCtx()
   const { players } = usePlayersCtx()
@@ -28,12 +28,14 @@ const GameOver = () => {
   const handleRematch = () => {
     let { gameName, memberUIDs, gameId, rematchNumber } = gameState
     const newRematchNumber = rematchNumber ? rematchNumber + 1 : 1
-    const [strippedGameId] = gameId.split("-rematch")
     doRematch({
       gameName,
       memberUIDs,
-      oldGameId: strippedGameId,
+      oldGameId: gameId,
       rematchNumber: newRematchNumber
+    }).then(({ newLoc }) => {
+      console.log("response from doRematch", newLoc)
+      history.push(newLoc)
     })
   }
   return (
@@ -106,13 +108,13 @@ const GameOver = () => {
           )}
         </>
       )}
-      {/* <div>
+      <div>
         <ShowMe obj={gameState} name="gameState" noModal />
         <ShowMe obj={gamePlay} name="gamePlay" noModal />
         <ShowMe obj={players} name="players" noModal />
-      </div> */}
+      </div>
     </div>
   )
 }
 
-export default GameOver
+export default withRouter(GameOver)

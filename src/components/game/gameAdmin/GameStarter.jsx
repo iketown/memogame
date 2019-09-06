@@ -20,6 +20,7 @@ import RequestList from "./RequestList"
 import MemberList from "./MemberList"
 import ShowMe from "../../../utils/ShowMe.jsx"
 import { useFirebase } from "../../../contexts/FirebaseCtx"
+import SpinningPageLoader from "../../SpinningPageLoader"
 //
 //
 const StyledDiv = styled.div`
@@ -35,7 +36,8 @@ const GameStarter = () => {
   } = useGameCtx()
   const { handleWinGame } = useFirebase()
   const [expanded, setExpanded] = useState(false)
-
+  if (!gameState || !gamePlay) return <SpinningPageLoader />
+  const { gameLog, ...gamePlayNoLog } = gamePlay
   function handleStartGame() {
     createRTDBGame()
     setGameInProgress()
@@ -96,7 +98,7 @@ const GameStarter = () => {
                   Start Game
                 </Button>
               )}
-              <ShowMe obj={gamePlay} name="gamePlay" />
+              <ShowMe obj={gamePlayNoLog} name="gamePlayNoLog" />
               <ShowMe obj={gameState} name="gameState" />
             </Grid>
           </Grid>

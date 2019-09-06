@@ -8,11 +8,16 @@ import NewSelectedRoomView from "./SelectedRoomView/NewSelectedRoomView.jsx"
 import OtherPlayersView from "../game/OtherPlayersView.jsx"
 import houseImage from "../../images/handDrawnHouse.svg"
 import { useWiderThan } from "../../hooks/useWidth"
-import { HouseGridCtxProvider } from "../../contexts/HouseGridCtx"
+import {
+  HouseGridCtxProvider,
+  useHouseGridCtx
+} from "../../contexts/HouseGridCtx"
 import StoragePile from "./StoragePile"
 import HouseDropSection from "./HouseDropSection"
-import { useGameCtx } from "../../contexts/GameCtx"
+import { useGameCtx, useHouseCtx } from "../../contexts/GameCtx"
+import { usePlayersCtx } from "../../contexts/PlayersCtx"
 import GameOver from "./GameOver.jsx"
+import ShowMe from "../../utils/ShowMe.jsx"
 //
 
 export const houseDimensions = {
@@ -114,8 +119,12 @@ const windowArr = [
 const HouseGrid = () => {
   const mdUp = useWiderThan("md")
   const [expanded, setExpanded] = useState(false)
+  const { myHouseTimer } = useHouseCtx()
   const { gameState } = useGameCtx()
+  const { players } = usePlayersCtx()
+  const { cardsInMyHouse } = useHouseCtx()
   const gameOver = gameState.completed
+  if (gameOver) return <GameOver />
   return (
     <DndProvider backend={HTML5Backend}>
       <HouseGridCtxProvider>
@@ -138,21 +147,26 @@ const HouseGrid = () => {
                 />
               ))}
             </StyleHouseGrid>
+            <ShowMe obj={myHouseTimer} name="myHouseTimer" noModal />
+            <h3>House Cards: {cardsInMyHouse}</h3>
           </Grid>
           <Grid item xs={6}>
-            {gameOver ? (
-              <GameOver />
-            ) : (
-              <>
-                <OtherPlayersView />
-                <StoragePile />
-              </>
-            )}
+            <>
+              <OtherPlayersView />
+              <StoragePile />
+              <ShowMe obj={players} name="players" noModal />
+              <ExpandedRoomView />
+            </>
           </Grid>
         </Grid>
       </HouseGridCtxProvider>
     </DndProvider>
   )
+}
+
+const ExpandedRoomView = () => {
+  const { expandedRoom } = useHouseGridCtx()
+  return <ShowMe obj={expandedRoom} name="expanded room" noModal />
 }
 
 export default HouseGrid

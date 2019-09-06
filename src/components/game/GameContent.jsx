@@ -10,31 +10,20 @@ import HouseGrid from "../house/HouseGrid.jsx"
 import GameStarter from "./gameAdmin/GameStarter.jsx"
 import { usePlayersCtx } from "../../contexts/PlayersCtx"
 import PendingGameView from "./gameAdmin/PendingGameView.jsx"
+import SpinningPageLoader from "../SpinningPageLoader.jsx"
 //
 //
 const GameContent = ({ gameId }) => {
   const { gameState } = useGameCtx()
-  const { players } = usePlayersCtx()
   const { user } = useAuthCtx()
   const memberUIDs = gameState && gameState.memberUIDs
-  if (!memberUIDs)
-    return (
-      <Container>
-        <div
-          style={{
-            margin: "20vh auto",
-            textAlign: "center"
-          }}
-        >
-          game doesnt exist. 🤷‍♂️ <Link to="/gamestart">Start a GAME</Link>
-        </div>
-      </Container>
-    )
+  if (!memberUIDs) return <SpinningPageLoader />
   const youAreAMember = memberUIDs.includes(user.uid)
   const thisIsYourGame = gameState && gameState.startedBy === user.uid
   const gameOn = gameState && gameState.inProgress
   const gameOffView = <PendingGameView />
   const nonGameMemberView = <YoureNotInThisGameYet />
+
   const gameMemberView = gameOn ? (
     <Grid container spacing={2}>
       <Grid item xs={!thisIsYourGame ? 12 : 4}>

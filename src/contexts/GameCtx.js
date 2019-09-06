@@ -50,6 +50,8 @@ export const HouseCtxProvider = props => {
   const gameId = props.gameId
   const { user } = useAuthCtx()
   const [myHouse, setMyHouse] = useState({})
+  const [myHouseTimer, setMyHouseTimer] = useState({})
+  // myHouseTimer formatted as  [itemId]: moment().toISOString()
   useEffect(() => {
     const myHouseRef = fdb.ref(
       `/currentGames/${gameId}/gameStates/${user.uid}/house`
@@ -62,57 +64,54 @@ export const HouseCtxProvider = props => {
   }, [fdb, gameId, user, user.uid])
   return (
     <HouseCtx.Provider
-      value={{ myHouse, setMyHouse, gameId, userId: user.uid }}
+      value={{ myHouse, myHouseTimer, setMyHouseTimer }}
       {...props}
     />
   )
 }
 export const useHouseCtx = () => {
-  const { fdb } = useFirebase()
-
   const ctx = useContext(HouseCtx)
   if (!ctx)
     throw new Error("useHouseCtx must be a descendant of HouseCtxProvider 😕")
-  const { myHouse, setMyHouse, gameId, userId } = ctx
-  const addToRoomFS = ({ roomId, itemId }) => {
-    const myHouseRef = fdb.ref(
-      `/currentGames/${gameId}/gameStates/${userId}/house`
-    )
-    const newRoom = myHouse[roomId] ? [itemId, ...myHouse[roomId]] : [itemId]
-    myHouseRef.update({ [roomId]: newRoom })
-  }
-  const removeFromRoomFS = ({ roomId, itemId }) => {
-    const myHouseRef = fdb.ref(
-      `/currentGames/${gameId}/gameStates/${userId}/house`
-    )
-    const newRoom = myHouse[roomId].filter(_itemId => _itemId !== itemId)
-    myHouseRef.update({ [roomId]: newRoom })
-  }
-  const removeFromRoomLocal = ({ roomId, itemId }) => {
-    setMyHouse(old => ({
+  const { myHouse, myHouseTimer, setMyHouseTimer } = ctx
+  const cardsInMyHouse = useMemo(() => {
+    const quantity = Object.values(myHouse).reduce((sum, room) => {
+      sum += room.length
+      return sum
+    }, 0)
+    return quantity
+  }, [myHouse])
+
+  // card must be in house for x seconds before it can be played.
+  const houseRestrictionSeconds = 15
+  const addToHouseTimer = itemId => {
+    // key is itemId
+    // value is when the timer restriction is over.
+    setMyHouseTimer(old => ({
       ...old,
-      [roomId]: [...old[roomId].filter(_itemId => _itemId !== itemId)]
+      [itemId]: moment()
+        .add(houseRestrictionSeconds, "seconds")
+        .endOf("second")
     }))
+    setTimeout(
+      () => removeFromHouseTimer(itemId),
+      houseRestrictionSeconds * 1000
+    )
   }
-  const reorderRoomLocal = ({ itemId, roomId, sourceIndex, destIndex }) => {
-    setMyHouse(old => {
-      if (!old[roomId]) return old
-      const newRoom = [...old[roomId]]
-      const [movingId] = newRoom.splice(sourceIndex, 1)
-      if (movingId !== itemId) {
-        console.log("these should match!", movingId, itemId)
-        return old
-      }
-      newRoom.splice(destIndex, 0, movingId)
-      return { ...old, [roomId]: newRoom }
+  const removeFromHouseTimer = itemId => {
+    console.log("remove from h t called", itemId)
+    setMyHouseTimer(old => {
+      const newObj = { ...old }
+      delete newObj[itemId]
+      return newObj
     })
   }
+
   return {
     myHouse,
-    setMyHouse,
-    removeFromRoomFS,
-    addToRoomFS,
-    reorderRoomLocal
+    myHouseTimer,
+    addToHouseTimer,
+    cardsInMyHouse
   }
 }
 // ⭐ 🌟 end HOUSE CONTEXT 🌟 ⭐ //
@@ -262,6 +261,7 @@ export const usePointsCtx = () => {
 
 export const GameCtxProvider = props => {
   const { firestore } = useFirebase()
+  const { user } = useAuthCtx()
   const { fdb } = useFirebase()
   const { allItems } = useAllItemsCtx()
   const [gameState, setGameState] = useState({})
@@ -316,12 +316,12 @@ export const GameCtxProvider = props => {
       gameName,
       startedBy,
       memberUIDs,
-      // members,
       whosTurnItIs: { uid: memberUIDs[0], startTime: moment().toISOString() },
       centerPile: [],
       gameStates
     })
   }
+
   const totalCards = useMemo(() => {
     if (!gamePlay) return null
     // return null
