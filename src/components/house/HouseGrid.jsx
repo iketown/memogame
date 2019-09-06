@@ -1,6 +1,6 @@
 import React, { useState } from "react"
 import styled from "styled-components"
-import { Grid } from "@material-ui/core"
+import { Grid, Typography } from "@material-ui/core"
 import { DndProvider } from "react-dnd"
 import HTML5Backend from "react-dnd-html5-backend"
 //
@@ -29,12 +29,11 @@ export const houseDimensions = {
 }
 const StyleHouseGrid = styled.div`
   position: relative;
-  /* background-image: url(${houseImage}); */
   width: ${p => p.width}rem;
   display: grid;
   grid-template-columns: 1fr 1fr;
-  grid-template-areas:  "attic attic" "bedroom bathroom" "family kitchen" "cellar cellar";
-  grid-template-rows:  repeat(4, ${p => p.rowHeight}px);
+  grid-template-areas: "attic attic" "bedroom bathroom" "family kitchen" "cellar cellar";
+  grid-template-rows: repeat(4, ${p => p.rowHeight}px);
   justify-content: space-around;
   align-items: end;
   justify-items: center;
@@ -48,10 +47,10 @@ const StyleHouseGrid = styled.div`
     bottom: 0;
     right: 0;
     position: absolute;
-    z-index: -1;   
+    z-index: -1;
   }
   &:before {
-    transition: all .5s;
+    transition: all 0.5s;
     top: -15px;
     left: -15px;
     bottom: -15px;
@@ -59,7 +58,7 @@ const StyleHouseGrid = styled.div`
     position: absolute;
     background-color: black;
     opacity: 0;
-    content: '';
+    content: "";
     ${p =>
       p.expanded
         ? `
@@ -76,9 +75,9 @@ const StyleHouseGrid = styled.div`
     justify-content: center;
     align-items: center;
   }
-.dragging {
-  background-color: orange;
-}
+  .dragging {
+    background-color: orange;
+  }
   .attic {
     grid-area: attic;
   }
@@ -147,8 +146,11 @@ const HouseGrid = () => {
                 />
               ))}
             </StyleHouseGrid>
-            <ShowMe obj={myHouseTimer} name="myHouseTimer" noModal />
-            <h3>House Cards: {cardsInMyHouse}</h3>
+            <Grid item xs={12} style={{ textAlign: "center" }}>
+              <Typography variant="subtitle1">
+                House Cards: {cardsInMyHouse}
+              </Typography>
+            </Grid>
           </Grid>
           <Grid item xs={6}>
             <>
