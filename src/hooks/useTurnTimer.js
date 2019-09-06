@@ -4,7 +4,7 @@ import { useGameFxns } from "./useGameFxns"
 import { useTurnTimerCtx } from "../contexts/TurnTimerCtx"
 import { useGameCtx } from "../contexts/GameCtx"
 
-const defaultSecondsPerTurn = 2500
+const defaultSecondsPerTurn = 15
 
 //
 //
