@@ -3,7 +3,7 @@ import React from "react"
 const BrainGears = ({ color = "white", width = "98px", height = "118px" }) => {
   return (
     <svg
-      width={width}
+      width={height}
       height={height}
       viewBox="0 0 97 118"
       version="1.1"

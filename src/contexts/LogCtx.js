@@ -40,7 +40,8 @@ export const useLogCtx = () => {
   const addLogMessage = ({ itemId, destination }) => {
     // Frank puts Purple Eggplant on center
     // Henry moves card into house
-    const name = user.displayName
+    const myPP = players[user.uid]
+    const name = myPP.displayName || myPP.email
     const itemName = itemFromItemId(itemId).name
     let text
     if (destination === "house") {

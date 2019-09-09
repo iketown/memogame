@@ -3,7 +3,7 @@ import styled from "styled-components"
 import { Card } from "@material-ui/core"
 //
 import brain from "../../images/newCards/brain.svg"
-import { useWiderThan } from "../../hooks/useWidth"
+import { useWiderThan } from "../../hooks/useScreenSize"
 import { useHouseGridCtx } from "../../contexts/HouseGridCtx"
 //
 //

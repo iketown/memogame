@@ -4,7 +4,7 @@ import styled from "styled-components"
 //
 import felt from "../../../images/felt.jpg"
 import { ItemTypes } from "../../../dnd/itemTypes"
-import { useWiderThan } from "../../../hooks/useWidth"
+import { useWiderThan } from "../../../hooks/useScreenSize"
 import { useCenterPileCtx, usePointsCtx } from "../../../contexts/GameCtx"
 import { Typography } from "@material-ui/core"
 import { WindowCard } from "../../house/DraggableCard"

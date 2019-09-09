@@ -5,9 +5,10 @@ import { Card, Typography, Button } from "@material-ui/core"
 import TimerOverlay from "./TimerOverlay"
 import { useAllItemsCtx } from "../../../contexts/AllItemsCtx"
 import { removeUid } from "../../../utils/imageUtils"
-import { useWiderThan } from "../../../hooks/useWidth"
+import { useWiderThan } from "../../../hooks/useScreenSize"
 import brain from "../../../images/newCards/brain.svg"
 import { FaThinkPeaks } from "react-icons/fa"
+import ClockOverlay from "./ClockOverlay"
 
 const StyledSorterCard = styled(Card)`
   width: ${p => p.width}rem;
@@ -41,7 +42,7 @@ const SorterCard = ({
       images={images}
       peek={faceUp}
     >
-      {restricted && !faceUp && <TimerOverlay secondsLeft={secondsLeft} />}
+      {restricted && !faceUp && <ClockOverlay secondsLeft={secondsLeft} />}
     </StyledSorterCard>
   )
 }

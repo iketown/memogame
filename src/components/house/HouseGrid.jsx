@@ -7,7 +7,7 @@ import HTML5Backend from "react-dnd-html5-backend"
 import NewSelectedRoomView from "./SelectedRoomView/NewSelectedRoomView.jsx"
 import OtherPlayersView from "../game/OtherPlayersView.jsx"
 import houseImage from "../../images/handDrawnHouse.svg"
-import { useWiderThan } from "../../hooks/useWidth"
+import { useWiderThan } from "../../hooks/useScreenSize"
 import {
   HouseGridCtxProvider,
   useHouseGridCtx
@@ -164,11 +164,6 @@ const HouseGrid = () => {
       </HouseGridCtxProvider>
     </DndProvider>
   )
-}
-
-const ExpandedRoomView = () => {
-  const { expandedRoom } = useHouseGridCtx()
-  return <ShowMe obj={expandedRoom} name="expanded room" noModal />
 }
 
 export default HouseGrid

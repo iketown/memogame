@@ -13,7 +13,7 @@ import PendingGameView from "./gameAdmin/PendingGameView.jsx"
 import SpinningPageLoader from "../SpinningPageLoader.jsx"
 //
 //
-const GameContent = ({ gameId }) => {
+const GameContent = () => {
   const { gameState } = useGameCtx()
   const { user } = useAuthCtx()
   const memberUIDs = gameState && gameState.memberUIDs
@@ -37,7 +37,7 @@ const GameContent = ({ gameId }) => {
         </Grid>
       )}
       <Grid item xs={12}>
-        <HouseGrid gameId={gameId} />
+        <HouseGrid />
       </Grid>
     </Grid>
   ) : (

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react"
 import styled from "styled-components"
-import { useWiderThan } from "../../hooks/useWidth"
+import { useWiderThan } from "../../hooks/useScreenSize"
 import { Card, Avatar } from "@material-ui/core"
 import { useDrag, DragPreviewImage } from "react-dnd"
 //
@@ -10,18 +10,21 @@ import { useAuthCtx } from "../../contexts/AuthCtx"
 import { removeUid } from "../../utils/imageUtils"
 import { useAllItemsCtx } from "../../contexts/AllItemsCtx"
 import { useGameFxns } from "../../hooks/useGameFxns"
+import { useClickMoveCtx } from "../../contexts/ClickMoveCtx"
 //
 //
+
 const DraggableCard = ({ itemId, scale, index }) => {
   // draggableCard is the top card in the storage pile.
   const { gamePlay } = useGameCtx()
   const { storageToCenterFX } = useGameFxns()
   const { user } = useAuthCtx()
+  const { toggleDraggingId, draggingItemId } = useClickMoveCtx()
   const isMyTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
-  const {
-    gameState: { gameId }
-  } = useGameCtx()
+  // const {
+  //   gameState: { gameId }
+  // } = useGameCtx()
   const [{ isDragging }, dragRef, preview] = useDrag({
     item: { type: ItemTypes.CARD, itemId, fromStorage: true },
     end: async (item, mon) => {},
@@ -33,6 +36,7 @@ const DraggableCard = ({ itemId, scale, index }) => {
   if (!itemId) return null
   return (
     <div
+      onClick={() => toggleDraggingId(itemId)}
       onDoubleClick={
         isMyTurn
           ? () => storageToCenterFX({ itemId })
@@ -42,7 +46,9 @@ const DraggableCard = ({ itemId, scale, index }) => {
       style={{
         opacity: isDragging ? 0.5 : 1,
         zIndex: 200,
-        cursor: isDragging ? "grabbing" : isMyTurn ? "grab" : "not-allowed"
+        cursor: isDragging ? "grabbing" : isMyTurn ? "grab" : "not-allowed",
+        height: "100%",
+        width: "100%"
       }}
     >
       <WindowCard index={index} itemId={itemId} scale={scale} dragMe />
@@ -65,6 +71,25 @@ const StyledCard = styled(Card)`
   position: absolute;
   border: 5px solid white;
 `
+const CardWithHalo = styled(StyledCard)`
+  @keyframes shimmy {
+    0% {
+      transform: scale(1);
+    }
+
+    100% {
+      transform: scale(1.1);
+      box-shadow: 8px 8px 6px #4444444d;
+    }
+  }
+  ${p =>
+    p.waitingToDrop
+      ? `
+    border: 2px solid black;
+  animation: shimmy 1s infinite;
+  `
+      : ``}
+`
 const BackgroundCard = styled(StyledCard)`
   top: ${p => p.index * offsetMultiplier}px;
   transform: scale(${p => 1 - p.index * 0.02}) rotate(${p => p.rotation}deg);
@@ -73,6 +98,8 @@ const BackgroundCard = styled(StyledCard)`
 
 export const WindowCard = ({ index, itemId, scale = 1, dragMe }) => {
   const { allItems } = useAllItemsCtx()
+  const { draggingItemId } = useClickMoveCtx()
+  const waitingToDrop = draggingItemId === itemId
   const mdUp = useWiderThan("md")
   const { imagesvg, rotation } = useMemo(() => {
     const imagesvg = index < 5 && itemId ? allItems[removeUid(itemId)].card : ""
@@ -89,7 +116,7 @@ export const WindowCard = ({ index, itemId, scale = 1, dragMe }) => {
     className: `cards card${index}`
   }
   return dragMe ? (
-    <StyledCard {...cardProps} />
+    <CardWithHalo waitingToDrop={waitingToDrop} {...cardProps} />
   ) : (
     <BackgroundCard {...cardProps} />
   )

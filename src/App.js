@@ -12,11 +12,12 @@ import DialogContainer from "./contexts/DialogContainer.jsx"
 import MyGames from "./pages/MyGames.page.jsx"
 import GamePage from "./pages/Game.page.jsx"
 import GameStart from "./pages/GameStart.page"
+import GamePageResponsive from "./components/game/GamePage.responsive.jsx"
 import { LogCtxProvider } from "./contexts/LogCtx"
 import { AllItemsCtxProvider } from "./contexts/AllItemsCtx"
 import { SnackbarProvider } from "notistack"
 import SpinningPageLoader from "./components/SpinningPageLoader"
-
+import GameContainer from "./pages/GameContainer.jsx"
 //
 //
 
@@ -34,10 +35,16 @@ const App = () => {
                     <DialogContainer />
                     <NavBar />
                     <Container>
-                      <Route path="/game/:gameId" component={GamePage} />
+                      <Route exact path="/game/:gameId" component={GamePage} />
+                      <Route
+                        exact
+                        path="/game/:gameId/new"
+                        component={GameContainer}
+                      />
                       <Route path="/mygames" component={MyGames} />
                       <Route path="/gamestart" component={GameStart} />
                       <Route path="/loader" component={SpinningPageLoader} />
+                      <Route path="/house" component={GamePageResponsive} />
                     </Container>
                   </DialogCtxProvider>
                 </LogCtxProvider>

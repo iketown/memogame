@@ -1,56 +1,22 @@
 import React from "react"
 import styled from "styled-components"
 import { Grid, Avatar, Typography } from "@material-ui/core"
-//
-import CenterPileDnD from "./CenterPile/CenterPileDnD.jsx"
-import MiniPlayerDisplay from "./Scores/MiniPlayerDisplay.jsx"
-import { useGameCtx } from "../../contexts/GameCtx.js"
-import { useAuthCtx } from "../../contexts/AuthCtx.js"
-import { usePlayersCtx } from "../../contexts/PlayersCtx.js"
-import { useTurnTimer, useOthersTurnTimer } from "../../hooks/useTurnTimer"
-import ScrollingPointsDisplay from "./ScrollingPointsDisplay.jsx"
-import { useOtherPlayerInfo } from "../../hooks/usePlayerInfo.js"
-import AvatarMonster from "../AvatarMonster.jsx"
 import { FaWarehouse, FaHome } from "react-icons/fa"
 //
+import MiniPlayerDisplay from "./MiniPlayerDisplay"
+import { useGameCtx } from "../../../contexts/GameCtx"
+import { useAuthCtx } from "../../../contexts/AuthCtx"
+import { usePlayersCtx } from "../../../contexts/PlayersCtx.js"
+import { useTurnTimer, useOthersTurnTimer } from "../../../hooks/useTurnTimer"
+import ScrollingPointsDisplay from "../ScrollingPointsDisplay.jsx"
+import { useOtherPlayerInfo } from "../../../hooks/usePlayerInfo.js"
+import AvatarMonster from "../../AvatarMonster.jsx"
 //
-const StyledBox = styled(Grid)`
-  border: 1px solid navy;
-  .center {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-  }
-`
-const OtherPlayersView = () => {
-  const { gamePlay } = useGameCtx()
-  const gameStates = gamePlay && gamePlay.gameStates
-  return (
-    <StyledBox container spacing={2}>
-      <Grid item xs={12} md={6} className="center">
-        <CenterPileDnD />
-      </Grid>
-      <Grid item xs={12} md={6}>
-        {gameStates &&
-          gamePlay.memberUIDs &&
-          Object.entries(gameStates)
-            .sort((a, b) => {
-              return gamePlay.memberUIDs.indexOf(a[0]) <
-                gamePlay.memberUIDs.indexOf(b[0])
-                ? -1
-                : 1
-            })
-            .map(([playerId, playerState]) => (
-              <PlayerDisplay key={playerId} playerId={playerId} />
-            ))}
-      </Grid>
-    </StyledBox>
-  )
-}
-
-export default OtherPlayersView
+//
 
 const StyledDisplay = styled.div`
+  flex-grow: ${p => (p.myTurn ? 1 : 0)};
+  transition: 0.4s flex-grow;
   position: relative;
   max-width: 10rem;
   display: grid;
@@ -88,7 +54,7 @@ const StyledDisplay = styled.div`
     margin-right: 4px;
   }
 `
-const PlayerDisplay = ({ playerId }) => {
+export const PlayerDisplay = ({ playerId }) => {
   const {
     points,
     storageCount,
@@ -124,7 +90,7 @@ const PlayerDisplay = ({ playerId }) => {
       {!!secondsLeft && <TimerBoxes secondsLeft={secondsLeft} />}
     </StyledDisplay>
   ) : (
-    <MiniPlayerDisplay playerId={playerId} />
+    <MiniPlayerDisplay playerId={playerId} myTurn={myTurn} />
   )
 }
 
@@ -151,3 +117,5 @@ const TimerBoxes = ({ secondsLeft }) => {
     </StyledTimerDiv>
   )
 }
+
+export default PlayerDisplay

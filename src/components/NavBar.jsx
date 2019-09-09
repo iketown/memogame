@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import {
   Button,
   Toolbar,
@@ -7,8 +7,12 @@ import {
   Menu,
   MenuItem,
   MenuList,
+  ListItem,
   ListItemText,
-  Typography
+  Typography,
+  Collapse,
+  List,
+  ListItemAvatar
 } from "@material-ui/core"
 import AvatarMonster from "./AvatarMonster.jsx"
 import BrainGears from "../images/BrainGears.jsx"
@@ -17,10 +21,22 @@ import { useFirebase } from "../contexts/FirebaseCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { useDialogCtx } from "../contexts/DialogCtx"
 import ButtonLink from "./navigation/ButtonLink.jsx"
+import { useWidth, useWindowSize } from "../hooks/useScreenSize"
+import { FaBars } from "react-icons/fa"
 
 const NavBar = props => {
-  // const { user } = useFirebase()
+  const [mobileOpen, setMobileOpen] = useState(false)
+  const menus = {
+    sm: [
+      <IconButton
+        onClick={() => setMobileOpen(old => !old)}
+        children={<FaBars color="white" />}
+      />
+    ]
+  }
   const { user, publicProfile } = useAuthCtx()
+  const widthText = useWidth()
+  const { heightText } = useWindowSize()
 
   const { dispatch: dialogDispatch } = useDialogCtx()
   const handleAuth = formType => () => {
@@ -45,22 +61,56 @@ const NavBar = props => {
       </Button>
     </>
   )
-  return (
-    <AppBar position="static" key={user}>
-      <Toolbar>
-        <BrainGears height="40px" />
-        <Typography variant="h6" style={{ flexGrow: 1 }}>
-          MEMOGA.ME
-        </Typography>
 
-        {!!user && signedInMenuItems}
-        {!user && signedOutMenuItems}
-      </Toolbar>
-    </AppBar>
+  function getContent() {
+    switch (widthText) {
+      case "xs":
+      case "sm":
+        return menus.sm
+      case "md":
+      case "lg":
+        return <div>md or large</div>
+      default:
+        return <div>no width</div>
+    }
+  }
+  return (
+    <>
+      <AppBar position="static" key={user}>
+        <Toolbar style={{ minHeight: "fit-content" }}>
+          <BrainGears height="30px" style={{ flexGrow: 1 }} />
+          <Typography variant="h6" style={{ flexGrow: 1, marginLeft: "5px" }}>
+            MEMOGA.ME {widthText} {heightText}
+          </Typography>
+
+          {!!user && signedInMenuItems}
+          {!user && signedOutMenuItems}
+          {getContent()}
+        </Toolbar>
+      </AppBar>
+      <ExpandingMenu open={mobileOpen} />
+    </>
   )
 }
 
 export default withRouter(NavBar)
+
+const ExpandingMenu = withRouter(({ open, history }) => {
+  return (
+    <Collapse in={open}>
+      <List>
+        <ListItem>
+          <ListItemAvatar>
+            <UserMenuButton history={history} />
+          </ListItemAvatar>
+          My User Name
+        </ListItem>
+        <ListItem>hey</ListItem>
+        <ListItem>hey</ListItem>
+      </List>
+    </Collapse>
+  )
+})
 
 const UserMenuButton = ({ history }) => {
   const [anchorEl, setAnchorEl] = useState(null)
