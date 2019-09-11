@@ -7,6 +7,8 @@ import { useHouseCtx } from "../../../contexts/GameCtx"
 import { IconButton } from "@material-ui/core"
 import { FaEye } from "react-icons/fa"
 import { useGameFxns } from "../../../hooks/useGameFxns"
+import { useGameCtx } from "../../../contexts/GameCtx"
+import { useAuthCtx } from "../../../contexts/AuthCtx"
 const style = {
   width: "8rem",
   height: "8rem",
@@ -28,6 +30,10 @@ const ReorderCard = ({
   const originalIndex = findCard(itemId).index
   const [peek, setPeek] = useState(false)
   const { subtractAPointFX, houseToCenterFX } = useGameFxns()
+  const { gamePlay } = useGameCtx()
+  const { user } = useAuthCtx()
+  const isMyTurn =
+    gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
   function peekAtCard() {
     setPeek(true)
     subtractAPointFX()
@@ -50,7 +56,8 @@ const ReorderCard = ({
           // no action.
         }
       }
-    }
+    },
+    canDrag: () => isMyTurn
   })
   const [{ isOver }, drop] = useDrop({
     accept: ItemTypes.CARD,

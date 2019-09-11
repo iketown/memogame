@@ -39,7 +39,7 @@ const App = () => {
                       <Route
                         exact
                         path="/game/:gameId"
-                        component={GameContent}
+                        component={GameContainer}
                       />
                       <Route
                         exact
