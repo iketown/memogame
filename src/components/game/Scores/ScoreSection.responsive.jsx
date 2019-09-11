@@ -28,16 +28,6 @@ const ScoreSection = () => {
           .map(([playerId, playerState]) => (
             <PlayerDisplay playerId={playerId} />
           ))}
-      {/* {Array.from({ length: 3 }, (_, index) => index).map(x => (
-        <PersonScoreContainer
-          key={x}
-          onClick={() => setTurn(x)}
-          myTurn={turn === x}
-        >
-          <AvatarMonster num={x + 1} />
-          <Typography variant="caption">iketown</Typography>
-        </PersonScoreContainer>
-      ))} */}
     </FlexDiv>
   )
 }

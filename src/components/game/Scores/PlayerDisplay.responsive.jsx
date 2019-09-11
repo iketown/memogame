@@ -11,6 +11,7 @@ import { useTurnTimer, useOthersTurnTimer } from "../../../hooks/useTurnTimer"
 import ScrollingPointsDisplay from "../ScrollingPointsDisplay.jsx"
 import { useOtherPlayerInfo } from "../../../hooks/usePlayerInfo.js"
 import AvatarMonster from "../../AvatarMonster.jsx"
+import TurnTimer from "../Timers/TurnTimer.jsx"
 //
 //
 
@@ -23,7 +24,7 @@ const StyledDisplay = styled.div`
   grid-template-areas: "username username username" "avatar storage total" "avatar house total" "timer timer timer";
   grid-template-columns: 46px 1fr 3rem;
   align-items: center;
-  grid-template-rows: repeat(2, 19px);
+  /* grid-template-rows: repeat(2, 19px); */
   margin-bottom: 5px;
   opacity: ${p => (p.myTurn ? 1 : 0.4)};
   padding: 10px;
@@ -63,6 +64,7 @@ export const PlayerDisplay = ({ playerId }) => {
     publicProfile
   } = useOtherPlayerInfo(playerId)
   const { gamePlay } = useGameCtx()
+  const { lastCheckIn } = gamePlay.whosTurnItIs
   const myTurn = gamePlay && gamePlay.whosTurnItIs.uid === playerId
   return myTurn ? (
     <StyledDisplay myTurn={myTurn}>
@@ -86,8 +88,10 @@ export const PlayerDisplay = ({ playerId }) => {
         </Typography>{" "}
       </div>
       <ScrollingPointsDisplay points={points} className="total" />
-
-      {!!secondsLeft && <TimerBoxes secondsLeft={secondsLeft} />}
+      <div className="timer">
+        <TurnTimer key={lastCheckIn} playerId={playerId} />
+      </div>
+      {/* {!!secondsLeft && <TimerBoxes secondsLeft={secondsLeft} />} */}
     </StyledDisplay>
   ) : (
     <MiniPlayerDisplay playerId={playerId} myTurn={myTurn} />

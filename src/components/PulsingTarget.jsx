@@ -1,30 +1,60 @@
 import React from "react"
 import styled from "styled-components"
-import { FaBullseye } from "react-icons/fa"
+import { FaBullseye, FaArrowDown } from "react-icons/fa"
+// import { useClickMoveCtx } from "../contexts/ClickMoveCtx"
 
 const TargetBox = styled.div`
+  font-size: 2rem;
+  z-index: 7;
+  /* background-color: yellow; */
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 4rem;
-  color: magenta;
+  cursor: pointer;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
   @keyframes pulse {
     0% {
-      transform: scale(1.1);
+      opacity: 0;
     }
-
+    50% {
+      opacity: 1;
+    }
     100% {
-      transform: scale(0.5);
+      opacity: 0;
     }
   }
-  .pulse {
+  .pulse-box {
+    background-image: radial-gradient(#ffffff33, #ffffffaa);
     animation: pulse 1s infinite;
+    width: 100%;
+    height: 100%;
+  }
+  .downarrow {
+    /* position: absolute; */
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    opacity: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 `
-const PulsingTarget = () => {
+const PulsingTarget = ({ roomId, active }) => {
+  // const { clickHouseTarget } = useClickMoveCtx()
+  if (!active) return null
   return (
     <TargetBox>
-      <FaBullseye className="pulse" />
+      {/* <div className="pulse-box"></div> */}
+      <div className="downarrow">
+        <FaArrowDown />
+      </div>
+      {/* <PulsingBG className='pulse'/> */}
+      {/* <FaBullseye className="pulse" /> */}
     </TargetBox>
   )
 }

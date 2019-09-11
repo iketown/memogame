@@ -11,12 +11,15 @@ import GameStarter from "./gameAdmin/GameStarter.jsx"
 import { usePlayersCtx } from "../../contexts/PlayersCtx"
 import PendingGameView from "./gameAdmin/PendingGameView.jsx"
 import SpinningPageLoader from "../SpinningPageLoader.jsx"
+import GameContainer from "../../pages/GameContainer.jsx"
+import GamePage from "./GamePage.responsive.jsx"
 //
 //
 const GameContent = () => {
   const { gameState } = useGameCtx()
   const { user } = useAuthCtx()
   const memberUIDs = gameState && gameState.memberUIDs
+  console.log("gameState", gameState)
   if (!memberUIDs) return <SpinningPageLoader />
   const youAreAMember = memberUIDs.includes(user.uid)
   const thisIsYourGame = gameState && gameState.startedBy === user.uid
@@ -37,7 +40,7 @@ const GameContent = () => {
         </Grid>
       )}
       <Grid item xs={12}>
-        <HouseGrid />
+        <GamePage />
       </Grid>
     </Grid>
   ) : (

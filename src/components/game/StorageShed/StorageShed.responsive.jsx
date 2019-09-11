@@ -17,7 +17,12 @@ const StorageShed = () => {
       <Room height={heightText}>
         <>
           {/* only the top card is draggable */}
-          <DraggableCard scale={1.5} itemId={storagePile[0]} index={1} />
+          <DraggableCard
+            scale={1.5}
+            itemId={storagePile[0]}
+            source="storage"
+            index={1}
+          />
           {/* the remaining cards are images */}
           {storagePile.slice(1).map((itemId, index) => (
             <WindowCard

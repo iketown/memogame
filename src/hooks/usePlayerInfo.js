@@ -16,8 +16,8 @@ export const useOtherPlayerInfo = playerId => {
     return (players && players[playerId]) || {}
   }, [playerId, players])
 
-  const secondsLeft = useOthersTurnTimer({ playerId })
-
+  // const secondsLeft = useOthersTurnTimer({ playerId })
+  const secondsLeft = 12
   const { points, storageCount, houseCount } = useMemo(() => {
     const playerState =
       gamePlay && gamePlay.gameStates && gamePlay.gameStates[playerId]

@@ -23,6 +23,7 @@ export const useGameFxns = () => {
     resetPointsClimber,
     incrementPointsClimber
   } = usePointsCtx()
+  const { setSelectedRoom } = useHouseCtx()
   const { user } = useAuthCtx()
   const { fdb, handleWinGame } = useFirebase()
   const { addLogMessage } = useLogCtx()
@@ -71,6 +72,9 @@ export const useGameFxns = () => {
       handleWinGame({ gameId })
     }
   }
+  const subtractAPointFX = () => {
+    addPoints(-1)
+  }
   function _endTurn() {
     const { memberUIDs } = gamePlay
     const myIndex = memberUIDs.findIndex(memUid => memUid === user.uid)
@@ -104,6 +108,7 @@ export const useGameFxns = () => {
     console.log("myHouseValue", myHouseValue)
     return myHouseRef.set(myHouseValue)
   }
+
   async function addToCenterFX({ itemId, fromHouse }) {
     const { centerRef, centerValue } = await _centerRefAndValue()
     // validate
@@ -172,15 +177,20 @@ export const useGameFxns = () => {
   //   )
   //   houseTimerRef.update({ [itemId]: time })
   // }
-  async function addToRoomFX({ roomId, itemId }) {
+  async function addToRoomFX({ roomId, itemId, index }) {
     addLogMessage({ destination: "house", itemId })
     // setHouseTimer(itemId)
     const { myHouseRef, myHouseValue } = await _myHouseRefAndValue()
     const newHouse = { ...myHouseValue }
     newHouse[roomId] = newHouse[roomId]
-      ? [...newHouse[roomId], itemId] // add it to the bottom
+      ? [
+          ...newHouse[roomId].slice(0, index),
+          itemId,
+          ...newHouse[roomId].slice(index)
+        ]
       : [itemId]
     addToHouseTimer(itemId)
+    setSelectedRoom({ roomId, faceUp: true })
     return myHouseRef.set(newHouse)
   }
 
@@ -199,9 +209,9 @@ export const useGameFxns = () => {
     removeFromRoomFX({ roomId, itemId })
     addToCenterFX({ itemId, fromHouse: true })
   }
-  function storageToHouseFX({ roomId, itemId }) {
+  function storageToHouseFX({ roomId, itemId, index }) {
     removeFromStorageFX({ itemId })
-    addToRoomFX({ roomId, itemId })
+    addToRoomFX({ roomId, itemId, index })
     addLogMessage({ itemId, destination: "house" })
   }
   async function reorderRoomFX({ itemId, roomId, sourceIndex, destIndex }) {
@@ -236,6 +246,7 @@ export const useGameFxns = () => {
     addToCenterFX,
     removeFromStorageFX,
     reorderRoomFX,
+    subtractAPointFX,
     _updateTurnTimer,
     _endTurn,
     togglePauseGame

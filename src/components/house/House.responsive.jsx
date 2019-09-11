@@ -6,11 +6,13 @@ import { Typography, Button } from "@material-ui/core"
 import RoomDnD from "./RoomDnD/RoomDnD"
 import SelectedRoom from "./SelectedRoomView/SelectedRoom.responsive.jsx"
 import { useWindowSize } from "../../hooks/useScreenSize"
+import { useHouseCtx } from "../../contexts/GameCtx"
 //
 //
 
 export const HouseContainer = styled.div`
   display: inline-block;
+  position: relative;
 `
 
 const HouseGrid = styled.div`
@@ -42,11 +44,11 @@ export const Roof = styled.div`
 `
 
 const House = () => {
-  const [selectedRoom, setSelectedRoom] = useState(null)
+  const { selectedRoom, setSelectedRoom } = useHouseCtx()
   const { heightText } = useWindowSize()
-  const handleSelectRoom = title => {
-    console.log("selecting room", title)
-    setSelectedRoom(title)
+  const handleSelectRoom = roomId => {
+    console.log("selecting room face down", roomId)
+    setSelectedRoom({ roomId, faceUp: false })
   }
   return (
     <HouseContainer>
@@ -71,9 +73,10 @@ const House = () => {
           <RoomDnD hoverFX title="dining" handleSelectRoom={handleSelectRoom} />
           <RoomDnD hoverFX title="garage" handleSelectRoom={handleSelectRoom} />
           <RoomDnD hoverFX title="office" handleSelectRoom={handleSelectRoom} />
-          {selectedRoom && (
+          {selectedRoom && selectedRoom.roomId && (
             <SelectedRoom
-              selectedRoom={selectedRoom}
+              selectedRoom={selectedRoom.roomId}
+              faceUp={selectedRoom.faceUp}
               handleSelectRoom={handleSelectRoom}
             />
           )}

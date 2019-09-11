@@ -18,6 +18,7 @@ import { AllItemsCtxProvider } from "./contexts/AllItemsCtx"
 import { SnackbarProvider } from "notistack"
 import SpinningPageLoader from "./components/SpinningPageLoader"
 import GameContainer from "./pages/GameContainer.jsx"
+import GameContent from "./components/game/GameContent.jsx"
 //
 //
 
@@ -35,7 +36,11 @@ const App = () => {
                     <DialogContainer />
                     <NavBar />
                     <Container>
-                      <Route exact path="/game/:gameId" component={GamePage} />
+                      <Route
+                        exact
+                        path="/game/:gameId"
+                        component={GameContent}
+                      />
                       <Route
                         exact
                         path="/game/:gameId/new"

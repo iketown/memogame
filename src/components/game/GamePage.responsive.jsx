@@ -79,31 +79,4 @@ const GamePage = () => {
   )
 }
 
-// const StyledHDButton = styled.div`
-//   position: absolute;
-//   left: 0px;
-//   top: 50%;
-//   transform: translateY(-50%);
-// `
-// const HouseDrawerButton = () => {
-//   const [open, setOpen] = useState(false)
-//   const toggleOpen = () => setOpen(old => !old)
-//   return (
-//     <StyledHDButton>
-//       <IconButton onClick={toggleOpen}>
-//         <FaHome />
-//         <FaArrowRight />
-//       </IconButton>
-//       <SwipeableDrawer open={open} onClose={toggleOpen}>
-//         <div style={{ width: "90vw" }}>
-//           hey wussup
-//           <div>
-//             <Button onClick={toggleOpen}>cancel</Button>
-//           </div>
-//         </div>
-//       </SwipeableDrawer>
-//     </StyledHDButton>
-//   )
-// }
-
 export default GamePage

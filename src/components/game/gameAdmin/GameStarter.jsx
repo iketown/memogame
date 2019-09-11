@@ -37,7 +37,7 @@ const GameStarter = () => {
   } = useGameCtx()
   const { handleWinGame } = useFirebase()
   const [expanded, setExpanded] = useState(false)
-  if (!gameState || !gamePlay) return <SpinningPageLoader />
+  if (!gameState || !gamePlay) return null
   const { gameLog, ...gamePlayNoLog } = gamePlay
   function handleStartGame() {
     createRTDBGame()

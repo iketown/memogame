@@ -47,6 +47,11 @@ export const useSoundCtx = () => {
 // ⭐ 🌟 HOUSE CONTEXT 🌟 ⭐ //
 const HouseCtx = createContext()
 export const HouseCtxProvider = props => {
+  const [selectedRoom, setSelectedRoom] = useState({
+    roomId: "",
+    faceUp: false
+  })
+
   const { fdb } = useFirebase()
   const gameId = props.gameId
   const { user } = useAuthCtx()
@@ -65,7 +70,13 @@ export const HouseCtxProvider = props => {
   }, [fdb, gameId, user, user.uid])
   return (
     <HouseCtx.Provider
-      value={{ myHouse, myHouseTimer, setMyHouseTimer }}
+      value={{
+        myHouse,
+        myHouseTimer,
+        setMyHouseTimer,
+        selectedRoom,
+        setSelectedRoom
+      }}
       {...props}
     />
   )
@@ -74,7 +85,13 @@ export const useHouseCtx = () => {
   const ctx = useContext(HouseCtx)
   if (!ctx)
     throw new Error("useHouseCtx must be a descendant of HouseCtxProvider 😕")
-  const { myHouse, myHouseTimer, setMyHouseTimer } = ctx
+  const {
+    myHouse,
+    myHouseTimer,
+    setMyHouseTimer,
+    selectedRoom,
+    setSelectedRoom
+  } = ctx
   const cardsInMyHouse = useMemo(() => {
     const quantity = Object.values(myHouse).reduce((sum, room) => {
       sum += room.length
@@ -115,7 +132,9 @@ export const useHouseCtx = () => {
     myHouse,
     myHouseTimer,
     addToHouseTimer,
-    cardsInMyHouse
+    cardsInMyHouse,
+    selectedRoom,
+    setSelectedRoom
   }
 }
 // ⭐ 🌟 end HOUSE CONTEXT 🌟 ⭐ //
@@ -305,14 +324,7 @@ export const GameCtxProvider = props => {
       const storagePile = randomListOfItemIds(uid)
       obj[uid] = {
         storagePile,
-        house: {
-          attic: [],
-          bedroom: [],
-          bath: [],
-          family: [],
-          kitchen: [],
-          cellar: []
-        }
+        house: {}
       }
       return obj
     }, {})

@@ -3,6 +3,7 @@ import styled from "styled-components"
 import { useWiderThan } from "../../hooks/useScreenSize"
 import { Card, Avatar } from "@material-ui/core"
 import { useDrag, DragPreviewImage } from "react-dnd"
+import brain from "../../images/newCards/brain.svg"
 //
 import { ItemTypes } from "../../dnd/itemTypes"
 import { useGameCtx } from "../../contexts/GameCtx"
@@ -10,24 +11,36 @@ import { useAuthCtx } from "../../contexts/AuthCtx"
 import { removeUid } from "../../utils/imageUtils"
 import { useAllItemsCtx } from "../../contexts/AllItemsCtx"
 import { useGameFxns } from "../../hooks/useGameFxns"
-import { useClickMoveCtx } from "../../contexts/ClickMoveCtx"
+// import { useClickMoveCtx } from "../../contexts/ClickMoveCtx"
 //
 //
 
-const DraggableCard = ({ itemId, scale, index }) => {
+const DraggableCard = ({ itemId, scale, index, source }) => {
   // draggableCard is the top card in the storage pile.
   const { gamePlay } = useGameCtx()
-  const { storageToCenterFX } = useGameFxns()
+  const { storageToCenterFX, storageToHouseFX } = useGameFxns()
   const { user } = useAuthCtx()
-  const { toggleDraggingId, draggingItemId } = useClickMoveCtx()
+  // const { toggleMovingItem, movingItem, cancelMovingCard } = useClickMoveCtx()
   const isMyTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
-  // const {
-  //   gameState: { gameId }
-  // } = useGameCtx()
+
   const [{ isDragging }, dragRef, preview] = useDrag({
-    item: { type: ItemTypes.CARD, itemId, fromStorage: true },
-    end: async (item, mon) => {},
+    item: { type: ItemTypes.CARD, itemId, source },
+    end: async (item, mon) => {
+      console.log("mon get drop result", mon.getDropResult())
+      // cancelMovingCard()
+      if (mon.getDropResult()) {
+        const { droppedAt, index } = mon.getDropResult()
+        if (droppedAt === "center") {
+          // handle dropped in center
+          storageToCenterFX({ itemId })
+        } else {
+          // handle dropped in house
+
+          storageToHouseFX({ roomId: droppedAt, itemId, index })
+        }
+      }
+    },
     collect: mon => ({
       isDragging: !!mon.isDragging()
     }),
@@ -36,7 +49,7 @@ const DraggableCard = ({ itemId, scale, index }) => {
   if (!itemId) return null
   return (
     <div
-      onClick={() => toggleDraggingId(itemId)}
+      // onClick={() => toggleMovingItem({ itemId, source })}
       onDoubleClick={
         isMyTurn
           ? () => storageToCenterFX({ itemId })
@@ -48,7 +61,10 @@ const DraggableCard = ({ itemId, scale, index }) => {
         zIndex: 200,
         cursor: isDragging ? "grabbing" : isMyTurn ? "grab" : "not-allowed",
         height: "100%",
-        width: "100%"
+        width: "100%",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center"
       }}
     >
       <WindowCard index={index} itemId={itemId} scale={scale} dragMe />
@@ -96,16 +112,26 @@ const BackgroundCard = styled(StyledCard)`
   border: 5px solid white;
 `
 
-export const WindowCard = ({ index, itemId, scale = 1, dragMe }) => {
+export const WindowCard = ({
+  index = 0,
+  itemId,
+  scale = 1,
+  dragMe,
+  faceUp = true,
+  handleDoubleClick = () => null
+}) => {
   const { allItems } = useAllItemsCtx()
-  const { draggingItemId } = useClickMoveCtx()
-  const waitingToDrop = draggingItemId === itemId
+  // const { movingItem } = useClickMoveCtx()
+  // const waitingToDrop = movingItem && movingItem.itemId === itemId
   const mdUp = useWiderThan("md")
   const { imagesvg, rotation } = useMemo(() => {
-    const imagesvg = index < 5 && itemId ? allItems[removeUid(itemId)].card : ""
+    const imagesvg =
+      faceUp && index < 5 && itemId
+        ? allItems[removeUid(itemId)] && allItems[removeUid(itemId)].card
+        : brain
     const rotation = (Math.random() - 0.5) * 18 + index // adding index makes the pile twirl
     return { imagesvg, rotation }
-  }, [allItems, index, itemId])
+  }, [allItems, faceUp, index, itemId])
 
   const windowHeight = mdUp ? 90 : 65
   const cardProps = {
@@ -116,7 +142,11 @@ export const WindowCard = ({ index, itemId, scale = 1, dragMe }) => {
     className: `cards card${index}`
   }
   return dragMe ? (
-    <CardWithHalo waitingToDrop={waitingToDrop} {...cardProps} />
+    <CardWithHalo
+      onDoubleClick={handleDoubleClick}
+      // waitingToDrop={waitingToDrop}
+      {...cardProps}
+    />
   ) : (
     <BackgroundCard {...cardProps} />
   )

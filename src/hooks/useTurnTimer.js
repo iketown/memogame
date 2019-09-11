@@ -52,6 +52,7 @@ export const useOthersTurnTimer = ({ playerId }) => {
   const doCounter =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === playerId
   const secondsPerTurn = (gameState && gameState.secondsPerTurn) || 30
+
   useEffect(() => {
     if (doCounter) {
       if (gamePlay.whosTurnItIs.lastCheckIn) {
