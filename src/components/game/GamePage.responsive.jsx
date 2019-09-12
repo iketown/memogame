@@ -1,27 +1,26 @@
-import React, { useState } from "react"
-import { useWidth, useWindowSize } from "../../hooks/useScreenSize"
+import React from "react"
+import { useWidth } from "../../hooks/useScreenSize"
 import styled from "styled-components"
 import House from "../house/House.responsive"
 import CenterSquare from "./CenterPile/CenterSquare.responsive.jsx"
 import StorageShed from "./StorageShed/StorageShed.responsive.jsx"
 import ScoreSection from "./Scores/ScoreSection.responsive"
-import { Fab, IconButton, SwipeableDrawer, Button } from "@material-ui/core"
-import { FaHome, FaArrowRight } from "react-icons/fa"
 import { DndProvider } from "react-dnd"
 import HTML5Backend from "react-dnd-html5-backend"
+import { useAdmin } from "../../hooks/useAdmin"
 //
 //
 
 function getTemplateAreas(width) {
   switch (width) {
     case "xs":
-      return ` "score score" "storage center" "house house" `
+      return ` "score score" "storage center" "house house" "yourturn yourturn" `
     case "sm":
-      return ` "house score" "house center" "house storage" `
+      return ` "score yourturn" "house center" "house storage" `
     case "md":
     case "lg":
     case "xl":
-      return ` "house center score" "house storage score" `
+      return ` "house center score" "house storage yourturn" `
     default:
       return ""
   }
@@ -56,9 +55,11 @@ const StorageSection = styled.div`
 const ScoreSectionContainer = styled.div`
   grid-area: score;
 `
+const YourTurnSectionContainer = styled.div`
+  grid-area: yourturn;
+`
 const GamePage = () => {
   const widthText = useWidth()
-  const { heightText } = useWindowSize()
   return (
     <DndProvider backend={HTML5Backend}>
       <ResponsiveGamePageGrid mobileSize={widthText === "xs"} width={widthText}>
@@ -67,6 +68,7 @@ const GamePage = () => {
         </ScoreSectionContainer>
         <HouseSection className="text-center">
           <House />
+          <Admin />
         </HouseSection>
         <CenterSection className="text-center">
           <CenterSquare />
@@ -74,9 +76,17 @@ const GamePage = () => {
         <StorageSection className="text-center">
           <StorageShed />
         </StorageSection>
+        <YourTurnSectionContainer>
+          <h4>your turn section</h4>
+        </YourTurnSectionContainer>
       </ResponsiveGamePageGrid>
     </DndProvider>
   )
 }
 
 export default GamePage
+
+const Admin = () => {
+  const iAmAdmin = useAdmin()
+  return <p>{iAmAdmin ? "admin" : "plebe"}</p>
+}

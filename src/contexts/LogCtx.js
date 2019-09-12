@@ -4,7 +4,7 @@ import { useAuthCtx } from "./AuthCtx"
 import { useGameCtx, useCenterPileCtx } from "./GameCtx"
 import { removeUid } from "../utils/imageUtils"
 import { doItemsMatch } from "../utils/gameLogic"
-import { useAllItemsCtx } from "./AllItemsCtx"
+import { itemFromItemId } from "../resources/allItems"
 import { usePlayersCtx } from "./PlayersCtx"
 const LogCtx = createContext()
 
@@ -28,7 +28,6 @@ export const useLogCtx = () => {
   const ctx = useContext(LogCtx)
   const { user } = useAuthCtx()
   const { players } = usePlayersCtx()
-  const { itemFromItemId } = useAllItemsCtx()
   const { centerPile } = useCenterPileCtx()
   const {
     gameState: { members, gameId }

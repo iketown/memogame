@@ -11,7 +11,7 @@ import moment from "moment"
 import { useAuthCtx } from "./AuthCtx"
 import { useFirebase } from "./FirebaseCtx"
 import { shuffle, doItemsMatch } from "../utils/gameLogic"
-import { useAllItemsCtx } from "./AllItemsCtx"
+import allItems from "../resources/allItems"
 
 const GameCtx = createContext()
 
@@ -286,7 +286,6 @@ export const GameCtxProvider = props => {
   const { firestore } = useFirebase()
   const { user } = useAuthCtx()
   const { fdb } = useFirebase()
-  const { allItems } = useAllItemsCtx()
   const [gameState, setGameState] = useState({})
   const [gamePlay, setGamePlay] = useState({})
 

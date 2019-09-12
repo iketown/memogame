@@ -3,7 +3,7 @@ import styled from "styled-components"
 import { useDrag, useDrop } from "react-dnd"
 import { ItemTypes } from "../../../dnd/itemTypes"
 import { WindowCard } from "../DraggableCard.jsx"
-import { useHouseCtx } from "../../../contexts/GameCtx"
+import { useHouseCtx, usePointsCtx } from "../../../contexts/GameCtx"
 import { IconButton } from "@material-ui/core"
 import { FaEye } from "react-icons/fa"
 import { useGameFxns } from "../../../hooks/useGameFxns"
@@ -30,6 +30,7 @@ const ReorderCard = ({
   const originalIndex = findCard(itemId).index
   const [peek, setPeek] = useState(false)
   const { subtractAPointFX, houseToCenterFX } = useGameFxns()
+  const { resetPointsClimber } = usePointsCtx()
   const { gamePlay } = useGameCtx()
   const { user } = useAuthCtx()
   const isMyTurn =
@@ -37,6 +38,7 @@ const ReorderCard = ({
   function peekAtCard() {
     setPeek(true)
     subtractAPointFX()
+    resetPointsClimber()
     setTimeout(() => setPeek(false), 2000)
   }
   const [{ isDragging }, drag] = useDrag({
@@ -50,6 +52,7 @@ const ReorderCard = ({
         const { droppedAt, index } = mon.getDropResult()
         if (droppedAt === "center") {
           // handle dropped in center
+          if (selectedRoom.faceUp || peek) resetPointsClimber()
           houseToCenterFX({ itemId, roomId })
         } else {
           // handle dropped in house
@@ -94,6 +97,7 @@ const ReorderCard = ({
   })
   const opacity = isDragging ? 0.5 : 1
   function handleDoubleClick() {
+    if (selectedRoom.faceUp || peek) resetPointsClimber()
     houseToCenterFX({ itemId, roomId })
   }
   return (

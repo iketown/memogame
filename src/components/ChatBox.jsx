@@ -12,7 +12,7 @@ import {
 import { FaTrashAlt } from "react-icons/fa"
 import { useFirebase } from "../contexts/FirebaseCtx"
 import { useGameCtx } from "../contexts/GameCtx"
-import { useAllItemsCtx } from "../contexts/AllItemsCtx"
+import { itemFromItemId } from "../resources/allItems"
 import { usePlayersCtx } from "../contexts/PlayersCtx"
 import AvatarMonster from "./AvatarMonster"
 
@@ -74,7 +74,6 @@ const StyledListItem = styled(ListItem)`
 `
 
 const LogListItem = ({ msg, handleTrash, nextEntry }) => {
-  const { itemFromItemId } = useAllItemsCtx()
   const { players } = usePlayersCtx()
 
   const person = players && players[msg.uid]

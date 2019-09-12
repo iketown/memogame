@@ -8,8 +8,8 @@ import brain from "../../images/newCards/brain.svg"
 import { ItemTypes } from "../../dnd/itemTypes"
 import { useGameCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
-import { removeUid } from "../../utils/imageUtils"
-import { useAllItemsCtx } from "../../contexts/AllItemsCtx"
+import { removeUid } from "../../resources/allItems"
+import allItems from "../../resources/allItems"
 import { useGameFxns } from "../../hooks/useGameFxns"
 // import { useClickMoveCtx } from "../../contexts/ClickMoveCtx"
 //
@@ -120,7 +120,6 @@ export const WindowCard = ({
   faceUp = true,
   handleDoubleClick = () => null
 }) => {
-  const { allItems } = useAllItemsCtx()
   // const { movingItem } = useClickMoveCtx()
   // const waitingToDrop = movingItem && movingItem.itemId === itemId
   const mdUp = useWiderThan("md")
@@ -131,7 +130,7 @@ export const WindowCard = ({
         : brain
     const rotation = (Math.random() - 0.5) * 18 + index // adding index makes the pile twirl
     return { imagesvg, rotation }
-  }, [allItems, faceUp, index, itemId])
+  }, [faceUp, index, itemId])
 
   const windowHeight = mdUp ? 90 : 65
   const cardProps = {

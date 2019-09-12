@@ -1,17 +1,12 @@
-import React from "react"
-import { Grid, Typography, Container } from "@material-ui/core"
-import { Link } from "react-router-dom"
+import React, { useMemo } from "react"
+import { Grid, Typography } from "@material-ui/core"
 //
-import ShowMe from "../../utils/ShowMe.jsx"
 import { useGameCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import YoureNotInThisGameYet from "./gameAdmin/YoureNotInThisGameYet.jsx"
-import HouseGrid from "../house/HouseGrid.jsx"
 import GameStarter from "./gameAdmin/GameStarter.jsx"
-import { usePlayersCtx } from "../../contexts/PlayersCtx"
 import PendingGameView from "./gameAdmin/PendingGameView.jsx"
 import SpinningPageLoader from "../SpinningPageLoader.jsx"
-import GameContainer from "../../pages/GameContainer.jsx"
 import GamePage from "./GamePage.responsive.jsx"
 //
 //
@@ -19,10 +14,12 @@ const GameContent = () => {
   const { gameState } = useGameCtx()
   const { user } = useAuthCtx()
   const memberUIDs = gameState && gameState.memberUIDs
-  console.log("gameState", gameState)
+  const thisIsYourGame = useMemo(
+    () => gameState && gameState.startedBy === user.uid,
+    [gameState, user.uid]
+  )
   if (!memberUIDs) return <SpinningPageLoader />
   const youAreAMember = memberUIDs.includes(user.uid)
-  const thisIsYourGame = gameState && gameState.startedBy === user.uid
   const gameOn = gameState && gameState.inProgress
   const gameOffView = <PendingGameView />
   const nonGameMemberView = <YoureNotInThisGameYet />

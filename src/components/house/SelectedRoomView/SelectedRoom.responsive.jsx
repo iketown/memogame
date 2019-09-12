@@ -1,16 +1,11 @@
 import React, { useState, useEffect } from "react"
 import styled from "styled-components"
-import update from "immutability-helper"
 import { Button } from "@material-ui/core"
 import { images } from "../../../images/newRooms"
 import { useHouseCtx } from "../../../contexts/GameCtx"
-import ResortableDnDCard from "./ResortableDnDCard"
-import DraggableCard from "../DraggableCard.jsx"
-import { useWiderThan } from "../../../hooks/useScreenSize"
 import ReorderCard from "./ReorderCard"
 import ReorderPlaceholder from "./ReorderPlaceholder"
 import SelectedRoomDrop from "./SelectedRoomDrop"
-import ShowMe from "../../../utils/ShowMe"
 import { useGameFxns } from "../../../hooks/useGameFxns"
 //
 const SelectedRoomSection = styled.div`
@@ -127,14 +122,7 @@ const SelectedRoom = ({ selectedRoom, handleSelectRoom }) => {
                   moveCard={moveCard}
                   findCard={findCard}
                   itemId={itemId}
-                >
-                  {/* <DraggableCard
-                itemId={itemId}
-                index={index}
-                source={selectedRoom}
-                scale={smallUp ? 1.5 : 1}
-            /> */}
-                </ReorderCard>
+                ></ReorderCard>
               </ReorderPlaceholder>
             ))}
             {thisRoom.length < 3 && (
@@ -155,7 +143,6 @@ const SelectedRoom = ({ selectedRoom, handleSelectRoom }) => {
       >
         cancel
       </Button>
-      {/* <ShowMe obj={thisRoomLocal} name="thisRoomLocal" noModal /> */}
     </>
   )
 }

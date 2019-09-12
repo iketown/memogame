@@ -33,7 +33,6 @@ const Game = props => {
           <HouseCtxProvider gameId={gameId}>
             <StoragePileCtxProvider gameId={gameId}>
               <CenterPileCtxProvider gameId={gameId}>
-                {/* <ClickMoveCtxProvider> */}
                 <ChatCtxProvider gameId={gameId}>
                   <SoundCtxProvider>
                     <SnackbarHandler gameId={gameId} />
@@ -41,7 +40,6 @@ const Game = props => {
                     <GameSounds />
                   </SoundCtxProvider>
                 </ChatCtxProvider>
-                {/* </ClickMoveCtxProvider> */}
               </CenterPileCtxProvider>
             </StoragePileCtxProvider>
           </HouseCtxProvider>

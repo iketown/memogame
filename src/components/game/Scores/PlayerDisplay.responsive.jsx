@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { Grid, Avatar, Typography } from "@material-ui/core"
+import { Grid, Avatar, Typography, Button } from "@material-ui/core"
 import { FaWarehouse, FaHome } from "react-icons/fa"
 //
 import MiniPlayerDisplay from "./MiniPlayerDisplay"
@@ -91,34 +91,9 @@ export const PlayerDisplay = ({ playerId }) => {
       <div className="timer">
         <TurnTimer key={lastCheckIn} playerId={playerId} />
       </div>
-      {/* {!!secondsLeft && <TimerBoxes secondsLeft={secondsLeft} />} */}
     </StyledDisplay>
   ) : (
     <MiniPlayerDisplay playerId={playerId} myTurn={myTurn} />
-  )
-}
-
-const StyledTimerDiv = styled.div`
-  width: 100%;
-  display: grid;
-  grid-template-columns: repeat(24, 1fr);
-  grid-gap: 1px;
-`
-const StyledTimerBox = styled.div`
-  /* border: 1px solid gainsboro; */
-  transition: 1s opacity;
-  opacity: ${p => (p.visible ? 1 : 0)};
-  background: green;
-  height: 4px;
-  width: 4px;
-`
-const TimerBoxes = ({ secondsLeft }) => {
-  return (
-    <StyledTimerDiv className="timer">
-      {Array.from({ length: 24 }, x => x).map((x, index) => (
-        <StyledTimerBox visible={index < secondsLeft} key={index} />
-      ))}
-    </StyledTimerDiv>
   )
 }
 

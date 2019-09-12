@@ -24,3 +24,4 @@ export const doItemsMatch = (itemId1, itemId2) => {
 
 export const maxItemsPerRoom = 3
 export const pointsRequiredToWin = 50
+export const secondsPerTurn = 20

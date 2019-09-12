@@ -18,15 +18,15 @@ const SelectedRoomDrop = ({ children, roomId, addCardLocal }) => {
     accept: ItemTypes.CARD,
     canDrop: (item, monitor) => {
       const canDrop =
+        // don't accept it if this room is full
         thisRoom &&
         thisRoom.length < maxItemsPerRoom &&
+        // dont drop here if ALSO dragging over
+        // ReorderPlaceholder (nested inside SelectedRoomDrop).
+        // ReorderPlaceholder puts it at a specified index.
+        // SelectedRoomDrop puts it at the end.
         monitor.isOver({ shallow: true })
-      // don't accept it if this room is full
 
-      // dont drop here if ALSO dragging over
-      // ReorderPlaceholder (nested inside SelectedRoomDrop).
-      // ReorderPlaceholder puts it at a specified index.
-      // SelectedRoomDrop puts it at the end.
       return canDrop
     },
     collect: mon => ({

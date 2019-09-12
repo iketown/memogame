@@ -11,6 +11,7 @@ import {
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { doItemsMatch, shuffle, pointsRequiredToWin } from "../utils/gameLogic"
 import { useLogCtx } from "../contexts/LogCtx"
+import { useCallback } from "react"
 
 //
 //
@@ -30,6 +31,14 @@ export const useGameFxns = () => {
   const { cardsInMyHouse, addToHouseTimer } = useHouseCtx()
   const { storagePile } = useStoragePileCtx()
   // internal fxns
+  const isItMyTurn = useCallback(() => {
+    return (
+      gamePlay &&
+      gamePlay.whosTurnItIs &&
+      user &&
+      gamePlay.whosTurnItIs.uid === user.uid
+    )
+  }, [gamePlay, user])
   async function _myHouseRefAndValue() {
     const myHouseRef = fdb.ref(
       `/currentGames/${gameId}/gameStates/${user.uid}/house`
@@ -56,7 +65,7 @@ export const useGameFxns = () => {
     })
     return { storageRef, storageValue }
   }
-  async function _pointsRefAndValue() {
+  const _pointsRefAndValue = useCallback(async () => {
     const pointsRef = fdb.ref(
       `/currentGames/${gameId}/gameStates/${user.uid}/points`
     )
@@ -64,18 +73,21 @@ export const useGameFxns = () => {
       .once("value")
       .then(snap => snap.val() || 0)
     return { pointsRef, pointsValue }
-  }
-  const addPoints = async (quantity = 1) => {
-    const { pointsRef, pointsValue } = await _pointsRefAndValue()
-    await pointsRef.set(pointsValue + quantity)
-    if (pointsValue + quantity >= pointsRequiredToWin) {
-      handleWinGame({ gameId })
-    }
-  }
+  }, [fdb, gameId, user.uid])
+  const addPoints = useCallback(
+    async (quantity = 1) => {
+      const { pointsRef, pointsValue } = await _pointsRefAndValue()
+      await pointsRef.set(pointsValue + quantity)
+      if (pointsValue + quantity >= pointsRequiredToWin) {
+        handleWinGame({ gameId })
+      }
+    },
+    [_pointsRefAndValue, gameId, handleWinGame]
+  )
   const subtractAPointFX = () => {
     addPoints(-1)
   }
-  function _endTurn() {
+  const _endTurn = useCallback(() => {
     const { memberUIDs } = gamePlay
     const myIndex = memberUIDs.findIndex(memUid => memUid === user.uid)
 
@@ -86,7 +98,22 @@ export const useGameFxns = () => {
       startTime: moment().toISOString()
     }
     fdb.ref(`/currentGames/${gameId}/whosTurnItIs`).set(nextPerson)
-  }
+  }, [fdb, gameId, gamePlay, user.uid])
+
+  const _forceNextTurn = useCallback(() => {
+    const { memberUIDs, whosTurnItIs } = gamePlay
+    const currentPlayerUid = whosTurnItIs.uid
+    const currentPlayerIndex = memberUIDs.findIndex(
+      _uid => _uid === currentPlayerUid
+    )
+    const nextPlayerIndex = (currentPlayerIndex + 1) % memberUIDs.length
+    const nextPerson = {
+      uid: memberUIDs[nextPlayerIndex],
+      startTime: moment().toISOString()
+    }
+    fdb.ref(`/currentGames/${gameId}/whosTurnItIs`).set(nextPerson)
+  }, [fdb, gameId, gamePlay])
+
   function _updateTurnTimer() {
     return fdb.ref(`/currentGames/${gameId}/whosTurnItIs`).update({
       lastCheckIn: moment().toISOString()
@@ -110,6 +137,9 @@ export const useGameFxns = () => {
   }
 
   async function addToCenterFX({ itemId, fromHouse }) {
+    if (!isItMyTurn()) {
+      return null
+    }
     const { centerRef, centerValue } = await _centerRefAndValue()
     // validate
     const [topCard] = centerValue
@@ -201,15 +231,18 @@ export const useGameFxns = () => {
     // _endTurn()
   }
   function storageToCenterFX({ itemId }) {
+    if (!isItMyTurn()) return null
     removeFromStorageFX({ itemId })
     addToCenterFX({ itemId })
   }
 
   function houseToCenterFX({ roomId, itemId }) {
+    if (!isItMyTurn()) return null
     removeFromRoomFX({ roomId, itemId })
     addToCenterFX({ itemId, fromHouse: true })
   }
   function storageToHouseFX({ roomId, itemId, index }) {
+    if (!isItMyTurn()) return null
     removeFromStorageFX({ itemId })
     addToRoomFX({ roomId, itemId, index })
     addLogMessage({ itemId, destination: "house" })
@@ -249,6 +282,7 @@ export const useGameFxns = () => {
     subtractAPointFX,
     _updateTurnTimer,
     _endTurn,
+    _forceNextTurn,
     togglePauseGame
   }
 }

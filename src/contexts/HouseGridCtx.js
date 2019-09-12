@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useReducer, useState } from "react"
 //
 import { shuffle } from "../utils/gameLogic"
-import { useAllItemsCtx } from "./AllItemsCtx"
+import allItems from "../resources/allItems"
 const HouseGridCtx = createContext()
 
 const initialState = {
@@ -57,7 +57,6 @@ export const HouseGridCtxProvider = props => {
     faceUp: false
   })
   const [houseState, houseDispatch] = useReducer(reducer, initialState)
-  const { allItems } = useAllItemsCtx()
   const fillHouse = () => {
     const itemsArr = Object.entries(allItems)
     shuffle(itemsArr)

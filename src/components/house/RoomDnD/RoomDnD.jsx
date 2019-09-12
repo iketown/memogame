@@ -55,7 +55,7 @@ const RoomDnD = ({ title, handleSelectRoom }) => {
   // const isFromHouse = movingItem && movingItem.source === "house"
 
   const WhiteBox = styled.div`
-    width: 1rem;
+    width: 5rem;
     height: 1rem;
     background: white;
     border-radius: 5%;

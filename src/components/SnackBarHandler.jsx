@@ -14,7 +14,6 @@ import ShowMe from "../utils/ShowMe"
 import { userInfo } from "os"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { usePlayersCtx } from "../contexts/PlayersCtx"
-import { useAllItemsCtx } from "../contexts/AllItemsCtx"
 import AvatarMonster from "./AvatarMonster"
 
 //
@@ -23,7 +22,6 @@ const SnackBarHandler = ({ gameId, enqueueSnackbar, closeSnackbar }) => {
   const { fdb } = useFirebase()
   const { players } = usePlayersCtx()
   const { user } = useAuthCtx()
-  const { itemFromItemId } = useAllItemsCtx()
 
   useEffect(() => {
     if (gameId) {
