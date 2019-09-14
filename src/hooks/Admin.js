@@ -1,34 +1,33 @@
-import React, { useEffect, useRef } from "react"
+import React, { useEffect } from "react"
 import { useGameCtx } from "../contexts/GameCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
-import { useGameFxns } from "./useGameFxns"
 import moment from "moment"
 import { secondsPerTurn } from "../utils/gameLogic"
+import { useGamePlayCtx } from "../contexts/GamePlayCtx"
 //
 //
-export const useAdmin = () => {
-  const { gamePlay, gameState } = useGameCtx()
+export const Admin = () => {
+  const { gameState } = useGameCtx("Admin")
+  const { gamePlay } = useGamePlayCtx("Admin")
   const { user } = useAuthCtx()
-  const { _forceNextTurn } = useGameFxns()
-  const turnTimerRef = useRef()
   const iAmAdmin = gameState && user && gameState.startedBy === user.uid
-
+  const whosTurnItIs = gamePlay && gamePlay.whosTurnItIs
+  console.log("Admin rendering  called")
   useEffect(() => {
-    if (iAmAdmin && gamePlay && gamePlay.whosTurnItIs && gameState && user) {
-      const { whosTurnItIs } = gamePlay
+    if (iAmAdmin && whosTurnItIs && gameState && user) {
       let startOfTurn = whosTurnItIs.lastCheckIn || whosTurnItIs.startTime
       console.log("startOfTurn", startOfTurn)
       const whenTurnIsOver = moment(startOfTurn).add(secondsPerTurn, "seconds")
 
       const msUntilTurnOver = moment(whenTurnIsOver).diff(moment())
       console.log("seconds left", msUntilTurnOver / 1000)
-      clearTimeout(turnTimerRef.current)
-      turnTimerRef.current = setTimeout(() => {
+      const timeOut = setTimeout(() => {
         console.log("TURN IS OVER.  changing player", moment().toISOString())
-        _forceNextTurn()
+        // _forceNextTurn()
       }, msUntilTurnOver)
+      return clearTimeout(timeOut)
     }
-  }, [_forceNextTurn, gamePlay, gameState, iAmAdmin, user])
+  }, [whosTurnItIs, gameState, iAmAdmin, user])
 
-  return iAmAdmin // just a boolean
+  return <p>admin</p>
 }

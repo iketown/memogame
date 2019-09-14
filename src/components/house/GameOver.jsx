@@ -16,10 +16,12 @@ import { useFirebase } from "../../contexts/FirebaseCtx"
 import AvatarMonster from "../AvatarMonster"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import { withRouter } from "react-router-dom"
+import { useGamePlayCtx } from "../../contexts/GamePlayCtx"
 //
 
 const GameOver = ({ history }) => {
-  const { gameState, gamePlay } = useGameCtx()
+  const { gameState } = useGameCtx("GameOver")
+  const { gamePlay } = useGamePlayCtx("GameOver")
   const { user } = useAuthCtx()
   const { players } = usePlayersCtx()
   const { doRematch } = useFirebase()

@@ -1,36 +1,36 @@
 import React, { useMemo } from "react"
 import styled from "styled-components"
 import { useWiderThan } from "../../hooks/useScreenSize"
-import { Card, Avatar } from "@material-ui/core"
-import { useDrag, DragPreviewImage } from "react-dnd"
+import { Card } from "@material-ui/core"
+import { useDrag } from "react-dnd"
 import brain from "../../images/newCards/brain.svg"
 //
 import { ItemTypes } from "../../dnd/itemTypes"
-import { useGameCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import { removeUid } from "../../resources/allItems"
 import allItems from "../../resources/allItems"
 import { useGameFxns } from "../../hooks/useGameFxns"
+import { useGamePlayCtx } from "../../contexts/GamePlayCtx"
 // import { useClickMoveCtx } from "../../contexts/ClickMoveCtx"
 //
 //
 
 const DraggableCard = ({ itemId, scale, index, source }) => {
   // draggableCard is the top card in the storage pile.
-  const { gamePlay } = useGameCtx()
-  const { storageToCenterFX, storageToHouseFX } = useGameFxns()
+  console.log("draggableCard renders", itemId, scale, index, source)
+  const { gamePlay } = useGamePlayCtx("DraggableCard")
+  const { storageToCenterFX, storageToHouseFX } = useGameFxns("DraggableCard")
   const { user } = useAuthCtx()
-  // const { toggleMovingItem, movingItem, cancelMovingCard } = useClickMoveCtx()
   const isMyTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
-
-  const [{ isDragging }, dragRef, preview] = useDrag({
+  const [{ isDragging }, dragRef] = useDrag({
     item: { type: ItemTypes.CARD, itemId, source },
     end: async (item, mon) => {
       console.log("mon get drop result", mon.getDropResult())
       // cancelMovingCard()
       if (mon.getDropResult()) {
         const { droppedAt, index } = mon.getDropResult()
+
         if (droppedAt === "center") {
           // handle dropped in center
           storageToCenterFX({ itemId })
@@ -87,25 +87,7 @@ const StyledCard = styled(Card)`
   position: absolute;
   border: 5px solid white;
 `
-const CardWithHalo = styled(StyledCard)`
-  @keyframes shimmy {
-    0% {
-      transform: scale(1);
-    }
 
-    100% {
-      transform: scale(1.1);
-      box-shadow: 8px 8px 6px #4444444d;
-    }
-  }
-  ${p =>
-    p.waitingToDrop
-      ? `
-    border: 2px solid black;
-  animation: shimmy 1s infinite;
-  `
-      : ``}
-`
 const BackgroundCard = styled(StyledCard)`
   top: ${p => p.index * offsetMultiplier}px;
   transform: scale(${p => 1 - p.index * 0.02}) rotate(${p => p.rotation}deg);
@@ -120,8 +102,6 @@ export const WindowCard = ({
   faceUp = true,
   handleDoubleClick = () => null
 }) => {
-  // const { movingItem } = useClickMoveCtx()
-  // const waitingToDrop = movingItem && movingItem.itemId === itemId
   const mdUp = useWiderThan("md")
   const { imagesvg, rotation } = useMemo(() => {
     const imagesvg =
@@ -141,11 +121,7 @@ export const WindowCard = ({
     className: `cards card${index}`
   }
   return dragMe ? (
-    <CardWithHalo
-      onDoubleClick={handleDoubleClick}
-      // waitingToDrop={waitingToDrop}
-      {...cardProps}
-    />
+    <StyledCard onDoubleClick={handleDoubleClick} {...cardProps} />
   ) : (
     <BackgroundCard {...cardProps} />
   )

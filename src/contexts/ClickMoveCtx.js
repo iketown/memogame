@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useReducer, useState } from "react"
-import { useGameCtx } from "./GameCtx"
+import React, { createContext, useContext, useState } from "react"
 import { useAuthCtx } from "./AuthCtx"
 import { useGameFxns } from "../hooks/useGameFxns"
+import { useGamePlayCtx } from "./GamePlayCtx"
 
 const ClickMoveCtx = createContext()
 
@@ -14,9 +14,9 @@ export const ClickMoveCtxProvider = props => {
 
 export const useClickMoveCtx = () => {
   const ctx = useContext(ClickMoveCtx)
-  const { gamePlay } = useGameCtx()
+  const { gamePlay } = useGamePlayCtx("useClickMoveCtx")
   const { user } = useAuthCtx()
-  const { storageToHouseFX } = useGameFxns()
+  const { storageToHouseFX } = useGameFxns("useClickMoveCtx")
   if (!ctx)
     throw new Error(
       "useClickMoveCtx must be a descendant of ClickMoveCtxProvider 😕 "

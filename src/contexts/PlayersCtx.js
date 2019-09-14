@@ -6,7 +6,7 @@ import { useAuthCtx } from "./AuthCtx"
 const PlayersCtx = createContext()
 
 export const PlayersCtxProvider = props => {
-  const { gameState } = useGameCtx()
+  const { gameState } = useGameCtx("PlayersCtxProvider")
   const [players, setPlayers] = useState({})
   const { user } = useAuthCtx()
   const { firestore } = useFirebase()
@@ -23,7 +23,7 @@ export const PlayersCtxProvider = props => {
     }
     if (gameState && (gameState.memberUIDs || gameState.memberRequests)) {
       updateFriends(gameState.memberUIDs)
-      ;[...gameState.memberUIDs, ...gameState.memberRequests].forEach(uid => {
+      ;[...gameState.memberUIDs].forEach(uid => {
         const memberRef = firestore.collection("publicProfiles").doc(uid)
         memberRef.onSnapshot(doc => {
           setPlayers(old => ({ ...old, [doc.id]: doc.data() }))

@@ -1,7 +1,5 @@
 import React from "react"
 import {
-  Button,
-  Grid,
   List,
   Card,
   CardContent,
@@ -38,7 +36,7 @@ const RequestList = ({ requests = [] }) => {
 }
 
 const RequestToJoin = ({ request }) => {
-  const { handleGameRequest } = useGameCtx()
+  const { handleGameRequest } = useGameCtx('RequestToJoin')
   const requestingUID = request.uid
   function handleAccept() {
     handleGameRequest({ requestingUID, approvedBool: true })

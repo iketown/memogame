@@ -1,19 +1,28 @@
 import React from "react"
 import styled from "styled-components"
-import { Grid, Avatar, Typography, Button } from "@material-ui/core"
+import { Typography } from "@material-ui/core"
 import { FaWarehouse, FaHome } from "react-icons/fa"
 //
 import MiniPlayerDisplay from "./MiniPlayerDisplay"
-import { useGameCtx } from "../../../contexts/GameCtx"
-import { useAuthCtx } from "../../../contexts/AuthCtx"
-import { usePlayersCtx } from "../../../contexts/PlayersCtx.js"
-import { useTurnTimer, useOthersTurnTimer } from "../../../hooks/useTurnTimer"
 import ScrollingPointsDisplay from "../ScrollingPointsDisplay.jsx"
 import { useOtherPlayerInfo } from "../../../hooks/usePlayerInfo.js"
 import AvatarMonster from "../../AvatarMonster.jsx"
 import TurnTimer from "../Timers/TurnTimer.jsx"
+import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
 //
 //
+
+const GreenBox = styled.div`
+  height: 4px;
+  width: 4px;
+  margin-right: 2.5px;
+  background: green;
+`
+const BoxContainer = styled.div`
+  display: flex;
+  justify-content: left;
+  width: 100%;
+`
 
 const StyledDisplay = styled.div`
   flex-grow: ${p => (p.myTurn ? 1 : 0)};
@@ -60,10 +69,9 @@ export const PlayerDisplay = ({ playerId }) => {
     points,
     storageCount,
     houseCount,
-    secondsLeft,
     publicProfile
   } = useOtherPlayerInfo(playerId)
-  const { gamePlay } = useGameCtx()
+  const { gamePlay } = useGamePlayCtx("PlayerDisplay")
   const { lastCheckIn } = gamePlay.whosTurnItIs
   const myTurn = gamePlay && gamePlay.whosTurnItIs.uid === playerId
   return myTurn ? (
@@ -89,7 +97,25 @@ export const PlayerDisplay = ({ playerId }) => {
       </div>
       <ScrollingPointsDisplay points={points} className="total" />
       <div className="timer">
-        <TurnTimer key={lastCheckIn} playerId={playerId} />
+        <TurnTimer
+          key={lastCheckIn}
+          playerId={playerId}
+          render={({ getTime }) =>
+            getTime() > 0 ? (
+              <BoxContainer>
+                {Array.from({ length: Math.min(getTime() / 1000, 20) }).map(
+                  (sec, i) => (
+                    <GreenBox key={i} />
+                  )
+                )}
+              </BoxContainer>
+            ) : (
+              <span style={{ fontSize: "9px", color: "red" }}>
+                game admin has disconnected
+              </span>
+            )
+          }
+        />
       </div>
     </StyledDisplay>
   ) : (

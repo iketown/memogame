@@ -1,9 +1,7 @@
-import React, { useState } from "react"
+import React from "react"
 import styled from "styled-components"
-import { Typography } from "@material-ui/core"
-import AvatarMonster from "../../AvatarMonster"
-import { useGameCtx } from "../../../contexts/GameCtx"
 import PlayerDisplay from "./PlayerDisplay.responsive"
+import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
 
 const FlexDiv = styled.div`
   display: flex;
@@ -11,7 +9,7 @@ const FlexDiv = styled.div`
 `
 
 const ScoreSection = () => {
-  const { gamePlay } = useGameCtx()
+  const { gamePlay } = useGamePlayCtx("ScoreSection")
   const gameStates = gamePlay && gamePlay.gameStates
 
   return (

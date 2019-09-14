@@ -4,16 +4,14 @@ import React, {
   useEffect,
   useState,
   useMemo,
-  useRef
+  useCallback
 } from "react"
 import firebase from "firebase/app"
 import moment from "moment"
 import { useAuthCtx } from "./AuthCtx"
 import { useFirebase } from "./FirebaseCtx"
-import { shuffle, doItemsMatch } from "../utils/gameLogic"
+import { shuffle } from "../utils/gameLogic"
 import allItems from "../resources/allItems"
-
-const GameCtx = createContext()
 
 // ⭐ 🌟 SOUNDS CONTEXT 🌟 ⭐ //
 
@@ -47,6 +45,7 @@ export const useSoundCtx = () => {
 // ⭐ 🌟 HOUSE CONTEXT 🌟 ⭐ //
 const HouseCtx = createContext()
 export const HouseCtxProvider = props => {
+  console.log("houseCtxProvider called")
   const [selectedRoom, setSelectedRoom] = useState({
     roomId: "",
     faceUp: false
@@ -56,8 +55,7 @@ export const HouseCtxProvider = props => {
   const gameId = props.gameId
   const { user } = useAuthCtx()
   const [myHouse, setMyHouse] = useState({})
-  const [myHouseTimer, setMyHouseTimer] = useState({})
-  // myHouseTimer formatted as  [itemId]: moment().toISOString()
+
   useEffect(() => {
     const myHouseRef = fdb.ref(
       `/currentGames/${gameId}/gameStates/${user.uid}/house`
@@ -72,8 +70,6 @@ export const HouseCtxProvider = props => {
     <HouseCtx.Provider
       value={{
         myHouse,
-        myHouseTimer,
-        setMyHouseTimer,
         selectedRoom,
         setSelectedRoom
       }}
@@ -85,13 +81,7 @@ export const useHouseCtx = () => {
   const ctx = useContext(HouseCtx)
   if (!ctx)
     throw new Error("useHouseCtx must be a descendant of HouseCtxProvider 😕")
-  const {
-    myHouse,
-    myHouseTimer,
-    setMyHouseTimer,
-    selectedRoom,
-    setSelectedRoom
-  } = ctx
+  const { myHouse, selectedRoom, setSelectedRoom } = ctx
   const cardsInMyHouse = useMemo(() => {
     const quantity = Object.values(myHouse).reduce((sum, room) => {
       sum += room.length
@@ -100,38 +90,8 @@ export const useHouseCtx = () => {
     return quantity
   }, [myHouse])
 
-  // card must be in house for x seconds before it can be played.
-  const houseRestrictionSeconds = 15
-
-  const houseTimeoutRef = useRef()
-  const addToHouseTimer = itemId => {
-    // key is itemId
-    // value is when the timer restriction is over.
-    setMyHouseTimer(old => ({
-      ...old,
-      [itemId]: moment()
-        .add(houseRestrictionSeconds, "seconds")
-        .endOf("second")
-    }))
-    clearTimeout(houseTimeoutRef.current)
-    houseTimeoutRef.current = setTimeout(
-      () => removeFromHouseTimer(itemId),
-      houseRestrictionSeconds * 1000
-    )
-  }
-  const removeFromHouseTimer = itemId => {
-    console.log("remove from h t called", itemId)
-    setMyHouseTimer(old => {
-      const newObj = { ...old }
-      delete newObj[itemId]
-      return newObj
-    })
-  }
-
   return {
     myHouse,
-    myHouseTimer,
-    addToHouseTimer,
     cardsInMyHouse,
     selectedRoom,
     setSelectedRoom
@@ -147,42 +107,37 @@ const CenterPileCtx = createContext()
 export const CenterPileCtxProvider = props => {
   const { fdb } = useFirebase()
   const gameId = props.gameId
-  const [centerPile, setCenterPile] = useState([])
+  const [centerPile, setCenterPileInState] = useState([])
+  const setCenterPile = useCallback(newState => {
+    console.log("settingCenterPile state", newState)
+    setCenterPileInState(newState)
+  }, [])
   useEffect(() => {
     // keep CENTER PILE in sync with firebase
     const centerPileRef = fdb.ref(`/currentGames/${gameId}/centerCardPile`)
     centerPileRef.on("value", snapshot => {
-      setCenterPile(snapshot.val() || [])
+      console.log("centerPileRef called")
+      const oldState = JSON.stringify(centerPile)
+      const newState = JSON.stringify(snapshot.val())
+      if (snapshot.val() && oldState !== newState) {
+        setCenterPile(snapshot.val() || [])
+      } else {
+        console.log("not gonna update centerPile")
+      }
     })
-    // return centerPileRef.off
-  }, [fdb, gameId])
-  return (
-    <CenterPileCtx.Provider value={{ centerPile, setCenterPile }} {...props} />
-  )
+  }, [centerPile, fdb, gameId, setCenterPile])
+  return <CenterPileCtx.Provider value={{ centerPile }} {...props} />
 }
 
 export const useCenterPileCtx = () => {
   const ctx = useContext(CenterPileCtx)
-  const { addPileToStorageLocal } = useStoragePileCtx()
   if (!ctx)
     throw new Error(
       "useCenterPileCtx must be a descendant of CenterPileCtxProvider 😕"
     )
-  const { centerPile, setCenterPile } = ctx
+  const { centerPile } = ctx
 
-  const addToCenterLocal = ({ itemId }) => {
-    const topCardId = centerPile[0]
-    const validPlay = doItemsMatch(topCardId, itemId)
-    if (validPlay) {
-      setCenterPile(old => [itemId, ...old])
-    } else {
-      //handle invalid
-      const oldCenterPile = [...centerPile] // to avoid race condition below
-      addPileToStorageLocal(oldCenterPile)
-      setCenterPile([itemId])
-    }
-  }
-  return { centerPile, setCenterPile, addToCenterLocal }
+  return { centerPile }
 }
 // ⭐ 🌟 end CENTER PILE CONTEXT 🌟 ⭐ //
 
@@ -220,18 +175,10 @@ export const useStoragePileCtx = () => {
     throw new Error(
       "useStoragePileCtx must be a descendant of StoragePileCtxProvider 😕"
     )
-  const removeFromStorageLocal = itemId => {
-    setStoragePile(old => [...old].filter(_item => _item !== itemId))
-  }
-  const addPileToStorageLocal = itemArr => {
-    setStoragePile(old => [...itemArr, ...old])
-  }
-  const { storagePile, setStoragePile } = ctx
+
+  const { storagePile } = ctx
   return {
-    storagePile,
-    setStoragePile,
-    removeFromStorageLocal,
-    addPileToStorageLocal
+    storagePile
   }
 }
 // ⭐ 🌟 end STORAGE PILE CONTEXT 🌟 ⭐ //
@@ -282,40 +229,50 @@ export const usePointsCtx = () => {
 }
 // ⭐ 🌟 END POINTS CONTEXT 🌟 ⭐ //
 
+const GameCtx = createContext()
 export const GameCtxProvider = props => {
   const { firestore } = useFirebase()
-  const { user } = useAuthCtx()
   const { fdb } = useFirebase()
-  const [gameState, setGameState] = useState({})
-  const [gamePlay, setGamePlay] = useState({})
+  const [gameState, setGameStateR] = useState({})
 
+  function setGameState(newState) {
+    console.log("setting game state", newState)
+    setGameStateR(newState)
+  }
   const gameId = props.gameId
 
   useEffect(() => {
     const gameRef = firestore.doc(`/games/${gameId}`)
-    const unsubscribe = gameRef.onSnapshot(doc => {
+    gameRef.onSnapshot(doc => {
+      console.log("new snapshot")
+      const compareFirst = true
       const values = doc.data()
-      if (values) {
+      if (compareFirst) {
+        const newGameStateJson = JSON.stringify({ ...values, gameId })
+        const oldStateJson = JSON.stringify(gameState)
+        if (newGameStateJson !== oldStateJson) {
+          console.log("update gameState")
+          setGameState({ ...values, gameId })
+        } else {
+          console.log("not gonna update gameState")
+        }
+      } else {
+        console.log("updating gameState")
         setGameState({ ...values, gameId })
       }
+      // if (values) {
+      //   setGameState({ ...values, gameId })
+      // }
     })
-    // return unsubscribe
-  }, [firestore, gameId])
+  }, [firestore, gameId, gameState])
 
-  useEffect(() => {
-    const gamePlayRef = fdb.ref(`/currentGames/${gameId}`)
-    gamePlayRef.on("value", snapshot => {
-      setGamePlay(snapshot.val())
-    })
-    // return gamePlayRef.off
-  }, [fdb, gameId])
-
-  function randomListOfItemIds(uid) {
+  const randomListOfItemIds = useCallback(uid => {
     const allIds = Object.keys(allItems).map(key => `${key}_${uid}`) // add uid to each person's cards so you know where they started, and so they stay unique
-    shuffle(allIds)
-    return allIds
-  }
-  function createRTDBGame() {
+    const shuffledIds = shuffle(allIds)
+    return shuffledIds
+  }, [])
+
+  const createRTDBGame = useCallback(() => {
     const gamePlayRef = fdb.ref(`/currentGames/${gameId}`)
     const { gameName, startedBy, memberUIDs } = gameState
 
@@ -335,80 +292,72 @@ export const GameCtxProvider = props => {
       centerPile: [],
       gameStates
     })
-  }
+  }, [fdb, gameId, gameState, randomListOfItemIds])
 
-  const totalCards = useMemo(() => {
-    if (!gamePlay) return null
-    // return null
-    const centerCards = gamePlay.centerCardPile
+  // const totalCards = useMemo(() => {
+  //   if (!gamePlay) return null
+  //   // return null
+  //   const centerCards = gamePlay.centerCardPile
 
-    const storageCards =
-      gamePlay.gameStates &&
-      Object.values(gamePlay.gameStates).reduce((arr, state) => {
-        if (state.storagePile) {
-          arr.push(...state.storagePile)
-        }
-        return arr
-      }, [])
+  //   const storageCards =
+  //     gamePlay.gameStates &&
+  //     Object.values(gamePlay.gameStates).reduce((arr, state) => {
+  //       if (state.storagePile) {
+  //         arr.push(...state.storagePile)
+  //       }
+  //       return arr
+  //     }, [])
 
-    const houseCards =
-      gamePlay.gameStates &&
-      Object.values(gamePlay.gameStates).reduce((arr, state) => {
-        if (state.house) {
-          Object.values(state.house).forEach(room => arr.push(...room))
-        }
-        return arr
-      }, [])
-    if (gamePlay.gameStates) {
-      Object.values(gamePlay.gameStates).forEach(gameState => {
-        const { house, storagePile } = gameState
-        if (house) {
-          Object.values(house).forEach(room => {
-            houseCards.concat(room)
-          })
-        }
-        if (storagePile && storagePile.length) {
-          storageCards.concat(...storagePile)
-        }
-      })
-    }
+  //   const houseCards =
+  //     gamePlay.gameStates &&
+  //     Object.values(gamePlay.gameStates).reduce((arr, state) => {
+  //       if (state.house) {
+  //         Object.values(state.house).forEach(room => arr.push(...room))
+  //       }
+  //       return arr
+  //     }, [])
+  //   if (gamePlay.gameStates) {
+  //     Object.values(gamePlay.gameStates).forEach(gameState => {
+  //       const { house, storagePile } = gameState
+  //       if (house) {
+  //         Object.values(house).forEach(room => {
+  //           houseCards.concat(room)
+  //         })
+  //       }
+  //       if (storagePile && storagePile.length) {
+  //         storageCards.concat(...storagePile)
+  //       }
+  //     })
+  //   }
 
-    const center = (centerCards && centerCards.length) || 0
-    const houses = (houseCards && houseCards.length) || 0
-    const storage = (storageCards && storageCards.length) || 0
-    return { center, houses, storage, total: center + houses + storage }
-  }, [gamePlay])
+  //   const center = (centerCards && centerCards.length) || 0
+  //   const houses = (houseCards && houseCards.length) || 0
+  //   const storage = (storageCards && storageCards.length) || 0
+  //   return { center, houses, storage, total: center + houses + storage }
+  // }, [])
+
   if (!gameId) return null
   return (
     <GameCtx.Provider
       value={{
         gameState,
-        setGamePlay,
-        gamePlay,
         firestore,
         gameId,
-        createRTDBGame,
-        totalCards
+        createRTDBGame
       }}
       {...props}
     />
   )
 }
 
-export const useGameCtx = () => {
+export const useGameCtx = byWho => {
+  console.log("useGameCtx called by", byWho)
   const ctx = useContext(GameCtx)
   const { user } = useAuthCtx()
   const { firestore } = useFirebase()
   if (!ctx)
     throw new Error("useGameCtx must be a descendant of GameCtxProvider 😕")
-  const {
-    gameState,
-    setGamePlay,
-    gameId,
-    gamePlay,
-    createRTDBGame,
-    totalCards
-  } = ctx
+  const { gameState, gameId, gamePlay, createRTDBGame, totalCards } = ctx
   //
 
   const _getGameFirestore = async () => {
@@ -441,7 +390,7 @@ export const useGameCtx = () => {
   }
   const removeRequest = async () => {
     console.log(`removing ${user.email} from request list - ${gameId}`)
-    const { gameRef, gameInfo } = await _getGameFirestore()
+    const { gameRef } = await _getGameFirestore()
     gameRef.update({
       memberRequests: firebase.firestore.FieldValue.arrayRemove(user.uid)
     })
@@ -470,7 +419,7 @@ export const useGameCtx = () => {
     })
   }
   const changeGameParameter = async ({ key, value }) => {
-    const { gameRef, gameInfo } = await _getGameFirestore()
+    const { gameRef } = await _getGameFirestore()
     gameRef.update({ [key]: value })
   }
   const handleGameRequest = async ({ requestingUID, approvedBool }) => {
@@ -505,7 +454,6 @@ export const useGameCtx = () => {
 
   return {
     gameState,
-    setGamePlay,
     gamePlay,
     gameId,
     requestJoinGame,

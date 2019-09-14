@@ -11,7 +11,7 @@ import GamePage from "./GamePage.responsive.jsx"
 //
 //
 const GameContent = () => {
-  const { gameState } = useGameCtx()
+  const { gameState } = useGameCtx('GameContent')
   const { user } = useAuthCtx()
   const memberUIDs = gameState && gameState.memberUIDs
   const thisIsYourGame = useMemo(

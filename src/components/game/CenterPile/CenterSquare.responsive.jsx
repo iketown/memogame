@@ -6,10 +6,8 @@ import PointsReactTransGroup from "./PointsReactTransGroup.jsx"
 import { HouseContainer } from "../../house/House.responsive.jsx"
 import { Room } from "../../house/RoomDnD/RoomDnD.jsx"
 import { ItemTypes } from "../../../dnd/itemTypes"
-import { useGameFxns } from "../../../hooks/useGameFxns"
 import { useCenterPileCtx } from "../../../contexts/GameCtx.js"
 import { WindowCard } from "../../house/DraggableCard.jsx"
-// import { useClickMoveCtx } from "../../../contexts/ClickMoveCtx.js"
 //
 //
 const offset = 0
@@ -27,23 +25,13 @@ const TableHalo = styled.div`
 
 const CenterSquare = () => {
   const { centerPile = [] } = useCenterPileCtx()
-  // const { cancelMovingCard } = useClickMoveCtx()
+
   const [{ isOver }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     canDrop: () => true,
     drop: (item, monitor) => {
       console.log("item dropped in center", item)
-      // cancelMovingCard()
-      const { source, itemId } = item
       return { droppedAt: "center" }
-
-      //   if (source === "storage") {
-      //     storageToCenterFX({ itemId })
-      //   } else {
-      //     houseToCenterFX({ roomId: source, itemId })
-      //     // handle closing selected room
-      //     // setExpandedRoom({ roomId: false })
-      //   }
     },
     collect: mon => ({
       isOver: !!mon.isOver(),

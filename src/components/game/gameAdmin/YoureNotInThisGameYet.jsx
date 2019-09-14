@@ -11,7 +11,7 @@ const CenterStyle = styled.div`
   text-align: center;
 `
 const YoureNotInThisGameYet = ({ gameId }) => {
-  const { gameState, requestJoinGame, removeRequest } = useGameCtx()
+  const { gameState, requestJoinGame, removeRequest } = useGameCtx('YoureNotInThisGameYet')
   const { user } = useAuthCtx()
   const alreadyRequestedThisGame =
     gameState.memberRequests && gameState.memberRequests.includes(user.uid)

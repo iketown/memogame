@@ -63,7 +63,7 @@ const RoomBigTitle = styled.div`
 
 const SelectedRoom = ({ selectedRoom, handleSelectRoom }) => {
   const { myHouse } = useHouseCtx()
-  const { reorderRoomFX } = useGameFxns()
+  const { reorderRoomFX } = useGameFxns("SelectedRoom")
   //   const [thisRoom, setThisRoom] = useState(myHouse[selectedRoom])
   const [thisRoomLocal, setThisRoomLocal] = useState([])
   useEffect(() => {
@@ -80,7 +80,7 @@ const SelectedRoom = ({ selectedRoom, handleSelectRoom }) => {
     ])
   }
   const moveCard = (itemId, atIndex) => {
-    const { card, index } = findCard(itemId)
+    const {  index } = findCard(itemId)
 
     reorderRoomFX({
       itemId,

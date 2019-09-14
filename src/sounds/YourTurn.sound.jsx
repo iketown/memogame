@@ -1,5 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from "react"
-import { Button } from "@material-ui/core"
+import React, { useState, useEffect, useRef } from "react"
 import Sound from "react-sound"
 
 import startTurn from "./startTurn.mp3"
@@ -8,23 +7,17 @@ import winGame from "./winGame.mp3"
 import loseGame from "./loseGame.mp3"
 
 import { useAuthCtx } from "../contexts/AuthCtx"
-import { useGameCtx } from "../contexts/GameCtx"
+import { useGamePlayCtx } from "../contexts/GamePlayCtx"
 //
 //
 const YourTurnSound = () => {
   const { user } = useAuthCtx()
-  const { gamePlay, gameState } = useGameCtx()
+  const { gamePlay } = useGamePlayCtx("YourTurnSound")
   const whosTurn = useRef(false)
 
   const [soundToPlay, setSoundToPlay] = useState(false)
-  useEffect(() => {}, [])
   useEffect(() => {
-    if (
-      gamePlay &&
-      !!gamePlay.whosTurnItIs &&
-      gameState &&
-      gameState.inProgress
-    ) {
+    if (gamePlay && !!gamePlay.whosTurnItIs) {
       const newWhosTurn = gamePlay.whosTurnItIs.uid
       if (newWhosTurn !== whosTurn.current) {
         // the turn has changed
@@ -39,7 +32,7 @@ const YourTurnSound = () => {
         whosTurn.current = newWhosTurn //
       }
     }
-  }, [gamePlay, gameState, user.uid])
+  }, [gamePlay, user.uid])
 
   return (
     <>
@@ -80,12 +73,6 @@ const YourTurnSound = () => {
         }
         onFinishedPlaying={() => setSoundToPlay(false)}
       />
-      {/* <Button onClick={() => setSoundToPlay("startTurn")}>
-        play start turn
-      </Button>
-      <Button onClick={() => setSoundToPlay("endTurn")}>end turn</Button>
-      <Button onClick={() => setSoundToPlay("winGame")}>win</Button>
-      <Button onClick={() => setSoundToPlay("loseGame")}>lose</Button> */}
     </>
   )
 }

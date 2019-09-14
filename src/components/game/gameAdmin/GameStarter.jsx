@@ -6,35 +6,28 @@ import {
   Collapse,
   CardHeader,
   CardContent,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
   IconButton
 } from "@material-ui/core"
-import styled from "styled-components"
 //
 import { useGameCtx } from "../../../contexts/GameCtx"
-import { FaUser, FaCaretDown, FaCaretUp, FaPlus, FaMinus } from "react-icons/fa"
+import { FaCaretDown, FaCaretUp, FaPlus, FaMinus } from "react-icons/fa"
 import RequestList from "./RequestList"
 import MemberList from "./MemberList"
 import ShowMe from "../../../utils/ShowMe.jsx"
 import { useFirebase } from "../../../contexts/FirebaseCtx"
-import SpinningPageLoader from "../../SpinningPageLoader"
+import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
 //
 //
-const StyledDiv = styled.div`
-  border: 1px solid green;
-`
+
 const GameStarter = () => {
   const {
     gameState,
-    gamePlay,
     createRTDBGame,
     openGameToNewPlayers,
     setGameInProgress,
     changeGameParameter
-  } = useGameCtx()
+  } = useGameCtx("GameStarter")
+  const { gamePlay } = useGamePlayCtx("GameStarter")
   const { handleWinGame } = useFirebase()
   const [expanded, setExpanded] = useState(false)
   if (!gameState || !gamePlay) return null

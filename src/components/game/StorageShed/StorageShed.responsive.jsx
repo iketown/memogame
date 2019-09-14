@@ -10,6 +10,7 @@ export const HalfRoof = styled(Roof)`
 `
 
 const StorageShed = () => {
+  console.log("StorageShed renders")
   const { storagePile = [] } = useStoragePileCtx()
   const { heightText } = useWindowSize()
   return (

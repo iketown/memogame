@@ -1,15 +1,13 @@
-import { useMemo, useState, useEffect } from "react"
-import moment from "moment"
-import { useGameCtx } from "../contexts/GameCtx"
+import { useMemo } from "react"
 import { usePlayersCtx } from "../contexts/PlayersCtx"
-import { useOthersTurnTimer } from "./useTurnTimer"
+import { useGamePlayCtx } from "../contexts/GamePlayCtx"
 
 //
 //
 export const useOtherPlayerInfo = playerId => {
   if (!playerId) throw new Error("useOtherPlayerInfo must be called with a uid")
 
-  const { gamePlay } = useGameCtx()
+  const { gamePlay } = useGamePlayCtx("useOtherPlayerInfo")
   const { players } = usePlayersCtx()
 
   const publicProfile = useMemo(() => {

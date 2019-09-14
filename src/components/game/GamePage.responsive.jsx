@@ -7,7 +7,8 @@ import StorageShed from "./StorageShed/StorageShed.responsive.jsx"
 import ScoreSection from "./Scores/ScoreSection.responsive"
 import { DndProvider } from "react-dnd"
 import HTML5Backend from "react-dnd-html5-backend"
-import { useAdmin } from "../../hooks/useAdmin"
+import { Admin } from "../../hooks/Admin"
+import YourTurnDisplay from "./Timers/YourTurnDisplay"
 //
 //
 
@@ -68,16 +69,16 @@ const GamePage = () => {
         </ScoreSectionContainer>
         <HouseSection className="text-center">
           <House />
-          <Admin />
         </HouseSection>
         <CenterSection className="text-center">
           <CenterSquare />
         </CenterSection>
         <StorageSection className="text-center">
           <StorageShed />
+          {/* <Admin /> */}
         </StorageSection>
         <YourTurnSectionContainer>
-          <h4>your turn section</h4>
+          <YourTurnDisplay />
         </YourTurnSectionContainer>
       </ResponsiveGamePageGrid>
     </DndProvider>
@@ -85,8 +86,3 @@ const GamePage = () => {
 }
 
 export default GamePage
-
-const Admin = () => {
-  const iAmAdmin = useAdmin()
-  return <p>{iAmAdmin ? "admin" : "plebe"}</p>
-}

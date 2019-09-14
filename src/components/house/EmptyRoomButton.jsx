@@ -4,13 +4,12 @@ import {
   Dialog,
   DialogContent,
   DialogActions,
-  DialogContentText,
   DialogTitle
 } from "@material-ui/core"
 import { useGameFxns } from "../../hooks/useGameFxns"
 const EmptyRoomButton = ({ roomId, handleCloseRoom }) => {
   const [open, setOpen] = useState(false)
-  const { emptyRoomToStorageFX } = useGameFxns()
+  const { emptyRoomToStorageFX } = useGameFxns("EmptyRoomButton")
   function handleConfirm() {
     emptyRoomToStorageFX({ roomId }).then(() => {
       setOpen(false)

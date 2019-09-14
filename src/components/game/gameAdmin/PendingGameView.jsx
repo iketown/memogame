@@ -1,21 +1,17 @@
 import React from "react"
 import {
   Card,
-  CardHeader,
   CardContent,
-  Collapse,
   Typography,
   Chip,
-  Avatar,
   IconButton,
   CardActions,
   Button
 } from "@material-ui/core"
 import styled from "styled-components"
-import { FaThumbsUp, FaTimes } from "react-icons/fa"
+import { FaThumbsUp } from "react-icons/fa"
 //
 import AvatarMonster from "../../AvatarMonster.jsx"
-import ShowMe from "../../../utils/ShowMe.jsx"
 import { useGameCtx } from "../../../contexts/GameCtx.js"
 import { usePlayersCtx } from "../../../contexts/PlayersCtx.js"
 import { useAuthCtx } from "../../../contexts/AuthCtx.js"
@@ -40,12 +36,11 @@ const PendingGameView = () => {
     removeFromGame,
     createRTDBGame,
     setGameInProgress
-  } = useGameCtx()
-  const { players } = usePlayersCtx()
+  } = useGameCtx("PendingGameView")
   const { user } = useAuthCtx()
   const myGame = user && gameState && user.uid === gameState.startedBy
   const noRequests =
-    gameState.memberRequests && gameState.memberRequests.length == 0
+    gameState.memberRequests && gameState.memberRequests.length === 0
   function handleStartGame() {
     createRTDBGame()
     setGameInProgress()
@@ -78,23 +73,24 @@ const PendingGameView = () => {
             <Typography variant="subtitle2">Requests to Join:</Typography>
             {!noRequests && (
               <PlayerChipContainer>
-                {gameState.memberRequests.map(uid => (
-                  <PlayerChip
-                    key={uid}
-                    uid={uid}
-                    handleClick={
-                      myGame
-                        ? () => {
-                            console.log("allowing in ", uid)
-                            handleGameRequest({
-                              requestingUID: uid,
-                              approvedBool: true
-                            })
-                          }
-                        : false
-                    }
-                  />
-                ))}
+                {gameState.memberRequests &&
+                  gameState.memberRequests.map(uid => (
+                    <PlayerChip
+                      key={uid}
+                      uid={uid}
+                      handleClick={
+                        myGame
+                          ? () => {
+                              console.log("allowing in ", uid)
+                              handleGameRequest({
+                                requestingUID: uid,
+                                approvedBool: true
+                              })
+                            }
+                          : false
+                      }
+                    />
+                  ))}
               </PlayerChipContainer>
             )}
           </PlayerSection>

@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import styled from "styled-components"
 import { useDrag, useDrop } from "react-dnd"
 import { ItemTypes } from "../../../dnd/itemTypes"
 import { WindowCard } from "../DraggableCard.jsx"
@@ -7,8 +6,8 @@ import { useHouseCtx, usePointsCtx } from "../../../contexts/GameCtx"
 import { IconButton } from "@material-ui/core"
 import { FaEye } from "react-icons/fa"
 import { useGameFxns } from "../../../hooks/useGameFxns"
-import { useGameCtx } from "../../../contexts/GameCtx"
 import { useAuthCtx } from "../../../contexts/AuthCtx"
+import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
 const style = {
   width: "8rem",
   height: "8rem",
@@ -29,17 +28,19 @@ const ReorderCard = ({
   const { selectedRoom } = useHouseCtx()
   const originalIndex = findCard(itemId).index
   const [peek, setPeek] = useState(false)
-  const { subtractAPointFX, houseToCenterFX } = useGameFxns()
+  const { subtractAPointFX, houseToCenterFX } = useGameFxns("ReorderCard")
   const { resetPointsClimber } = usePointsCtx()
-  const { gamePlay } = useGameCtx()
+  const { gamePlay } = useGamePlayCtx("ReorderCard")
   const { user } = useAuthCtx()
   const isMyTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
   function peekAtCard() {
-    setPeek(true)
-    subtractAPointFX()
-    resetPointsClimber()
-    setTimeout(() => setPeek(false), 2000)
+    if (isMyTurn) {
+      setPeek(true)
+      subtractAPointFX()
+      resetPointsClimber()
+      setTimeout(() => setPeek(false), 2000)
+    }
   }
   const [{ isDragging }, drag] = useDrag({
     item: { type: ItemTypes.CARD, itemId, originalIndex },
@@ -49,7 +50,7 @@ const ReorderCard = ({
     end: async (item, mon) => {
       console.log("mon get drop result", mon.getDropResult())
       if (mon.getDropResult()) {
-        const { droppedAt, index } = mon.getDropResult()
+        const { droppedAt } = mon.getDropResult()
         if (droppedAt === "center") {
           // handle dropped in center
           if (selectedRoom.faceUp || peek) resetPointsClimber()
@@ -60,20 +61,13 @@ const ReorderCard = ({
         }
       }
     },
-    canDrag: () => isMyTurn
+    canDrag: () =>
+      isMyTurn || selectedRoom.faceUp || (!isMyTurn && !selectedRoom.faceUp) //  so you can drag to the center when its not your turn.
   })
-  const [{ isOver }, drop] = useDrop({
+  const [, drop] = useDrop({
     accept: ItemTypes.CARD,
     canDrop: ({ itemId }, monitor) => {
-      if (selectedRoom.faceUp) {
-        return true
-      }
-      if (!thisRoom.includes(itemId)) {
-        // if this card is coming from storage
-        // slotting between facedown cards is ok.
-        return true
-      }
-      return false
+      return selectedRoom.faceUp || !thisRoom.includes(itemId)
     },
     collect: mon => ({
       isOver: !!mon.isOver()
@@ -98,7 +92,12 @@ const ReorderCard = ({
   const opacity = isDragging ? 0.5 : 1
   function handleDoubleClick() {
     if (selectedRoom.faceUp || peek) resetPointsClimber()
-    houseToCenterFX({ itemId, roomId })
+    if (isMyTurn) {
+      return houseToCenterFX({ itemId, roomId })
+    }
+    if (!isMyTurn && !selectedRoom.faceUp && !peek) {
+      return houseToCenterFX({ itemId, roomId })
+    }
   }
   return (
     <div style={{ position: "relative" }}>
@@ -111,7 +110,7 @@ const ReorderCard = ({
           handleDoubleClick={handleDoubleClick}
         />
       </div>
-      {!peek && !selectedRoom.faceUp && (
+      {isMyTurn && !peek && !selectedRoom.faceUp && (
         <IconButton
           onClick={peekAtCard}
           style={{

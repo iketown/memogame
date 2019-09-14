@@ -13,7 +13,6 @@ import MyGames from "./pages/MyGames.page.jsx"
 import GamePage from "./pages/Game.page.jsx"
 import GameStart from "./pages/GameStart.page"
 import GamePageResponsive from "./components/game/GamePage.responsive.jsx"
-import { LogCtxProvider } from "./contexts/LogCtx"
 import { SnackbarProvider } from "notistack"
 import SpinningPageLoader from "./components/SpinningPageLoader"
 import GameContainer from "./pages/GameContainer.jsx"
@@ -29,24 +28,18 @@ const App = () => {
         <SnackbarProvider dense preventDuplicate>
           <FirebaseCtxProvider>
             <AuthCtxProvider>
-              <LogCtxProvider>
-                <DialogCtxProvider>
-                  <DialogContainer />
-                  <NavBar />
-                  <Container>
-                    <Route
-                      exact
-                      path="/game/:gameId"
-                      component={GameContainer}
-                    />
+              <DialogCtxProvider>
+                <DialogContainer />
+                <NavBar />
+                <Container>
+                  <Route exact path="/game/:gameId" component={GameContainer} />
 
-                    <Route path="/mygames" component={MyGames} />
-                    <Route path="/gamestart" component={GameStart} />
-                    <Route path="/loader" component={SpinningPageLoader} />
-                    <Route path="/house" component={GamePageResponsive} />
-                  </Container>
-                </DialogCtxProvider>
-              </LogCtxProvider>
+                  <Route path="/mygames" component={MyGames} />
+                  <Route path="/gamestart" component={GameStart} />
+                  <Route path="/loader" component={SpinningPageLoader} />
+                  <Route path="/house" component={GamePageResponsive} />
+                </Container>
+              </DialogCtxProvider>
             </AuthCtxProvider>
           </FirebaseCtxProvider>
         </SnackbarProvider>

@@ -4,15 +4,9 @@ import { Typography } from "@material-ui/core"
 import { images } from "../../../images/newRooms"
 import { getBoxSize } from "../../../utils/sizeUtils"
 import RoomDrop from "./RoomDrop"
-import {
-  useWindowSize,
-  useWidth,
-  useWiderThan
-} from "../../../hooks/useScreenSize"
-import PulsingTarget from "../../PulsingTarget.jsx"
+import { useWindowSize, useWiderThan } from "../../../hooks/useScreenSize"
 // import { useClickMoveCtx } from "../../../contexts/ClickMoveCtx"
-import { useGameCtx, useHouseCtx } from "../../../contexts/GameCtx"
-import { WindowCard } from "../DraggableCard"
+import { useHouseCtx } from "../../../contexts/GameCtx"
 //
 //
 
@@ -40,18 +34,12 @@ export const Room = styled.div`
   transform-origin: ${p => transformOrigins[p.room]};
 `
 
-const CardsDiv = styled.div`
-  display: relative;
-  background: white;
-`
-
 const RoomDnD = ({ title, handleSelectRoom }) => {
   const { heightText } = useWindowSize()
   // const { movingItem } = useClickMoveCtx()
   const smallUp = useWiderThan("sm")
   const { myHouse } = useHouseCtx()
   const thisRoom = myHouse[title] || []
-  const isFull = thisRoom.length === 3
   // const isFromHouse = movingItem && movingItem.source === "house"
 
   const WhiteBox = styled.div`
@@ -99,7 +87,7 @@ const RoomDnD = ({ title, handleSelectRoom }) => {
         </CenteredTitle>
         <WhiteBoxes>
           {Array.from({ length: thisRoom.length }).map((_, index) => {
-            return <WhiteBox></WhiteBox>
+            return <WhiteBox key={index}></WhiteBox>
           })}
         </WhiteBoxes>
       </RoomDrop>
