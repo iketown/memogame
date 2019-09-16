@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useCallback } from "react"
 import styled from "styled-components"
 import { images } from "../../images/newRooms/index"
 import { Typography, Button } from "@material-ui/core"
@@ -7,10 +7,11 @@ import RoomDnD from "./RoomDnD/RoomDnD"
 import SelectedRoom from "./SelectedRoomView/SelectedRoom.responsive.jsx"
 import { useWindowSize } from "../../hooks/useScreenSize"
 import { useHouseCtx } from "../../contexts/GameCtx"
+import { HouseCtxProvider } from "../../contexts/GameCtx"
 //
 //
 
-export const HouseContainer = styled.div`
+export const StyledHouse = styled.div`
   display: inline-block;
   position: relative;
 `
@@ -32,7 +33,7 @@ const HouseGrid = styled.div`
 `
 
 export const Roof = styled.div`
-  height: ${p => (p.short ? "22" : "23")}px;
+  height: 22px;
   background-size: cover;
   transform: scale(1.1) translateY(10px);
   background-position: bottom;
@@ -42,48 +43,71 @@ export const Roof = styled.div`
   justify-content: center;
   align-items: center;
 `
-
-const House = () => {
-  const { selectedRoom, setSelectedRoom } = useHouseCtx()
-  const { heightText } = useWindowSize()
-  const handleSelectRoom = roomId => {
-    console.log("selecting room face down", roomId)
-    setSelectedRoom({ roomId, faceUp: false })
-  }
+const HouseContainer = () => {
   return (
-    <HouseContainer>
-      <HouseGrid>
-        <Roof short={heightText === "short"} />
-        <div className="rooms">
-          <RoomDnD
-            hoverFX
-            title="bedroom"
-            handleSelectRoom={handleSelectRoom}
-          />
-          <RoomDnD
-            hoverFX
-            title="bathroom"
-            handleSelectRoom={handleSelectRoom}
-          />
-          <RoomDnD
-            hoverFX
-            title="kitchen"
-            handleSelectRoom={handleSelectRoom}
-          />
-          <RoomDnD hoverFX title="dining" handleSelectRoom={handleSelectRoom} />
-          <RoomDnD hoverFX title="garage" handleSelectRoom={handleSelectRoom} />
-          <RoomDnD hoverFX title="office" handleSelectRoom={handleSelectRoom} />
-          {selectedRoom && selectedRoom.roomId && (
-            <SelectedRoom
-              selectedRoom={selectedRoom.roomId}
-              faceUp={selectedRoom.faceUp}
-              handleSelectRoom={handleSelectRoom}
-            />
-          )}
-        </div>
-      </HouseGrid>
-    </HouseContainer>
+    <HouseCtxProvider>
+      <House />
+    </HouseCtxProvider>
   )
 }
 
-export default House
+const House = () => {
+  const { selectedRoom, setSelectedRoom } = useHouseCtx()
+  const handleSelectRoom = useCallback(
+    roomId => {
+      setSelectedRoom({ roomId, faceUp: false })
+    },
+    [setSelectedRoom]
+  )
+
+  return (
+    <HouseCtxProvider>
+      <StyledHouse>
+        <HouseGrid>
+          <Roof />
+          <div className="rooms">
+            <RoomDnD
+              hoverFX
+              title="bedroom"
+              handleSelectRoom={handleSelectRoom}
+            />
+            <RoomDnD
+              hoverFX
+              title="bathroom"
+              handleSelectRoom={handleSelectRoom}
+            />
+            <RoomDnD
+              hoverFX
+              title="kitchen"
+              handleSelectRoom={handleSelectRoom}
+            />
+            <RoomDnD
+              hoverFX
+              title="dining"
+              handleSelectRoom={handleSelectRoom}
+            />
+            <RoomDnD
+              hoverFX
+              title="garage"
+              handleSelectRoom={handleSelectRoom}
+            />
+            <RoomDnD
+              hoverFX
+              title="office"
+              handleSelectRoom={handleSelectRoom}
+            />
+            {selectedRoom && selectedRoom.roomId && (
+              <SelectedRoom
+                selectedRoom={selectedRoom.roomId}
+                faceUp={selectedRoom.faceUp}
+                handleSelectRoom={handleSelectRoom}
+              />
+            )}
+          </div>
+        </HouseGrid>
+      </StyledHouse>
+    </HouseCtxProvider>
+  )
+}
+
+export default HouseContainer

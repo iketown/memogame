@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react"
 import { useFirebase } from "./FirebaseCtx"
 import { useAuthCtx } from "./AuthCtx"
-import { useGameCtx, useCenterPileCtx } from "./GameCtx"
+import { useGameCtx } from "./GameCtx"
 import { doItemsMatch } from "../utils/gameLogic"
 import { itemFromItemId } from "../resources/allItems"
 import { usePlayersCtx } from "./PlayersCtx"
@@ -33,7 +33,6 @@ export const useLogCtx = byWho => {
   const { doAddToLog } = useFirebase()
   const { user } = useAuthCtx()
   const { players } = usePlayersCtx()
-  const { centerPile } = useCenterPileCtx()
   // const {
   //   gameState: { gameId }
   // } = useGameCtx("useLogCtx")
@@ -53,16 +52,11 @@ export const useLogCtx = byWho => {
     if (destination === "center") {
       text = `${name} plays ${itemName}`
     }
-    const topCardId = centerPile && centerPile[0]
-    const valid =
-      destination === "center" ? doItemsMatch(topCardId, itemId) : true
-    // avatar link would be nice here.
 
     doAddToLog({
       gameId,
       uid: user.uid,
       player: players[user.uid],
-      valid,
       text
     })
   }

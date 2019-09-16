@@ -24,7 +24,7 @@ const ScoreSection = () => {
               : 1
           })
           .map(([playerId, playerState]) => (
-            <PlayerDisplay playerId={playerId} />
+            <PlayerDisplay key={playerId} playerId={playerId} />
           ))}
     </FlexDiv>
   )

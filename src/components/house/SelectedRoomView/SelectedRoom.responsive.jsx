@@ -80,7 +80,7 @@ const SelectedRoom = ({ selectedRoom, handleSelectRoom }) => {
     ])
   }
   const moveCard = (itemId, atIndex) => {
-    const {  index } = findCard(itemId)
+    const { index } = findCard(itemId)
 
     reorderRoomFX({
       itemId,

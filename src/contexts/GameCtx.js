@@ -12,6 +12,7 @@ import { useAuthCtx } from "./AuthCtx"
 import { useFirebase } from "./FirebaseCtx"
 import { shuffle } from "../utils/gameLogic"
 import allItems from "../resources/allItems"
+import { useGamePlayCtx } from "./GamePlayCtx"
 
 // ⭐ 🌟 SOUNDS CONTEXT 🌟 ⭐ //
 
@@ -50,28 +51,23 @@ export const HouseCtxProvider = props => {
     roomId: "",
     faceUp: false
   })
+  const setSelectedRoomAndLog = useCallback(args => {
+    console.log("setSelectedRoom", args)
+    setSelectedRoom(args)
+  }, [])
+  const { myGameState } = useGamePlayCtx()
+  // const [myHouse, setMyHouse] = useState({})
+  const _myHouse = (myGameState && myGameState.house) || {}
+  const myHouse = useMemo(() => {
+    return _myHouse
+  }, [_myHouse])
 
-  const { fdb } = useFirebase()
-  const gameId = props.gameId
-  const { user } = useAuthCtx()
-  const [myHouse, setMyHouse] = useState({})
-
-  useEffect(() => {
-    const myHouseRef = fdb.ref(
-      `/currentGames/${gameId}/gameStates/${user.uid}/house`
-    )
-    // keep MY HOUSE in sync with firebase
-    myHouseRef.on("value", snapshot => {
-      setMyHouse(snapshot.val() || {})
-    })
-    // return myHouseRef.off
-  }, [fdb, gameId, user, user.uid])
   return (
     <HouseCtx.Provider
       value={{
         myHouse,
         selectedRoom,
-        setSelectedRoom
+        setSelectedRoom: setSelectedRoomAndLog
       }}
       {...props}
     />
@@ -83,11 +79,13 @@ export const useHouseCtx = () => {
     throw new Error("useHouseCtx must be a descendant of HouseCtxProvider 😕")
   const { myHouse, selectedRoom, setSelectedRoom } = ctx
   const cardsInMyHouse = useMemo(() => {
-    const quantity = Object.values(myHouse).reduce((sum, room) => {
-      sum += room.length
-      return sum
-    }, 0)
-    return quantity
+    if (!!myHouse) {
+      const quantity = Object.values(myHouse).reduce((sum, room) => {
+        sum += room.length
+        return sum
+      }, 0)
+      return quantity
+    }
   }, [myHouse])
 
   return {
@@ -101,72 +99,25 @@ export const useHouseCtx = () => {
 
 //
 
-// ⭐ 🌟 CENTER PILE CONTEXT 🌟 ⭐ //
-const CenterPileCtx = createContext()
-
-export const CenterPileCtxProvider = props => {
-  const { fdb } = useFirebase()
-  const gameId = props.gameId
-  const [centerPile, setCenterPileInState] = useState([])
-  const setCenterPile = useCallback(newState => {
-    console.log("settingCenterPile state", newState)
-    setCenterPileInState(newState)
-  }, [])
-  useEffect(() => {
-    // keep CENTER PILE in sync with firebase
-    const centerPileRef = fdb.ref(`/currentGames/${gameId}/centerCardPile`)
-    centerPileRef.on("value", snapshot => {
-      console.log("centerPileRef called")
-      const oldState = JSON.stringify(centerPile)
-      const newState = JSON.stringify(snapshot.val())
-      if (snapshot.val() && oldState !== newState) {
-        setCenterPile(snapshot.val() || [])
-      } else {
-        console.log("not gonna update centerPile")
-      }
-    })
-  }, [centerPile, fdb, gameId, setCenterPile])
-  return <CenterPileCtx.Provider value={{ centerPile }} {...props} />
-}
-
-export const useCenterPileCtx = () => {
-  const ctx = useContext(CenterPileCtx)
-  if (!ctx)
-    throw new Error(
-      "useCenterPileCtx must be a descendant of CenterPileCtxProvider 😕"
-    )
-  const { centerPile } = ctx
-
-  return { centerPile }
-}
-// ⭐ 🌟 end CENTER PILE CONTEXT 🌟 ⭐ //
-
 //
 
 // ⭐ 🌟 STORAGE PILE CONTEXT 🌟 ⭐ //
 const StoragePileCtx = createContext()
 export const StoragePileCtxProvider = props => {
-  const { fdb } = useFirebase()
-  const gameId = props.gameId
+  const { gamePlay } = useGamePlayCtx()
   const { user } = useAuthCtx()
-  const [storagePile, setStoragePile] = useState([])
-  useEffect(() => {
-    // keep STORAGE PILE in sync with firebase
-    const storagePileRef = fdb.ref(
-      `/currentGames/${gameId}/gameStates/${user.uid}/storagePile`
-    )
-    storagePileRef.on("value", snapshot => {
-      if (snapshot.val()) setStoragePile(snapshot.val())
-      else setStoragePile([])
-    })
-    // return storagePileRef.off
-  }, [fdb, gameId, user.uid])
-  return (
-    <StoragePileCtx.Provider
-      value={{ storagePile, setStoragePile }}
-      {...props}
-    />
-  )
+  const storagePile = useMemo(() => {
+    const _storagePile =
+      gamePlay &&
+      gamePlay.gameStates &&
+      gamePlay.gameStates[user.uid] &&
+      gamePlay.gameStates[user.uid].storagePile
+
+    console.log("new storagePile in StoragePileCtxProvider", _storagePile)
+    return _storagePile
+  }, [gamePlay, user.uid])
+
+  return <StoragePileCtx.Provider value={{ storagePile }} {...props} />
 }
 
 export const useStoragePileCtx = () => {

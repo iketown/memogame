@@ -1,20 +1,26 @@
-import React from "react"
+import React, { memo } from "react"
 import styled from "styled-components"
-import { HouseContainer, Roof } from "../../house/House.responsive.jsx"
+import { Roof } from "../../house/House.responsive.jsx"
 import { Room } from "../../house/RoomDnD/RoomDnD"
 import { useStoragePileCtx } from "../../../contexts/GameCtx"
 import DraggableCard, { WindowCard } from "../../house/DraggableCard.jsx"
 import { useWindowSize } from "../../../hooks/useScreenSize"
+import isEqual from "lodash/isEqual"
+
 export const HalfRoof = styled(Roof)`
   height: 13px;
 `
 
-const StorageShed = () => {
-  console.log("StorageShed renders")
+const StorageShedContainer = () => {
   const { storagePile = [] } = useStoragePileCtx()
   const { heightText } = useWindowSize()
+  return <StorageShed storagePile={storagePile} heightText={heightText} />
+}
+
+const StorageShed = memo(({ storagePile, heightText }) => {
+  console.log("StorageShed renders")
   return (
-    <HouseContainer>
+    <div>
       <Room height={heightText}>
         <>
           {/* only the top card is draggable */}
@@ -35,8 +41,15 @@ const StorageShed = () => {
           ))}
         </>
       </Room>
-    </HouseContainer>
+    </div>
   )
-}
+}, propsEqual)
 
-export default StorageShed
+export default StorageShedContainer
+
+function propsEqual(prev, next) {
+  const prevSP = prev.storagePile
+  const nextSP = next.storagePile
+  const pilesEqual = isEqual(prevSP, nextSP)
+  return pilesEqual
+}

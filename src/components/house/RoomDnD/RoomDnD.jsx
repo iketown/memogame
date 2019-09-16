@@ -1,4 +1,4 @@
-import React from "react"
+import React, { memo } from "react"
 import styled from "styled-components"
 import { Typography } from "@material-ui/core"
 import { images } from "../../../images/newRooms"
@@ -7,6 +7,8 @@ import RoomDrop from "./RoomDrop"
 import { useWindowSize, useWiderThan } from "../../../hooks/useScreenSize"
 // import { useClickMoveCtx } from "../../../contexts/ClickMoveCtx"
 import { useHouseCtx } from "../../../contexts/GameCtx"
+import isEqual from "lodash/isEqual"
+import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
 //
 //
 
@@ -34,65 +36,83 @@ export const Room = styled.div`
   transform-origin: ${p => transformOrigins[p.room]};
 `
 
-const RoomDnD = ({ title, handleSelectRoom }) => {
+const WhiteBox = styled.div`
+  width: 5rem;
+  height: 1rem;
+  background: white;
+  border-radius: 5%;
+  border: 1px solid grey;
+  box-shadow: 3px 3px 4px 0px black;
+`
+const CenteredTitle = styled(Typography)`
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+`
+const WhiteBoxes = styled.div`
+  position: absolute;
+  top: 0;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+  padding: 5px;
+`
+
+const RoomDnDContainer = ({ title, handleSelectRoom }) => {
   const { heightText } = useWindowSize()
-  // const { movingItem } = useClickMoveCtx()
   const smallUp = useWiderThan("sm")
   const { myHouse } = useHouseCtx()
   const thisRoom = myHouse[title] || []
-  // const isFromHouse = movingItem && movingItem.source === "house"
-
-  const WhiteBox = styled.div`
-    width: 5rem;
-    height: 1rem;
-    background: white;
-    border-radius: 5%;
-    border: 1px solid grey;
-    box-shadow: 3px 3px 4px 0px black;
-  `
-  const CenteredTitle = styled(Typography)`
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-  `
-  const WhiteBoxes = styled.div`
-    position: absolute;
-    top: 0;
-    bottom: 1rem;
-    left: 0;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-around;
-    align-items: center;
-    padding: 5px;
-  `
   return (
-    <Room
-      height={heightText}
+    <RoomDnD
+      title={title}
+      handleSelectRoom={handleSelectRoom}
+      heightText={heightText}
       smallUp={smallUp}
-      room={title}
-      // hoverFX={hoverFX}
-      onClick={() => handleSelectRoom(title)}
-    >
-      <RoomDrop roomId={title}>
-        {/* <PulsingTarget
-          active={movingItem && !isFull && !isFromHouse}
-          roomId={title}
-        /> */}
-
-        <CenteredTitle className={title} variant="subtitle1">
-          {title.toUpperCase()}
-        </CenteredTitle>
-        <WhiteBoxes>
-          {Array.from({ length: thisRoom.length }).map((_, index) => {
-            return <WhiteBox key={index}></WhiteBox>
-          })}
-        </WhiteBoxes>
-      </RoomDrop>
-    </Room>
+      thisRoom={thisRoom}
+    />
   )
 }
 
-export default RoomDnD
+const RoomDnD = memo(
+  ({ title, handleSelectRoom, heightText, smallUp, thisRoom }) => {
+    console.log("rendering RoomDnD", title)
+    return (
+      <Room
+        height={heightText}
+        smallUp={smallUp}
+        room={title}
+        // hoverFX={hoverFX}
+        onClick={() => handleSelectRoom(title)}
+      >
+        <RoomDrop
+          roomId={title}
+          thisRoom={thisRoom}
+          handleSelectRoom={handleSelectRoom}
+        >
+          <CenteredTitle className={title} variant="subtitle1">
+            {title.toUpperCase()}
+          </CenteredTitle>
+          <WhiteBoxes>
+            {Array.from({ length: thisRoom.length }).map((_, index) => {
+              return <WhiteBox key={index}></WhiteBox>
+            })}
+          </WhiteBoxes>
+        </RoomDrop>
+      </Room>
+    )
+  },
+  propsEqual
+)
+
+function propsEqual(prev, next) {
+  const _yepEqual = isEqual(prev, next)
+  return _yepEqual
+}
+
+export default RoomDnDContainer

@@ -4,8 +4,10 @@ import styled from "styled-components"
 import { ItemTypes } from "../../../dnd/itemTypes"
 import { useHouseCtx } from "../../../contexts/GameCtx"
 import { maxItemsPerRoom } from "../../../utils/gameLogic"
+
+//
+//
 const StyledRoomContainer = styled.div`
-  /* border: ${p => (p.canDrop ? "5px solid yellow" : "none")}; */
   position: absolute;
   top: 0;
   left: 0;
@@ -15,18 +17,34 @@ const StyledRoomContainer = styled.div`
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
+  :after {
+    opacity: ${p => (p.isOver || p.canDrop ? 1 : 0)};
+    border: ${p =>
+      p.isOver && p.canDrop
+        ? "5px solid green"
+        : p.canDrop
+        ? "5px solid yellow"
+        : "none"};
+    transition: opacity 0.5s;
+
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+  }
 `
 //
 //
-const RoomDrop = ({ children, roomId }) => {
-  const { myHouse } = useHouseCtx()
-  const thisRoom = myHouse[roomId] || []
+const RoomDrop = ({ children, roomId, thisRoom = [], handleSelectRoom }) => {
   const canDropBool = useMemo(() => {
     return thisRoom.length < maxItemsPerRoom
   }, [thisRoom.length])
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     drop: (item, mon) => {
+      handleSelectRoom(roomId)
       return { droppedAt: roomId, index: thisRoom.length }
     },
     collect: monitor => ({
@@ -35,8 +53,9 @@ const RoomDrop = ({ children, roomId }) => {
     }),
     canDrop: () => canDropBool
   })
+  console.log("rendering DnD roomdrop", roomId)
   return (
-    <StyledRoomContainer canDrop={isOver && canDrop} ref={dropRef}>
+    <StyledRoomContainer isOver={isOver} canDrop={canDrop} ref={dropRef}>
       {children}
     </StyledRoomContainer>
   )

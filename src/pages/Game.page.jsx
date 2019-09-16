@@ -4,7 +4,6 @@ import { useAuthCtx } from "../contexts/AuthCtx"
 import {
   GameCtxProvider,
   HouseCtxProvider,
-  CenterPileCtxProvider,
   StoragePileCtxProvider,
   PointsCtxProvider,
   SoundCtxProvider
@@ -30,15 +29,13 @@ const Game = props => {
           <PlayersCtxProvider>
             <HouseCtxProvider gameId={gameId}>
               <StoragePileCtxProvider gameId={gameId}>
-                <CenterPileCtxProvider gameId={gameId}>
-                  <ChatCtxProvider gameId={gameId}>
-                    <SoundCtxProvider>
-                      <SnackbarHandler gameId={gameId} />
-                      <GameSounds />
-                      <GameContent gameId={gameId} />
-                    </SoundCtxProvider>
-                  </ChatCtxProvider>
-                </CenterPileCtxProvider>
+                <ChatCtxProvider gameId={gameId}>
+                  <SoundCtxProvider>
+                    <SnackbarHandler gameId={gameId} />
+                    <GameSounds />
+                    <GameContent gameId={gameId} />
+                  </SoundCtxProvider>
+                </ChatCtxProvider>
               </StoragePileCtxProvider>
             </HouseCtxProvider>
           </PlayersCtxProvider>

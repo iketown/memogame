@@ -79,7 +79,7 @@ const PointsReactTransGroup = () => {
         {pointsDisplay && (
           <CSSTransition
             classNames="staranimation"
-            in={pointsDisplay}
+            in={!!pointsDisplay}
             timeout={1200}
           >
             <BigDiv>
