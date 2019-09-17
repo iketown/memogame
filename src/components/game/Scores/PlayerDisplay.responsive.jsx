@@ -28,13 +28,14 @@ const StyledDisplay = styled.div`
   flex-grow: ${p => (p.myTurn ? 1 : 0)};
   transition: 0.4s flex-grow;
   position: relative;
+
   max-width: 10rem;
   display: grid;
   grid-template-areas: "username username username" "avatar storage total" "avatar house total" "timer timer timer";
   grid-template-columns: 46px 1fr 3rem;
   align-items: center;
   /* grid-template-rows: repeat(2, 19px); */
-  margin-bottom: 5px;
+  margin: 10px;
   opacity: ${p => (p.myTurn ? 1 : 0.4)};
   padding: 10px;
   box-shadow: 1px 1px 2px #7d7d7d;
@@ -110,8 +111,8 @@ export const PlayerDisplay = ({ playerId }) => {
                 )}
               </BoxContainer>
             ) : (
-              <span style={{ fontSize: "9px", color: "red" }}>
-                game admin has disconnected
+              <span style={{ fontSize: "9px", color: "grey" }}>
+                waiting for admin response
               </span>
             )
           }

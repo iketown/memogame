@@ -5,9 +5,9 @@ import {
   useGameCtx,
   usePointsCtx,
   useSoundCtx,
-  useHouseCtx,
   useStoragePileCtx
 } from "../contexts/GameCtx"
+import { useHouseCtx } from "../contexts/HouseContext"
 import { useGamePlayCtx } from "../contexts/GamePlayCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { doItemsMatch, shuffle, pointsRequiredToWin } from "../utils/gameLogic"

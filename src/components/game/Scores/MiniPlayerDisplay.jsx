@@ -6,6 +6,7 @@ import AvatarMonster from "../../AvatarMonster.jsx"
 //
 //
 const StyledMiniDiv = styled.div`
+  margin: 10px;
   flex-grow: 0.2;
   transition: 0.4s flex-grow;
   display: flex;

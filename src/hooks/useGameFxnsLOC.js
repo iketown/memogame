@@ -2,23 +2,26 @@ import {
   useGameCtx,
   usePointsCtx,
   useSoundCtx,
-  useHouseCtx,
   useStoragePileCtx
 } from "../contexts/GameCtx"
+import { useCallback } from "react"
 import { useGamePlayCtx } from "../contexts/GamePlayCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { doItemsMatch, shuffle, pointsRequiredToWin } from "../utils/gameLogic"
 import moment from "moment"
 import { storage } from "firebase"
 import { useFirebase } from "../contexts/FirebaseCtx"
+import { secondsPerTurn } from "../utils/gameLogic"
+import { useDialogCtx } from "../contexts/DialogCtx"
 
 export const useGameFxnsLOC = byWho => {
-  console.log("useGameFxns called by", byWho)
-  const { gameId } = useGameCtx("useGameFxns")
+  console.log("useGameFxnsLOC called by", byWho)
+  const { gameId, gameState } = useGameCtx("useGameFxns")
   const { gamePlay } = useGamePlayCtx("useGameFxns")
   const { user } = useAuthCtx()
   const { dropCardSound } = useSoundCtx()
   const { fdb } = useFirebase()
+  const { dispatch } = useDialogCtx()
   const {
     setPointsDisplay,
     pointsClimber,
@@ -28,34 +31,38 @@ export const useGameFxnsLOC = byWho => {
   const myGameState =
     gamePlay && gamePlay.gameStates && gamePlay.gameStates[user.uid]
 
-  async function _sendNewGameState({
-    centerCardPile,
-    myUpdateObj,
-    whosTurnItIs
-  }) {
-    console.log(" sending newGameState", {
-      centerCardPile,
-      myUpdateObj,
-      whosTurnItIs
-    })
-    if (!gamePlay) throw new Error("missing gamePlay")
-    if (centerCardPile && myUpdateObj) {
-      const gameRef = fdb.ref(`/currentGames/${gameId}`)
-      const newGamePlay = { ...gamePlay }
-      const myOldGameState = gamePlay.gameStates[user.uid]
-      newGamePlay.centerCardPile = centerCardPile
-      newGamePlay.gameStates[user.uid] = { ...myOldGameState, ...myUpdateObj }
-      gameRef.update({ ...newGamePlay })
-    }
+  const _sendNewGameState = useCallback(
+    ({ centerCardPile, myUpdateObj, whosTurnItIs }) => {
+      console.log(" sending newGameState", {
+        centerCardPile,
+        myUpdateObj,
+        whosTurnItIs
+      })
+      if (!gamePlay) throw new Error("missing gamePlay")
+      if (centerCardPile && myUpdateObj) {
+        const gameRef = fdb.ref(`/currentGames/${gameId}`)
+        const newGamePlay = { ...gamePlay }
+        const myOldGameState = gamePlay.gameStates[user.uid]
+        newGamePlay.centerCardPile = centerCardPile
+        newGamePlay.whosTurnItIs = whosTurnItIs
+        newGamePlay.gameStates[user.uid] = { ...myOldGameState, ...myUpdateObj }
+        return gameRef.update({ ...newGamePlay })
+      }
+      if (myUpdateObj) {
+        // moving things around in house or changing points doesn't affect others states
+        const myGameStateRef = fdb.ref(
+          `/currentGames/${gameId}/gameStates/${user.uid}`
+        )
+        myGameStateRef.update(myUpdateObj)
+      }
+      if (whosTurnItIs) {
+        const wTIIRef = fdb.ref(`/currentGames/${gameId}/whosTurnItIs`)
+        wTIIRef.update(whosTurnItIs)
+      }
+    },
+    [fdb, gameId, gamePlay, user.uid]
+  )
 
-    if (myUpdateObj) {
-      // moving things around in house doesn't affect others states
-      const myGameStateRef = fdb.ref(
-        `/currentGames/${gameId}/gameStates/${user.uid}`
-      )
-      myGameStateRef.update(myUpdateObj)
-    }
-  }
   function _addPoints(quantity) {
     const { points } = myGameState
     return points ? points + quantity : quantity
@@ -93,50 +100,68 @@ export const useGameFxnsLOC = byWho => {
       throw new Error("topCard should equal itemID")
     }
   }
-  function _updateWhosTurnItIs({ endTurnBool }) {
-    if (!gamePlay) throw new Error("no gamePlay!")
-    if (endTurnBool) {
-      // next persons turn
-      const { memberUIDs } = gamePlay
-      const currentTurnIndex = memberUIDs.findIndex(
-        id => id === gamePlay.whosTurnItIs.uid
-      )
-      const nextTurnIndex = (currentTurnIndex + 1) % memberUIDs.length
-      return {
-        // no lastCheckIn, that comes from player
-        startTime: moment().toISOString(),
-        uid: memberUIDs[nextTurnIndex]
+  const _updateWhosTurnItIs = useCallback(
+    ({ endTurnBool, extendEndTurnTime }) => {
+      if (!gamePlay) throw new Error("no gamePlay!")
+      if (endTurnBool) {
+        // next persons turn
+        const { memberUIDs } = gamePlay
+        const currentTurnIndex = memberUIDs.findIndex(
+          id => id === gamePlay.whosTurnItIs.uid
+        )
+        const nextTurnIndex = (currentTurnIndex + 1) % memberUIDs.length
+        return {
+          ...gamePlay.whosTurnItIs,
+          startTime: moment().toISOString(),
+          endTurnTime: moment()
+            .add(secondsPerTurn, "seconds")
+            .toISOString(),
+          uid: memberUIDs[nextTurnIndex]
+        }
+      } else {
+        // same persons turn, just update the checkin
+        const newWTII = {
+          ...gamePlay.whosTurnItIs,
+          lastCheckIn: moment().toISOString()
+        }
+        if (extendEndTurnTime) {
+          newWTII.endTurnTime = moment()
+            .add(secondsPerTurn, "seconds")
+            .toISOString()
+        }
+        return newWTII
       }
-    } else {
-      // same persons turn, just update the checkin
-      const newWTII = {
-        ...gamePlay.whosTurnItIs,
-        lastCheckIn: moment().toISOString()
-      }
-      return newWTII
-    }
-  }
+    },
+    [gamePlay]
+  )
 
-  function _addToCenter({ itemId, fromHouse = false }) {
+  function _addToCenter({ itemId, fromHouse = false, noPoints = false }) {
+    const isMyTurn = gamePlay.whosTurnItIs.uid === user.uid
     const { centerCardPile: oldCenterCardPile = [] } = gamePlay
-    const { storagePile: oldStoragePile = [] } = myGameState
+    let { storagePile: oldStoragePile = [] } = myGameState
     if (!gamePlay) throw new Error("missing gamePlay")
     const [topCard] = oldCenterCardPile
     const isValid = doItemsMatch(topCard, itemId)
     let points
     let centerCardPile
     let endTurnBool = false
-    let storagePile
+    let storagePile = [...oldStoragePile]
+
     if (isValid) {
       // UI respond to valid card
       let pointsThisPlay = 1
       if (fromHouse) {
-        pointsThisPlay = pointsClimber
-        incrementPointsClimber()
+        if (noPoints) {
+          resetPointsClimber()
+          pointsThisPlay = 1
+        } else {
+          pointsThisPlay = pointsClimber
+          incrementPointsClimber()
+        }
       } else {
         // card is from storage pile
-        storagePile = _removeFromStorage({ itemId })
         resetPointsClimber()
+        storagePile = _removeFromStorage({ itemId })
       }
       setPointsDisplay(pointsThisPlay)
       points = _addPoints(pointsThisPlay)
@@ -146,13 +171,19 @@ export const useGameFxnsLOC = byWho => {
       //   _checkIfDone(fromHouse ? "house" : "storage")
     } else {
       // UI respond to inValid card
+      if (fromHouse) {
+        // do whatever
+      } else {
+        // from storage pile
+        oldStoragePile = _removeFromStorage({ itemId })
+      }
       dropCardSound({ valid: false })
       points = _addPoints(-oldCenterCardPile.length)
       centerCardPile = [itemId]
       const shuffledOldCenterCardPile = shuffle(oldCenterCardPile)
       storagePile = [...oldStoragePile, ...shuffledOldCenterCardPile]
       resetPointsClimber()
-      endTurnBool = true
+      endTurnBool = isMyTurn ? true : false
     }
     return { storagePile, centerCardPile, points, endTurnBool }
   }
@@ -161,40 +192,90 @@ export const useGameFxnsLOC = byWho => {
     const storagePile = _removeFromStorage({ itemId })
     const house = _addToHouse({ roomId, itemId, index })
     const myUpdateObj = { house, storagePile }
-    _sendNewGameState({ myUpdateObj }) // no gameUpdateObj needed
+    const whosTurnItIs = {
+      ...gamePlay.whosTurnItIs,
+      lastCheckIn: moment().toISOString()
+    }
+    _sendNewGameState({ myUpdateObj, whosTurnItIs })
   }
   function storageToCenter({ itemId }) {
     const { storagePile, centerCardPile, points, endTurnBool } = _addToCenter({
       itemId,
       fromHouse: false
     })
-    const whosTurnItIs = _updateWhosTurnItIs({ endTurnBool })
-    _sendNewGameState({
+    const whosTurnItIs = _updateWhosTurnItIs({
+      endTurnBool,
+      extendEndTurnTime: true
+    })
+    const newGameState = {
       whosTurnItIs,
       centerCardPile,
       myUpdateObj: { storagePile, points }
-    })
+    }
+    console.log("storageToCenter newGameState", newGameState)
+    _sendNewGameState(newGameState)
   }
-  function houseToCenter({ roomId, itemId }) {
+  function houseToCenter({ roomId, itemId, noPoints }) {
     const house = _removeFromHouse({ roomId, itemId })
-    const { storagePile, centerCardPile, points, endTurnBool } = _addToCenter({
+    let { storagePile, centerCardPile, points, endTurnBool } = _addToCenter({
       itemId,
-      fromHouse: true
+      fromHouse: true,
+      noPoints
     })
-    const whosTurnItIs = _updateWhosTurnItIs({ endTurnBool })
-    _sendNewGameState({
+    const whosTurnItIs = _updateWhosTurnItIs({
+      endTurnBool,
+      extendEndTurnTime: true
+    })
+    const newGameState = {
       whosTurnItIs,
       centerCardPile,
       myUpdateObj: { storagePile, points, house }
-    })
+    }
+    console.log("newGameState houseToCenter", newGameState)
+    _sendNewGameState(newGameState)
   }
+  function reorderRoom({ itemId, roomId, sourceIndex, destIndex }) {
+    const newRoom = [...myGameState.house[roomId]]
+    const [movingId] = newRoom.splice(sourceIndex, 1)
+    if (movingId !== itemId)
+      throw new Error(`these should match ${movingId} / ${itemId}`)
+    newRoom.splice(destIndex, 0, movingId)
+    const myUpdateObj = { house: { ...myGameState.house, [roomId]: newRoom } }
+    console.log("newGameState reorderRoom", myUpdateObj)
+    const whosTurnItIs = _updateWhosTurnItIs({
+      endTurnBool: false,
+      extendEndTurnTime: false
+    })
+    _sendNewGameState({ myUpdateObj, whosTurnItIs })
+  }
+  function changePoints(delta) {
+    const points = _addPoints(delta)
+    _sendNewGameState({ myUpdateObj: { points } })
+  }
+  const forceNextTurn = () => {
+    const whosTurnItIs = _updateWhosTurnItIs({ endTurnBool: true })
+    if (user.uid !== gameState.startedBy) return null
+    if (gamePlay.whosTurnItIs.gamePaused) return null
+    _sendNewGameState({ whosTurnItIs }) // only the admin will send this.
+  }
+  const unpauseGame = useCallback(() => {
+    const whosTurnItIs = _updateWhosTurnItIs({ endTurnBool: false })
+    _sendNewGameState({ whosTurnItIs: { ...whosTurnItIs, gamePaused: false } })
+  }, [_sendNewGameState, _updateWhosTurnItIs])
 
-  function reorderRoom({ itemId, roomId, sourceIndex, destIndex }) {}
+  const pauseGame = () => {
+    const whosTurnItIs = gamePlay.whosTurnItIs
+    _sendNewGameState({ whosTurnItIs: { ...whosTurnItIs, gamePaused: true } })
+  }
 
   return {
     storageToHouse,
     storageToCenter,
     houseToCenter,
-    reorderRoom
+    reorderRoom,
+    changePoints,
+    forceNextTurn,
+    unpauseGame,
+    pauseGame
   }
 }

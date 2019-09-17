@@ -43,60 +43,6 @@ export const useSoundCtx = () => {
 }
 // ⭐ 🌟 END SOUNDS CONTEXT 🌟 ⭐ //
 
-// ⭐ 🌟 HOUSE CONTEXT 🌟 ⭐ //
-const HouseCtx = createContext()
-export const HouseCtxProvider = props => {
-  console.log("houseCtxProvider called")
-  const [selectedRoom, setSelectedRoom] = useState({
-    roomId: "",
-    faceUp: false
-  })
-  const setSelectedRoomAndLog = useCallback(args => {
-    console.log("setSelectedRoom", args)
-    setSelectedRoom(args)
-  }, [])
-  const { myGameState } = useGamePlayCtx()
-  // const [myHouse, setMyHouse] = useState({})
-  const _myHouse = (myGameState && myGameState.house) || {}
-  const myHouse = useMemo(() => {
-    return _myHouse
-  }, [_myHouse])
-
-  return (
-    <HouseCtx.Provider
-      value={{
-        myHouse,
-        selectedRoom,
-        setSelectedRoom: setSelectedRoomAndLog
-      }}
-      {...props}
-    />
-  )
-}
-export const useHouseCtx = () => {
-  const ctx = useContext(HouseCtx)
-  if (!ctx)
-    throw new Error("useHouseCtx must be a descendant of HouseCtxProvider 😕")
-  const { myHouse, selectedRoom, setSelectedRoom } = ctx
-  const cardsInMyHouse = useMemo(() => {
-    if (!!myHouse) {
-      const quantity = Object.values(myHouse).reduce((sum, room) => {
-        sum += room.length
-        return sum
-      }, 0)
-      return quantity
-    }
-  }, [myHouse])
-
-  return {
-    myHouse,
-    cardsInMyHouse,
-    selectedRoom,
-    setSelectedRoom
-  }
-}
-// ⭐ 🌟 end HOUSE CONTEXT 🌟 ⭐ //
-
 //
 
 //
@@ -104,7 +50,7 @@ export const useHouseCtx = () => {
 // ⭐ 🌟 STORAGE PILE CONTEXT 🌟 ⭐ //
 const StoragePileCtx = createContext()
 export const StoragePileCtxProvider = props => {
-  const { gamePlay } = useGamePlayCtx()
+  const { gamePlay } = useGamePlayCtx("StoragePileCtx")
   const { user } = useAuthCtx()
   const storagePile = useMemo(() => {
     const _storagePile =
@@ -113,7 +59,6 @@ export const StoragePileCtxProvider = props => {
       gamePlay.gameStates[user.uid] &&
       gamePlay.gameStates[user.uid].storagePile
 
-    console.log("new storagePile in StoragePileCtxProvider", _storagePile)
     return _storagePile
   }, [gamePlay, user.uid])
 
@@ -142,14 +87,19 @@ export const PointsCtxProvider = props => {
   const [pointsDisplay, setPointsDisplay] = useState(false)
   // pointsClimber keeps track of how many points the next card is worth (if you play consecutive cards from house, each value is 1 more than the previous)
   const [pointsClimber, setPointsClimber] = useState(1)
-
+  const memoSetPointsClimber = useCallback(args => {
+    setPointsClimber(args)
+  }, [])
+  const memoSetPointsDisplay = useCallback(args => {
+    setPointsDisplay(args)
+  }, [])
   return (
     <PointsCtx.Provider
       value={{
         pointsDisplay,
-        setPointsDisplay,
+        setPointsDisplay: memoSetPointsDisplay,
         pointsClimber,
-        setPointsClimber
+        setPointsClimber: memoSetPointsClimber
       }}
       {...props}
     />
@@ -164,12 +114,12 @@ export const usePointsCtx = () => {
     pointsClimber,
     setPointsClimber
   } = ctx
-  const incrementPointsClimber = () => {
+  const incrementPointsClimber = useCallback(() => {
     setPointsClimber(old => old + 1)
-  }
-  const resetPointsClimber = () => {
+  }, [setPointsClimber])
+  const resetPointsClimber = useCallback(() => {
     setPointsClimber(1)
-  }
+  }, [setPointsClimber])
   return {
     pointsDisplay,
     setPointsDisplay,

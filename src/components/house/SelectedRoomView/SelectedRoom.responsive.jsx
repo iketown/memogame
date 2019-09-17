@@ -1,12 +1,16 @@
 import React, { useState, useEffect } from "react"
 import styled from "styled-components"
 import { Button } from "@material-ui/core"
+import Timer from "react-compound-timer/build"
+import moment from "moment"
+//
 import { images } from "../../../images/newRooms"
-import { useHouseCtx } from "../../../contexts/GameCtx"
+import { useHouseCtx } from "../../../contexts/HouseContext"
 import ReorderCard from "./ReorderCard"
 import ReorderPlaceholder from "./ReorderPlaceholder"
 import SelectedRoomDrop from "./SelectedRoomDrop"
-import { useGameFxns } from "../../../hooks/useGameFxns"
+import { useGameFxnsLOC } from "../../../hooks/useGameFxnsLOC"
+import ShowMe from "../../../utils/ShowMe.jsx"
 //
 const SelectedRoomSection = styled.div`
   position: relative;
@@ -59,40 +63,38 @@ const RoomBigTitle = styled.div`
   text-shadow: 1px 3px 5px #777474;
 `
 //
+
+const StyledSeconds = styled.div`
+  position: absolute;
+  bottom: 1rem;
+  right: 1rem;
+  font-size: 4rem;
+  color: red;
+`
 //
 
-const SelectedRoom = ({ selectedRoom, handleSelectRoom }) => {
-  const { myHouse } = useHouseCtx()
-  const { reorderRoomFX } = useGameFxns("SelectedRoom")
+const SelectedRoom = () => {
+  const {
+    myHouse,
+    resetRoomTimer,
+    onTimerEnd,
+    selectedRoom,
+    setSelectedRoom
+  } = useHouseCtx()
+  const { reorderRoom } = useGameFxnsLOC()
   //   const [thisRoom, setThisRoom] = useState(myHouse[selectedRoom])
-  const [thisRoomLocal, setThisRoomLocal] = useState([])
-  useEffect(() => {
-    if (myHouse[selectedRoom]) {
-      setThisRoomLocal(myHouse[selectedRoom])
-    }
-  }, [myHouse, selectedRoom])
-  const thisRoom = myHouse[selectedRoom] || []
-  const addCardLocal = ({ itemId, index }) => {
-    setThisRoomLocal(old => [
-      ...old.slice(0, index),
-      itemId,
-      ...old.slice(index)
-    ])
-  }
+  const { roomId, faceUp, expiryTime } = selectedRoom
+  const thisRoom = myHouse[roomId] || []
+
   const moveCard = (itemId, atIndex) => {
     const { index } = findCard(itemId)
-
-    reorderRoomFX({
+    resetRoomTimer()
+    reorderRoom({
       itemId,
-      roomId: selectedRoom,
+      roomId,
       sourceIndex: index,
       destIndex: atIndex
     })
-    // setThisRoom(
-    //   update(thisRoom, {
-    //     $splice: [[index, 1], [atIndex, 0, card]]
-    //   })
-    // )
   }
   const findCard = itemId => {
     const card = thisRoom.filter(c => c === itemId)[0]
@@ -104,19 +106,19 @@ const SelectedRoom = ({ selectedRoom, handleSelectRoom }) => {
   return (
     <>
       <SelectedRoomSection selectedRoom={selectedRoom}>
-        <SelectedRoomDrop addCardLocal={addCardLocal} roomId={selectedRoom}>
-          <RoomBigTitle>{selectedRoom.toUpperCase()}</RoomBigTitle>
-          <SelectedRoomBackground selectedRoom={selectedRoom} />
+        <SelectedRoomDrop roomId={roomId}>
+          <RoomBigTitle>{roomId.toUpperCase()}</RoomBigTitle>
+          <SelectedRoomBackground selectedRoom={roomId} />
           <SelectedRoomContent>
             {thisRoom.map((itemId, index) => (
               <ReorderPlaceholder
                 key={itemId}
-                roomId={selectedRoom}
+                roomId={roomId}
                 index={index}
                 thisRoom={thisRoom}
               >
                 <ReorderCard
-                  roomId={selectedRoom}
+                  roomId={roomId}
                   thisRoom={thisRoom}
                   index={index}
                   moveCard={moveCard}
@@ -127,19 +129,31 @@ const SelectedRoom = ({ selectedRoom, handleSelectRoom }) => {
             ))}
             {thisRoom.length < 3 && (
               <ReorderPlaceholder
-                roomId={selectedRoom}
+                roomId={roomId}
                 thisRoom={thisRoom}
                 index={thisRoom.length}
               />
             )}
           </SelectedRoomContent>
         </SelectedRoomDrop>
+        {expiryTime && (
+          <Timer
+            key={expiryTime}
+            direction="backward"
+            initialTime={moment(expiryTime).diff(moment())}
+            checkpoints={[{ time: 0, callback: onTimerEnd }]}
+          >
+            <StyledSeconds>
+              <Timer.Seconds />
+            </StyledSeconds>
+          </Timer>
+        )}
       </SelectedRoomSection>
       <Button
         fullWidth
         variant="contained"
         color="primary"
-        onClick={() => handleSelectRoom(null)}
+        onClick={() => setSelectedRoom({ roomId: "", faceUp: false })}
       >
         cancel
       </Button>

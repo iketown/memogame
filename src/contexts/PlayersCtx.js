@@ -23,7 +23,9 @@ export const PlayersCtxProvider = props => {
     }
     if (gameState && (gameState.memberUIDs || gameState.memberRequests)) {
       updateFriends(gameState.memberUIDs)
-      ;[...gameState.memberUIDs].forEach(uid => {
+      const memUIDs = gameState.memberUIDs || []
+      const reqUIDs = gameState.memberRequests || []
+      ;[...memUIDs, ...reqUIDs].forEach(uid => {
         const memberRef = firestore.collection("publicProfiles").doc(uid)
         memberRef.onSnapshot(doc => {
           setPlayers(old => ({ ...old, [doc.id]: doc.data() }))

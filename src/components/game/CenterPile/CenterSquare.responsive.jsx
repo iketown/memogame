@@ -3,7 +3,6 @@ import { useDrop } from "react-dnd"
 import styled from "styled-components"
 //
 import PointsReactTransGroup from "./PointsReactTransGroup.jsx"
-import { Room } from "../../house/RoomDnD/RoomDnD.jsx"
 import { ItemTypes } from "../../../dnd/itemTypes"
 import { WindowCard } from "../../house/DraggableCard.jsx"
 import { useGamePlayCtx } from "../../../contexts/GamePlayCtx.js"
@@ -11,20 +10,11 @@ import isEqual from "lodash/isEqual"
 import CenterPlate from "./CenterPlateSvg.jsx"
 //
 //
-const TableHalo = styled.div`
-  /* transform: scaleY(0.9); */
-  position: absolute;
-  top: 0px;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  border: 1px solid lightgreen;
-  border-radius: 50%;
-  box-shadow: 1px 0px 20px 7px #2fdc36;
-`
+
 const CenterSquareContainer = () => {
-  const { gamePlay } = useGamePlayCtx("CenterSquare")
-  const centerCardPile = (gamePlay && gamePlay.centerCardPile) || []
+  const {
+    gamePlay: { centerCardPile }
+  } = useGamePlayCtx("CenterSquareContainer")
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     canDrop: () => true,
@@ -37,7 +27,7 @@ const CenterSquareContainer = () => {
       canDrop: !!mon.canDrop()
     })
   })
-  console.log("rendering DnD CENTER container")
+  console.log("CenterSquare rendering container")
   return (
     <CenterSquare
       dropRef={dropRef}
@@ -49,6 +39,7 @@ const CenterSquareContainer = () => {
 }
 
 const CenterSquare = ({ centerCardPile, dropRef, isOver, canDrop }) => {
+  console.log("CenterSquare rendering")
   return (
     <div ref={dropRef}>
       <CenterPlate canDrop={canDrop} isOver={isOver}>
@@ -59,8 +50,8 @@ const CenterSquare = ({ centerCardPile, dropRef, isOver, canDrop }) => {
   )
 }
 
-const PileOfCards = memo(({ centerCardPile }) => {
-  console.log("rendering pile of cards")
+const PileOfCards = memo(({ centerCardPile = [] }) => {
+  console.log("CenterSquare rendering pile of cards", centerCardPile)
   return centerCardPile.map((itemId, index) => {
     return (
       <WindowCard scale={1.5} index={index + 2} key={itemId} itemId={itemId} />
@@ -69,6 +60,7 @@ const PileOfCards = memo(({ centerCardPile }) => {
 }, propsEqual)
 
 function propsEqual(prev, next) {
+  console.log("CenterSquare props", prev, next)
   return isEqual(prev, next)
 }
 

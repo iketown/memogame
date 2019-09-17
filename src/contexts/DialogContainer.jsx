@@ -6,6 +6,7 @@ import SignUpForm from "../components/form/SignUpForm.jsx"
 import SignInForm from "../components/form/SignInForm"
 import EditProfile from "../components/form/EditProfile.jsx"
 import ResetPasswordForm from "../components/form/ResetPasswordForm"
+import PauseGameDialog from "../components/game/PauseGameDialog"
 
 //
 //
@@ -19,6 +20,8 @@ function getContent(formType) {
       return <ResetPasswordForm />
     case "editProfile":
       return <EditProfile />
+    case "pauseGame":
+      return <PauseGameDialog />
     default:
       return <div>no formtype</div>
   }

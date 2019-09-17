@@ -11,7 +11,8 @@ import { removeUid } from "../../resources/allItems"
 import allItems from "../../resources/allItems"
 import { useGamePlayCtx } from "../../contexts/GamePlayCtx"
 import { useGameFxnsLOC } from "../../hooks/useGameFxnsLOC"
-// import { useClickMoveCtx } from "../../contexts/ClickMoveCtx"
+import isEqual from "lodash/isEqual"
+import { usePointsCtx } from "../../contexts/GameCtx"
 //
 //
 
@@ -20,6 +21,7 @@ const DraggableCard = ({ itemId, scale, index, source }) => {
   console.log("draggableCard renders", itemId, scale, index, source)
   const { gamePlay } = useGamePlayCtx("DraggableCard")
   const { storageToCenter, storageToHouse } = useGameFxnsLOC()
+  const { resetPointsClimber } = usePointsCtx()
   const { user } = useAuthCtx()
   const isMyTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
@@ -37,6 +39,7 @@ const DraggableCard = ({ itemId, scale, index, source }) => {
           storageToCenter({ itemId })
         } else {
           // handle dropped in house
+          resetPointsClimber()
           storageToHouse({ itemId, roomId: droppedAt, index })
           // storageToHouseFX({ roomId: droppedAt, itemId, index })
         }
@@ -103,15 +106,14 @@ export const WindowCard = memo(
     handleDoubleClick = () => null
   }) => {
     const mdUp = useWiderThan("md")
-    const { imagesvg, rotation } = useMemo(() => {
-      console.log("memoing WindowCard")
-      const imagesvg =
-        faceUp && itemId
-          ? allItems[removeUid(itemId)] && allItems[removeUid(itemId)].card
-          : brain
-      const rotation = (Math.random() - 0.5) * 30
-      return { imagesvg, rotation }
+    const imagesvg = useMemo(() => {
+      return faceUp && !!itemId
+        ? allItems[removeUid(itemId)] && allItems[removeUid(itemId)].card
+        : brain
     }, [faceUp, itemId])
+    const rotation = useMemo(() => {
+      return (Math.random() - 0.5) * 30
+    }, [])
 
     const windowHeight = mdUp ? 90 : 65
     const cardProps = {
@@ -130,9 +132,10 @@ export const WindowCard = memo(
   areEqual
 )
 function areEqual(prevProps, nextProps) {
-  // dont rerender if the index is still greater than 4.  (dont keep rerendering the bottom cards in the pile)
-  const dontReprint = nextProps.index > 3
-  return dontReprint
+  const { index: prevIndex, ...prevComp } = prevProps
+  const { index: nextIndex, ...nextComp } = nextProps
+  if (nextIndex < 5) return false
+  return isEqual(prevComp, nextComp)
 }
 
 export const BackgroundPile = () => {}

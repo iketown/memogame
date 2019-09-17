@@ -2,8 +2,9 @@ import React, { useMemo } from "react"
 import { useDrop } from "react-dnd"
 import styled from "styled-components"
 import { ItemTypes } from "../../../dnd/itemTypes"
-import { useHouseCtx } from "../../../contexts/GameCtx"
 import { maxItemsPerRoom } from "../../../utils/gameLogic"
+import { useHouseCtx } from "../../../contexts/HouseContext"
+import moment from "moment"
 
 //
 //
@@ -38,13 +39,14 @@ const StyledRoomContainer = styled.div`
 //
 //
 const RoomDrop = ({ children, roomId, thisRoom = [], handleSelectRoom }) => {
+  const { selectedRoom, setSelectedRoom } = useHouseCtx()
   const canDropBool = useMemo(() => {
     return thisRoom.length < maxItemsPerRoom
   }, [thisRoom.length])
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     drop: (item, mon) => {
-      handleSelectRoom(roomId)
+      setSelectedRoom({ roomId, faceUp: true })
       return { droppedAt: roomId, index: thisRoom.length }
     },
     collect: monitor => ({

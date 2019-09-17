@@ -2,7 +2,7 @@ import React from "react"
 import styled from "styled-components"
 import { useDrop } from "react-dnd"
 import { ItemTypes } from "../../../dnd/itemTypes"
-import { useHouseCtx } from "../../../contexts/GameCtx"
+import { useHouseCtx } from "../../../contexts/HouseContext"
 import { maxItemsPerRoom } from "../../../utils/gameLogic"
 
 const SelectRoomContainer = styled.div`
@@ -11,8 +11,8 @@ const SelectRoomContainer = styled.div`
   box-sizing: content-box;
 `
 
-const SelectedRoomDrop = ({ children, roomId, addCardLocal }) => {
-  const { myHouse } = useHouseCtx()
+const SelectedRoomDrop = ({ children, roomId }) => {
+  const { myHouse, setSelectedRoom } = useHouseCtx()
   const thisRoom = (myHouse && myHouse[roomId]) || []
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
@@ -34,7 +34,7 @@ const SelectedRoomDrop = ({ children, roomId, addCardLocal }) => {
       canDrop: !!mon.canDrop()
     }),
     drop: ({ itemId }) => {
-      addCardLocal({ itemId, index: thisRoom.length }) // this is optional.  makes it faster?
+      setSelectedRoom({ roomId, faceUp: true })
       return {
         droppedAt: roomId,
         index: thisRoom.length

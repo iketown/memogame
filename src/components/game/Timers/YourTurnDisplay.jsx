@@ -1,28 +1,54 @@
 import React from "react"
+import styled from "styled-components"
+import Timer from "react-compound-timer"
+//
 import TurnTimer from "./TurnTimer.jsx"
 import { useAuthCtx } from "../../../contexts/AuthCtx.js"
 import { useGamePlayCtx } from "../../../contexts/GamePlayCtx.js"
+import { usePlayersCtx } from "../../../contexts/PlayersCtx.js"
 
+const StyledText = styled.div`
+  text-align: center;
+  height: 100%;
+  .your-turn {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: maroon;
+  }
+  .seconds {
+    font-size: 2rem;
+    color: blue;
+  }
+`
+//
+//
 const YourTurnDisplay = () => {
   const { user } = useAuthCtx()
   const { gamePlay } = useGamePlayCtx("YourTurnDisplay")
-  const itsYourTurn =
-    gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid === user.uid
-
+  const { players } = usePlayersCtx()
+  const whosTurn =
+    gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid
+  const itsYourTurn = whosTurn === user.uid
+  if (gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.gamePaused)
+    return <p>game paused</p>
   return !itsYourTurn ? (
-    <div />
+    players[whosTurn] ? (
+      <div>{players[whosTurn].displayName} is up</div>
+    ) : (
+      <div />
+    )
   ) : (
     <div>
       <TurnTimer
         playerId={user.uid}
         render={({ getTime }) => {
           return (
-            <div style={{ textAlign: "center" }}>
-              <div style={{ fontSize: "1rem" }}>YOUR TURN</div>
-              <p style={{ fontSize: "5rem", margin: "10px", color: "maroon" }}>
-                {Math.floor(getTime() / 1000)}
-              </p>
-            </div>
+            <StyledText>
+              <div className="your-turn">YOUR TURN</div>
+              <div className="seconds">
+                <Timer.Seconds />
+              </div>
+            </StyledText>
           )
         }}
       />

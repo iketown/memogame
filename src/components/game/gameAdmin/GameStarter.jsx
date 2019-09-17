@@ -16,6 +16,7 @@ import MemberList from "./MemberList"
 import ShowMe from "../../../utils/ShowMe.jsx"
 import { useFirebase } from "../../../contexts/FirebaseCtx"
 import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
+import { useGameFxnsLOC } from "../../../hooks/useGameFxnsLOC"
 //
 //
 
@@ -28,6 +29,7 @@ const GameStarter = () => {
     changeGameParameter
   } = useGameCtx("GameStarter")
   const { gamePlay } = useGamePlayCtx("GameStarter")
+  const { pauseGame } = useGameFxnsLOC("GameStarter")
   const { handleWinGame } = useFirebase()
   const [expanded, setExpanded] = useState(false)
   if (!gameState || !gamePlay) return null
@@ -68,6 +70,7 @@ const GameStarter = () => {
               >
                 Cheat WIN
               </Button>
+              <Button onClick={pauseGame}>Pause</Button>
             </Grid>
             {gameState.memberRequests && gameState.memberRequests.length ? (
               <Grid item xs={12}>

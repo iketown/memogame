@@ -12,6 +12,8 @@ import GameContent from "../components/game/GameContent.jsx"
 import SnackbarHandler from "../components/SnackBarHandler.jsx"
 import { PlayersCtxProvider } from "../contexts/PlayersCtx"
 import { GamePlayCtxProvider } from "../contexts/GamePlayCtx"
+import GameSounds from "../sounds/GameSounds.jsx"
+import GamePauser from "./GamePauser.jsx"
 //
 //
 const Game = props => {
@@ -29,7 +31,8 @@ const Game = props => {
                 <SoundCtxProvider>
                   <SnackbarHandler gameId={gameId} />
                   <GameContent />
-                  {/* <GameSounds /> */}
+                  <GameSounds />
+                  <GamePauser />
                 </SoundCtxProvider>
               </ChatCtxProvider>
             </StoragePileCtxProvider>

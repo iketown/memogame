@@ -2,12 +2,13 @@ import React, { useState } from "react"
 import { useDrag, useDrop } from "react-dnd"
 import { ItemTypes } from "../../../dnd/itemTypes"
 import { WindowCard } from "../DraggableCard.jsx"
-import { useHouseCtx, usePointsCtx } from "../../../contexts/GameCtx"
+import { usePointsCtx } from "../../../contexts/GameCtx"
+import { useHouseCtx } from "../../../contexts/HouseContext"
 import { IconButton } from "@material-ui/core"
 import { FaEye } from "react-icons/fa"
-import { useGameFxns } from "../../../hooks/useGameFxns"
 import { useAuthCtx } from "../../../contexts/AuthCtx"
 import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
+import { useGameFxnsLOC } from "../../../hooks/useGameFxnsLOC"
 const style = {
   width: "8rem",
   height: "8rem",
@@ -28,7 +29,7 @@ const ReorderCard = ({
   const { selectedRoom } = useHouseCtx()
   const originalIndex = findCard(itemId).index
   const [peek, setPeek] = useState(false)
-  const { subtractAPointFX, houseToCenterFX } = useGameFxns("ReorderCard")
+  const { changePoints, houseToCenter } = useGameFxnsLOC("ReorderCard")
   const { resetPointsClimber } = usePointsCtx()
   const { gamePlay } = useGamePlayCtx("ReorderCard")
   const { user } = useAuthCtx()
@@ -37,7 +38,8 @@ const ReorderCard = ({
   function peekAtCard() {
     if (isMyTurn) {
       setPeek(true)
-      subtractAPointFX()
+      // subtractAPointFX()
+      changePoints(-1)
       resetPointsClimber()
       setTimeout(() => setPeek(false), 2000)
     }
@@ -54,7 +56,7 @@ const ReorderCard = ({
         if (droppedAt === "center") {
           // handle dropped in center
           if (selectedRoom.faceUp || peek) resetPointsClimber()
-          houseToCenterFX({ itemId, roomId })
+          houseToCenter({ itemId, roomId, noPoints: true })
         } else {
           // handle dropped in house
           // no action.
@@ -93,12 +95,14 @@ const ReorderCard = ({
   function handleDoubleClick() {
     if (selectedRoom.faceUp || peek) resetPointsClimber()
     if (isMyTurn) {
-      return houseToCenterFX({ itemId, roomId })
+      // return houseToCenterFX({ itemId, roomId, noPoints: selectedRoom.faceUp || peek })
+      houseToCenter({ roomId, itemId, noPoints: selectedRoom.faceUp || peek })
     }
     if (!isMyTurn && !selectedRoom.faceUp && !peek) {
-      return houseToCenterFX({ itemId, roomId })
+      houseToCenter({ roomId, itemId })
     }
   }
+  console.log("rendering ReorderCard", selectedRoom)
   return (
     <div style={{ position: "relative" }}>
       <div ref={node => drag(drop(node))} style={{ ...style, opacity }}>

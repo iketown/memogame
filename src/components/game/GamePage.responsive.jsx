@@ -40,6 +40,8 @@ const ResponsiveGamePageGrid = styled.div`
   grid-template-rows: ${p =>
     p.mobileSize ? "max-content, max-content, 1fr" : "repeat(3, max-content)"};
   grid-template-areas: ${p => getTemplateAreas(p.width)};
+  justify-items: center;
+  align-items: center;
 `
 const HouseSection = styled.div`
   grid-area: house;
@@ -59,6 +61,9 @@ const ScoreSectionContainer = styled.div`
 `
 const YourTurnSectionContainer = styled.div`
   grid-area: yourturn;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 const GamePage = () => {
   const widthText = useWidth()

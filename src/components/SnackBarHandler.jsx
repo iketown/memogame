@@ -15,9 +15,7 @@ const SnackBarHandler = ({ gameId, enqueueSnackbar, closeSnackbar }) => {
   //   if (gameId) {
   //     const gameLogRef = fdb.ref(`/currentGames/${gameId}/gameLog`)
   //     gameLogRef.on("child_added", (snapshot, prevKey) => {
-  //       const { uid,
-  //         itemId,
-  //         destination, timeStamp } = snapshot.val()
+  //       const { uid, itemId, destination, timeStamp } = snapshot.val()
   //       const howLongAgo = Math.abs(moment(timeStamp).diff(moment(), "seconds"))
   //       if (howLongAgo < 5) {
   //         enqueueSnackbar(text, {

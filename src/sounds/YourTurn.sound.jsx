@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react"
+import React, { useState, useEffect, useRef, memo } from "react"
 import Sound from "react-sound"
 
 import startTurn from "./startTurn.mp3"
@@ -10,15 +10,21 @@ import { useAuthCtx } from "../contexts/AuthCtx"
 import { useGamePlayCtx } from "../contexts/GamePlayCtx"
 //
 //
-const YourTurnSound = () => {
-  const { user } = useAuthCtx()
+const YourTurnSoundContainer = () => {
   const { gamePlay } = useGamePlayCtx("YourTurnSound")
+  const whosTurnUid =
+    gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid
+  return <MemoYourTurnSound whosTurnUid={whosTurnUid} />
+}
+
+const YourTurnSound = ({ whosTurnUid }) => {
+  const { user } = useAuthCtx()
   const whosTurn = useRef(false)
 
   const [soundToPlay, setSoundToPlay] = useState(false)
   useEffect(() => {
-    if (gamePlay && !!gamePlay.whosTurnItIs) {
-      const newWhosTurn = gamePlay.whosTurnItIs.uid
+    if (whosTurnUid) {
+      const newWhosTurn = whosTurnUid
       if (newWhosTurn !== whosTurn.current) {
         // the turn has changed
         if (newWhosTurn === user.uid) {
@@ -32,7 +38,7 @@ const YourTurnSound = () => {
         whosTurn.current = newWhosTurn //
       }
     }
-  }, [gamePlay, user.uid])
+  }, [user.uid, whosTurnUid])
 
   return (
     <>
@@ -55,7 +61,7 @@ const YourTurnSound = () => {
         onFinishedPlaying={() => setSoundToPlay(false)}
       />
 
-      <Sound
+      {/* <Sound
         url={winGame}
         playStatus={
           soundToPlay === "winGame"
@@ -72,9 +78,15 @@ const YourTurnSound = () => {
             : Sound.status.STOPPED
         }
         onFinishedPlaying={() => setSoundToPlay(false)}
-      />
+      /> */}
     </>
   )
 }
 
-export default YourTurnSound
+const MemoYourTurnSound = memo(YourTurnSound, propsEqual)
+function propsEqual(prev, next) {
+  console.log("YourTurnSound props equal", prev, next)
+  return false
+}
+
+export default YourTurnSoundContainer

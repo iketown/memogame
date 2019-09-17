@@ -6,7 +6,7 @@ import { useStoragePileCtx } from "../../../contexts/GameCtx"
 import DraggableCard, { WindowCard } from "../../house/DraggableCard.jsx"
 import { useWindowSize } from "../../../hooks/useScreenSize"
 import isEqual from "lodash/isEqual"
-
+import CenterPlate from "../CenterPile/CenterPlateSvg.jsx"
 export const HalfRoof = styled(Roof)`
   height: 13px;
 `
@@ -20,28 +20,26 @@ const StorageShedContainer = () => {
 const StorageShed = memo(({ storagePile, heightText }) => {
   console.log("StorageShed renders")
   return (
-    <div>
-      <Room height={heightText}>
-        <>
-          {/* only the top card is draggable */}
-          <DraggableCard
+    <CenterPlate>
+      <>
+        {/* only the top card is draggable */}
+        <DraggableCard
+          scale={1.5}
+          itemId={storagePile[0]}
+          source="storage"
+          index={1}
+        />
+        {/* the remaining cards are images */}
+        {storagePile.slice(1).map((itemId, index) => (
+          <WindowCard
             scale={1.5}
-            itemId={storagePile[0]}
-            source="storage"
-            index={1}
+            index={index + 2}
+            key={itemId}
+            itemId={itemId}
           />
-          {/* the remaining cards are images */}
-          {storagePile.slice(1).map((itemId, index) => (
-            <WindowCard
-              scale={1.5}
-              index={index + 2}
-              key={itemId}
-              itemId={itemId}
-            />
-          ))}
-        </>
-      </Room>
-    </div>
+        ))}
+      </>
+    </CenterPlate>
   )
 }, propsEqual)
 

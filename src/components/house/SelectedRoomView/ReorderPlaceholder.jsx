@@ -4,6 +4,7 @@ import { useDrag, useDrop } from "react-dnd"
 import { ItemTypes } from "../../../dnd/itemTypes"
 import { FaArrowDown } from "react-icons/fa"
 import { maxItemsPerRoom } from "../../../utils/gameLogic"
+import { useHouseCtx } from "../../../contexts/HouseContext"
 const ExpandingBox = styled.div`
   /* height: 3rem; */
   /* background: ${p => (p.expand ? "blue" : "gainsboro")}; */
@@ -21,6 +22,7 @@ const SpacerBox = styled.div`
   padding: 1rem;
 `
 const ReorderPlaceholder = ({ thisRoom = [], roomId, children, index }) => {
+  const { setSelectedRoom } = useHouseCtx()
   const [{ isOver, canDrop }, dropRef] = useDrop({
     accept: ItemTypes.CARD,
     canDrop: ({ itemId }, monitor) =>
@@ -31,6 +33,7 @@ const ReorderPlaceholder = ({ thisRoom = [], roomId, children, index }) => {
     }),
     // hover: () => console.log("index", index),
     drop: item => {
+      setSelectedRoom({ roomId, faceUp: true })
       return { droppedAt: roomId, index }
     }
   })

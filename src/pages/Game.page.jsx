@@ -27,17 +27,15 @@ const Game = props => {
       <PointsCtxProvider>
         <TurnTimerCtxProvider gameId={gameId}>
           <PlayersCtxProvider>
-            <HouseCtxProvider gameId={gameId}>
-              <StoragePileCtxProvider gameId={gameId}>
-                <ChatCtxProvider gameId={gameId}>
-                  <SoundCtxProvider>
-                    <SnackbarHandler gameId={gameId} />
-                    <GameSounds />
-                    <GameContent gameId={gameId} />
-                  </SoundCtxProvider>
-                </ChatCtxProvider>
-              </StoragePileCtxProvider>
-            </HouseCtxProvider>
+            <StoragePileCtxProvider gameId={gameId}>
+              <ChatCtxProvider gameId={gameId}>
+                <SoundCtxProvider>
+                  <SnackbarHandler gameId={gameId} />
+                  <GameSounds />
+                  <GameContent gameId={gameId} />
+                </SoundCtxProvider>
+              </ChatCtxProvider>
+            </StoragePileCtxProvider>
           </PlayersCtxProvider>
         </TurnTimerCtxProvider>
       </PointsCtxProvider>
