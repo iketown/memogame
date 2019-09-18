@@ -78,6 +78,20 @@ class Firebase {
       completed: false
     })
   }
+  doSendInvite = ({ uid, displayName = "unknown", gameName }) => {
+    const user = this.auth.currentUser
+    const invitesRef = this.firestore.collection("invites")
+    return invitesRef.add({
+      invited: uid,
+      invitedBy: user.uid,
+      displayName,
+      gameName,
+      timeStamp: moment().toISOString()
+    })
+  }
+  doDisInvite = inviteId => {
+    this.firestore.doc(`/invites/${inviteId}`).delete()
+  }
 
   doRematch = async ({ oldGameId, gameName, memberUIDs, rematchNumber }) => {
     const oldGameRef = this.firestore.doc(`/games/${oldGameId}`)
@@ -175,10 +189,13 @@ class Firebase {
     gameRef.remove()
     firestoreRef.delete()
   }
-  handleWinGame = async ({ gameId }) => {
+  handleEndGame = async ({ gameId, scores }) => {
     const firestoreRef = this.firestore.doc(`/games/${gameId}`)
-    const { uid } = this.auth.currentUser
-    firestoreRef.update({ completed: moment().toISOString(), winner: uid })
+    firestoreRef.update({
+      completed: moment().toISOString(),
+      inProgress: false,
+      scores
+    })
   }
 }
 export default Firebase

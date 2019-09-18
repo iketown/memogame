@@ -8,6 +8,7 @@ import { WindowCard } from "../../house/DraggableCard.jsx"
 import { useGamePlayCtx } from "../../../contexts/GamePlayCtx.js"
 import isEqual from "lodash/isEqual"
 import CenterPlate from "./CenterPlateSvg.jsx"
+import Blinker from "../Scores/Blinker.jsx"
 //
 //
 
@@ -43,6 +44,7 @@ const CenterSquare = ({ centerCardPile, dropRef, isOver, canDrop }) => {
   return (
     <div ref={dropRef}>
       <CenterPlate canDrop={canDrop} isOver={isOver}>
+        <Blinker displayPlayer="all" circular={true} />
         <PileOfCards centerCardPile={centerCardPile} />
         <PointsReactTransGroup key="reactTransGroup" />
       </CenterPlate>

@@ -7,6 +7,8 @@ import DraggableCard, { WindowCard } from "../../house/DraggableCard.jsx"
 import { useWindowSize } from "../../../hooks/useScreenSize"
 import isEqual from "lodash/isEqual"
 import CenterPlate from "../CenterPile/CenterPlateSvg.jsx"
+import Blinker from "../Scores/Blinker.jsx"
+import { useAuthCtx } from "../../../contexts/AuthCtx.js"
 export const HalfRoof = styled(Roof)`
   height: 13px;
 `
@@ -18,27 +20,27 @@ const StorageShedContainer = () => {
 }
 
 const StorageShed = memo(({ storagePile, heightText }) => {
-  console.log("StorageShed renders")
+  console.log("StorageShed renders", storagePile)
+  const { user } = useAuthCtx()
   return (
     <CenterPlate>
-      <>
-        {/* only the top card is draggable */}
-        <DraggableCard
+      <Blinker circular={true} displayPlayer={user.uid} />
+      {/* only the top card is draggable */}
+      <DraggableCard
+        scale={1.5}
+        itemId={storagePile[0]}
+        source="storage"
+        index={1}
+      />
+      {/* the remaining cards are images */}
+      {storagePile.slice(1).map((itemId, index) => (
+        <WindowCard
           scale={1.5}
-          itemId={storagePile[0]}
-          source="storage"
-          index={1}
+          index={index + 2}
+          key={itemId}
+          itemId={itemId}
         />
-        {/* the remaining cards are images */}
-        {storagePile.slice(1).map((itemId, index) => (
-          <WindowCard
-            scale={1.5}
-            index={index + 2}
-            key={itemId}
-            itemId={itemId}
-          />
-        ))}
-      </>
+      ))}
     </CenterPlate>
   )
 }, propsEqual)

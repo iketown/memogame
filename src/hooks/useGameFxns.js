@@ -77,20 +77,6 @@ const useFDB = ({ gameId }) => {
     fdb.ref(`/currentGames/${gameId}/whosTurnItIs`).set(nextPerson)
   }
 
-  const _forceNextTurn = () => {
-    const { memberUIDs, whosTurnItIs } = gamePlay
-    const currentPlayerUid = whosTurnItIs.uid
-    const currentPlayerIndex = memberUIDs.findIndex(
-      _uid => _uid === currentPlayerUid
-    )
-    const nextPlayerIndex = (currentPlayerIndex + 1) % memberUIDs.length
-    const nextPerson = {
-      uid: memberUIDs[nextPlayerIndex],
-      startTime: moment().toISOString()
-    }
-    fdb.ref(`/currentGames/${gameId}/whosTurnItIs`).set(nextPerson)
-  }
-
   function _updateTurnTimer() {
     return fdb.ref(`/currentGames/${gameId}/whosTurnItIs`).update({
       lastCheckIn: moment().toISOString()
@@ -104,7 +90,6 @@ const useFDB = ({ gameId }) => {
     _pointsRefAndValue,
     _addLogMessage,
     _endTurn,
-    _forceNextTurn,
     _updateTurnTimer
   }
 }
@@ -136,7 +121,6 @@ export const useGameFxns = byWho => {
     _pointsRefAndValue,
     _addLogMessage,
     _endTurn,
-    _forceNextTurn,
     _updateTurnTimer
   } = useFDB({ gameId })
 
@@ -309,7 +293,6 @@ export const useGameFxns = byWho => {
     reorderRoomFX,
     subtractAPointFX,
     _updateTurnTimer,
-    _endTurn,
-    _forceNextTurn
+    _endTurn
   }
 }

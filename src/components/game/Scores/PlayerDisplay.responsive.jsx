@@ -9,6 +9,7 @@ import { useOtherPlayerInfo } from "../../../hooks/usePlayerInfo.js"
 import AvatarMonster from "../../AvatarMonster.jsx"
 import TurnTimer from "../Timers/TurnTimer.jsx"
 import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
+import Blinker from "./Blinker.jsx"
 //
 //
 
@@ -77,6 +78,7 @@ export const PlayerDisplay = ({ playerId }) => {
   const myTurn = gamePlay && gamePlay.whosTurnItIs.uid === playerId
   return myTurn ? (
     <StyledDisplay myTurn={myTurn}>
+      <Blinker circular={false} displayPlayer={playerId} />
       {publicProfile && (
         <Typography variant="caption" className="name-display">
           {publicProfile.displayName}

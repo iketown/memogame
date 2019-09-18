@@ -21,6 +21,23 @@ export const GamePlayCtxProvider = ({ gameId, ...props }) => {
   const myGameState = useMemo(() => {
     return gamePlay && gamePlay.gameStates && gamePlay.gameStates[user.uid]
   }, [gamePlay, user.uid])
+
+  const myTotalCards = useMemo(() => {
+    let allCards = []
+    if (myGameState) {
+      const { house, storagePile } = myGameState
+      if (house) {
+        Object.values(house).forEach(room => {
+          allCards.push(...room)
+        })
+      }
+      if (storagePile) {
+        allCards.push(...storagePile)
+      }
+    }
+    return allCards.length
+  }, [myGameState])
+
   useEffect(() => {
     const setGamePlay = newState => {
       console.log("setting game play")
@@ -39,7 +56,12 @@ export const GamePlayCtxProvider = ({ gameId, ...props }) => {
     }
   }, [fdb, gameId, gamePlay])
 
-  return <GamePlayCtx.Provider value={{ gamePlay, myGameState }} {...props} />
+  return (
+    <GamePlayCtx.Provider
+      value={{ gamePlay, myGameState, myTotalCards }}
+      {...props}
+    />
+  )
 }
 
 export const useGamePlayCtx = calledBy => {
@@ -50,6 +72,6 @@ export const useGamePlayCtx = calledBy => {
     )
 
   console.log("useGamePlayCtx called by", calledBy)
-  const { gamePlay, myGameState } = ctx
-  return { gamePlay, myGameState }
+  const { gamePlay, myGameState, myTotalCards } = ctx
+  return { gamePlay, myGameState, myTotalCards }
 }

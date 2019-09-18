@@ -13,14 +13,17 @@ import { storage } from "firebase"
 import { useFirebase } from "../contexts/FirebaseCtx"
 import { secondsPerTurn } from "../utils/gameLogic"
 import { useDialogCtx } from "../contexts/DialogCtx"
+import { usePlayersCtx } from "../contexts/PlayersCtx"
+import { getGameScores } from "../pages/GameOver"
 
 export const useGameFxnsLOC = byWho => {
   console.log("useGameFxnsLOC called by", byWho)
   const { gameId, gameState } = useGameCtx("useGameFxns")
-  const { gamePlay } = useGamePlayCtx("useGameFxns")
+  const { players } = usePlayersCtx()
+  const { gamePlay, myTotalCards } = useGamePlayCtx("useGameFxns")
   const { user } = useAuthCtx()
   const { dropCardSound } = useSoundCtx()
-  const { fdb } = useFirebase()
+  const { fdb, handleEndGame } = useFirebase()
   const { dispatch } = useDialogCtx()
   const {
     setPointsDisplay,
@@ -31,36 +34,71 @@ export const useGameFxnsLOC = byWho => {
   const myGameState =
     gamePlay && gamePlay.gameStates && gamePlay.gameStates[user.uid]
 
+  const amIDone = useCallback(
+    ({ myUpdateObj }) => {
+      const allMyCards = []
+      if (!!myUpdateObj && myUpdateObj.points >= pointsRequiredToWin)
+        return true
+      if (myGameState) {
+        if (myGameState.points >= pointsRequiredToWin) return true
+        const storagePile =
+          (myUpdateObj && myUpdateObj.storagePile) ||
+          myGameState.storagePile ||
+          []
+        const house =
+          (myUpdateObj && myUpdateObj.house) || myGameState.house || {}
+
+        allMyCards.push(...storagePile)
+
+        Object.values(house).forEach(room => {
+          allMyCards.push(...room)
+        })
+        if (allMyCards.length <= 0) return true
+      }
+      return false
+    },
+    [myGameState]
+  )
+  const handleGameOver = useCallback(() => {
+    console.log("game is OVER! newGameState")
+    const scores = getGameScores({ gamePlay, players })
+    handleEndGame({ gameId, scores })
+  }, [gameId, gamePlay, handleEndGame, players])
+
   const _sendNewGameState = useCallback(
-    ({ centerCardPile, myUpdateObj, whosTurnItIs }) => {
-      console.log(" sending newGameState", {
+    ({ centerCardPile, myUpdateObj, whosTurnItIs, calledFrom }) => {
+      console.log(`sending newGameState from ${calledFrom}`, {
         centerCardPile,
         myUpdateObj,
         whosTurnItIs
       })
       if (!gamePlay) throw new Error("missing gamePlay")
-      if (centerCardPile && myUpdateObj) {
+      if (centerCardPile && myUpdateObj && whosTurnItIs) {
         const gameRef = fdb.ref(`/currentGames/${gameId}`)
         const newGamePlay = { ...gamePlay }
         const myOldGameState = gamePlay.gameStates[user.uid]
         newGamePlay.centerCardPile = centerCardPile
         newGamePlay.whosTurnItIs = whosTurnItIs
         newGamePlay.gameStates[user.uid] = { ...myOldGameState, ...myUpdateObj }
-        return gameRef.update({ ...newGamePlay })
+        newGamePlay.lastCardBy = user.uid
+        gameRef.update({ ...newGamePlay })
+      } else {
+        if (myUpdateObj) {
+          // moving things around in house or changing points doesn't affect others states
+          const myGameStateRef = fdb.ref(
+            `/currentGames/${gameId}/gameStates/${user.uid}`
+          )
+          myGameStateRef.update(myUpdateObj)
+        }
+        if (whosTurnItIs) {
+          const wTIIRef = fdb.ref(`/currentGames/${gameId}/whosTurnItIs`)
+          wTIIRef.update(whosTurnItIs)
+        }
       }
-      if (myUpdateObj) {
-        // moving things around in house or changing points doesn't affect others states
-        const myGameStateRef = fdb.ref(
-          `/currentGames/${gameId}/gameStates/${user.uid}`
-        )
-        myGameStateRef.update(myUpdateObj)
-      }
-      if (whosTurnItIs) {
-        const wTIIRef = fdb.ref(`/currentGames/${gameId}/whosTurnItIs`)
-        wTIIRef.update(whosTurnItIs)
-      }
+      const gameIsOver = amIDone({ myUpdateObj })
+      if (gameIsOver) handleGameOver()
     },
-    [fdb, gameId, gamePlay, user.uid]
+    [amIDone, fdb, gameId, gamePlay, handleGameOver, user.uid]
   )
 
   function _addPoints(quantity) {
@@ -196,7 +234,11 @@ export const useGameFxnsLOC = byWho => {
       ...gamePlay.whosTurnItIs,
       lastCheckIn: moment().toISOString()
     }
-    _sendNewGameState({ myUpdateObj, whosTurnItIs })
+    _sendNewGameState({
+      myUpdateObj,
+      whosTurnItIs,
+      calledFrom: "storageToHouse"
+    })
   }
   function storageToCenter({ itemId }) {
     const { storagePile, centerCardPile, points, endTurnBool } = _addToCenter({
@@ -210,7 +252,8 @@ export const useGameFxnsLOC = byWho => {
     const newGameState = {
       whosTurnItIs,
       centerCardPile,
-      myUpdateObj: { storagePile, points }
+      myUpdateObj: { storagePile, points },
+      calledFrom: "storageToCenter"
     }
     console.log("storageToCenter newGameState", newGameState)
     _sendNewGameState(newGameState)
@@ -229,9 +272,9 @@ export const useGameFxnsLOC = byWho => {
     const newGameState = {
       whosTurnItIs,
       centerCardPile,
-      myUpdateObj: { storagePile, points, house }
+      myUpdateObj: { storagePile, points, house },
+      calledFrom: "houseToCenter"
     }
-    console.log("newGameState houseToCenter", newGameState)
     _sendNewGameState(newGameState)
   }
   function reorderRoom({ itemId, roomId, sourceIndex, destIndex }) {
@@ -246,26 +289,36 @@ export const useGameFxnsLOC = byWho => {
       endTurnBool: false,
       extendEndTurnTime: false
     })
-    _sendNewGameState({ myUpdateObj, whosTurnItIs })
+    _sendNewGameState({ myUpdateObj, whosTurnItIs, calledFrom: "reorderRoom" })
   }
   function changePoints(delta) {
     const points = _addPoints(delta)
-    _sendNewGameState({ myUpdateObj: { points } })
+    _sendNewGameState({ myUpdateObj: { points }, calledFrom: "changePoints" })
   }
   const forceNextTurn = () => {
     const whosTurnItIs = _updateWhosTurnItIs({ endTurnBool: true })
     if (user.uid !== gameState.startedBy) return null
     if (gamePlay.whosTurnItIs.gamePaused) return null
-    _sendNewGameState({ whosTurnItIs }) // only the admin will send this.
+    _sendNewGameState({ whosTurnItIs, calledFrom: "forceNextTurn" }) // only the admin will send this.
+  }
+  const endMyTurn = () => {
+    const whosTurnItIs = _updateWhosTurnItIs({ endTurnBool: true })
+    _sendNewGameState({ whosTurnItIs, calledFrom: "endMyTurn" })
   }
   const unpauseGame = useCallback(() => {
     const whosTurnItIs = _updateWhosTurnItIs({ endTurnBool: false })
-    _sendNewGameState({ whosTurnItIs: { ...whosTurnItIs, gamePaused: false } })
+    _sendNewGameState({
+      whosTurnItIs: { ...whosTurnItIs, gamePaused: false },
+      calledFrom: "unpauseGame"
+    })
   }, [_sendNewGameState, _updateWhosTurnItIs])
 
   const pauseGame = () => {
     const whosTurnItIs = gamePlay.whosTurnItIs
-    _sendNewGameState({ whosTurnItIs: { ...whosTurnItIs, gamePaused: true } })
+    _sendNewGameState({
+      whosTurnItIs: { ...whosTurnItIs, gamePaused: true },
+      calledFrom: "pauseGame"
+    })
   }
 
   return {
@@ -275,6 +328,7 @@ export const useGameFxnsLOC = byWho => {
     reorderRoom,
     changePoints,
     forceNextTurn,
+    endMyTurn,
     unpauseGame,
     pauseGame
   }

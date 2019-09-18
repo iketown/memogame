@@ -1,11 +1,13 @@
 import React from "react"
 import styled from "styled-components"
 import Timer from "react-compound-timer"
+import { Button } from "@material-ui/core"
 //
 import TurnTimer from "./TurnTimer.jsx"
 import { useAuthCtx } from "../../../contexts/AuthCtx.js"
 import { useGamePlayCtx } from "../../../contexts/GamePlayCtx.js"
 import { usePlayersCtx } from "../../../contexts/PlayersCtx.js"
+import { useGameFxnsLOC } from "../../../hooks/useGameFxnsLOC"
 
 const StyledText = styled.div`
   text-align: center;
@@ -26,6 +28,7 @@ const YourTurnDisplay = () => {
   const { user } = useAuthCtx()
   const { gamePlay } = useGamePlayCtx("YourTurnDisplay")
   const { players } = usePlayersCtx()
+  const { endMyTurn } = useGameFxnsLOC()
   const whosTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid
   const itsYourTurn = whosTurn === user.uid
@@ -48,6 +51,10 @@ const YourTurnDisplay = () => {
               <div className="seconds">
                 <Timer.Seconds />
               </div>
+              <br />
+              <Button onClick={endMyTurn} variant="contained" color="primary">
+                End Turn
+              </Button>
             </StyledText>
           )
         }}

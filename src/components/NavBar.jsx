@@ -16,7 +16,7 @@ import {
 } from "@material-ui/core"
 import AvatarMonster from "./AvatarMonster.jsx"
 import BrainGears from "../images/BrainGears.jsx"
-import { withRouter } from "react-router-dom"
+import { withRouter, Link } from "react-router-dom"
 import { useFirebase } from "../contexts/FirebaseCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { useDialogCtx } from "../contexts/DialogCtx"
@@ -29,6 +29,7 @@ const NavBar = props => {
   const menus = {
     sm: [
       <IconButton
+        key={123}
         onClick={() => setMobileOpen(old => !old)}
         children={<FaBars color="white" />}
       />
@@ -69,7 +70,7 @@ const NavBar = props => {
         return menus.sm
       case "md":
       case "lg":
-        return <div>md or large</div>
+        return <div>menu</div>
       default:
         return <div>no width</div>
     }
@@ -80,7 +81,9 @@ const NavBar = props => {
         <Toolbar style={{ minHeight: "fit-content" }}>
           <BrainGears height="30px" style={{ flexGrow: 1 }} />
           <Typography variant="h6" style={{ flexGrow: 1, marginLeft: "5px" }}>
-            MEMOGA.ME {widthText} {heightText}
+            <Link style={{ color: "inherit", textDecoration: "none" }} to="/">
+              MEMOGA.ME {widthText}
+            </Link>
           </Typography>
 
           {!!user && signedInMenuItems}

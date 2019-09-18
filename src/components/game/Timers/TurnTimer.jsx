@@ -14,7 +14,7 @@ const TurnTimer = ({ playerId, children, render = () => null }) => {
     moment(gamePlay.whosTurnItIs.startTime).add(secondsPerTurn, "seconds")
   const initialTime = moment(endTurnTime).diff(moment())
   useEffect(() => {
-    if (moment(endTurnTime) < moment().add(10, "seconds")) {
+    if (moment(endTurnTime).add(10, "seconds") < moment()) {
       console.log("forcing turn change")
       forceNextTurn()
     }

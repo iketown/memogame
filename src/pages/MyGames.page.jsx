@@ -22,17 +22,14 @@ const MyGamesPage = () => {
       const myGamesRef = firestore
         .collection(`games`)
         .where("memberUIDs", "array-contains", user.uid)
-      myGamesRef
-        .get()
-        .then(querySnapshot => {
-          const _myGames = []
-          querySnapshot.forEach(doc => {
-            _myGames.push({ id: doc.id, ...doc.data() })
-            console.log("my game", doc.id, doc.data())
-          })
-          setMyGames(_myGames)
+      myGamesRef.onSnapshot(querySnapshot => {
+        const _myGames = []
+        querySnapshot.forEach(doc => {
+          _myGames.push({ id: doc.id, ...doc.data() })
+          console.log("my game", doc.id, doc.data())
         })
-        .catch(err => console.log("error getting docs", err))
+        setMyGames(_myGames)
+      })
     }
   }, [firestore, user])
   return (

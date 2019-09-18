@@ -2,7 +2,7 @@ import React from "react"
 import { Container } from "@material-ui/core"
 import { ThemeProvider } from "@material-ui/styles"
 import { createMuiTheme } from "@material-ui/core/styles"
-
+import styled from "styled-components"
 import NavBar from "./components/NavBar"
 import { BrowserRouter as Router, Route } from "react-router-dom"
 import { DialogCtxProvider } from "./contexts/DialogCtx"
@@ -16,9 +16,17 @@ import GamePageResponsive from "./components/game/GamePage.responsive.jsx"
 import { SnackbarProvider } from "notistack"
 import SpinningPageLoader from "./components/SpinningPageLoader"
 import GameContainer from "./pages/GameContainer.jsx"
+import GameOver from "./pages/GameOver.jsx"
 import GameContent from "./components/game/GameContent.jsx"
 //
 //
+
+const FullHeightContainer = styled.div`
+  margin: 0 1rem;
+  position: relative;
+  height: calc(100vh - 47px);
+  top: 0;
+`
 
 const theme = createMuiTheme()
 const App = () => {
@@ -31,14 +39,14 @@ const App = () => {
               <DialogCtxProvider>
                 <DialogContainer />
                 <NavBar />
-                <Container>
+                <FullHeightContainer>
                   <Route exact path="/game/:gameId" component={GameContainer} />
-
+                  <Route path="/gameover/:gameId" component={GameOver} />
                   <Route path="/mygames" component={MyGames} />
                   <Route path="/gamestart" component={GameStart} />
                   <Route path="/loader" component={SpinningPageLoader} />
                   <Route path="/house" component={GamePageResponsive} />
-                </Container>
+                </FullHeightContainer>
               </DialogCtxProvider>
             </AuthCtxProvider>
           </FirebaseCtxProvider>
