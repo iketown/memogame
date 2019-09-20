@@ -55,7 +55,7 @@ export const useGameFxnsLOC = byWho => {
         })
         if (allMyCards.length <= 0) return true
       }
-      if (gamePlay) {
+      if (gamePlay && gamePlay.centerCardPile) {
         const [topCard] = gamePlay.centerCardPile
         let playableCard = false
         Object.entries(gamePlay.gameStates).forEach(([uid, state]) => {
@@ -66,14 +66,14 @@ export const useGameFxnsLOC = byWho => {
                   if (doItemsMatch(card, topCard)) {
                     console.log("matching card found", card, uid)
                     playableCard = true
+                    // there IS a playablecard, so amIDone is false
                   }
                 })
               }
             })
           }
         })
-        console.log("NO PLAYABLE CARDS LEFT!")
-        return true // no playable cards
+        return !playableCard
       }
       return false
     },
