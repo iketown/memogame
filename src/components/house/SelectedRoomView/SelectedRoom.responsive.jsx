@@ -155,7 +155,7 @@ const SelectedRoom = () => {
         color="primary"
         onClick={() => setSelectedRoom({ roomId: "", faceUp: false })}
       >
-        cancel
+        CLOSE
       </Button>
     </>
   )

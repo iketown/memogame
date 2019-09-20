@@ -55,29 +55,29 @@ export const useGameFxnsLOC = byWho => {
         })
         if (allMyCards.length <= 0) return true
       }
-      if (gamePlay && gamePlay.centerCardPile) {
-        const [topCard] = gamePlay.centerCardPile
-        let playableCard = false
-        Object.entries(gamePlay.gameStates).forEach(([uid, state]) => {
-          if (!playableCard && state.house) {
-            Object.values(state.house).forEach(room => {
-              if (!playableCard) {
-                room.forEach(card => {
-                  if (doItemsMatch(card, topCard)) {
-                    console.log("matching card found", card, uid)
-                    playableCard = true
-                    // there IS a playablecard, so amIDone is false
-                  }
-                })
-              }
-            })
-          }
-        })
-        return !playableCard
-      }
+      // if (gamePlay && gamePlay.centerCardPile) {
+      //   const [topCard] = gamePlay.centerCardPile
+      //   let playableCard = false
+      //   Object.entries(gamePlay.gameStates).forEach(([uid, state]) => {
+      //     if (!playableCard && state.house) {
+      //       Object.values(state.house).forEach(room => {
+      //         if (!playableCard) {
+      //           room.forEach(card => {
+      //             if (doItemsMatch(card, topCard)) {
+      //               console.log("matching card found", card, uid)
+      //               playableCard = true
+      //               // there IS a playablecard, so amIDone is false
+      //             }
+      //           })
+      //         }
+      //       })
+      //     }
+      //   })
+      //   return !playableCard
+      // }
       return false
     },
-    [gamePlay, myGameState]
+    [myGameState]
   )
   const handleGameOver = useCallback(() => {
     console.log("game is OVER! newGameState")
