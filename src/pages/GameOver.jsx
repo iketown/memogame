@@ -160,9 +160,9 @@ const GameOver = () => {
         </Button>
       )}
       {youWon && "YOU WON"}
-      <div>
+      {/* <div>
         <ShowMe obj={scores} name="scores" noModal />
-      </div>
+      </div> */}
     </FullPage>
   )
 }
