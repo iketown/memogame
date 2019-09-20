@@ -1,3 +1,5 @@
+import allItems from "../resources/allItems"
+
 export function shuffle(array) {
   const newArray = [...array]
   for (let i = newArray.length - 1; i > 0; i--) {
@@ -28,3 +30,9 @@ export const doItemsMatch = (itemId1, itemId2) => {
 export const maxItemsPerRoom = 3
 export const pointsRequiredToWin = 50
 export const secondsPerTurn = 20
+
+export const randomListOfItemIds = uid => {
+  const allIds = Object.keys(allItems).map(key => `${key}_${uid}`) // add uid to each person's cards so you know where they started, and so they stay unique
+  const shuffledIds = shuffle(allIds)
+  return shuffledIds
+}

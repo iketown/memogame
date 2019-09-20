@@ -3,6 +3,7 @@ import * as firebase from "firebase"
 import "firebase/auth"
 import "firebase/firestore"
 import moment from "moment"
+import { randomListOfItemIds } from "../utils/gameLogic"
 
 const {
   REACT_APP_API_KEY,
@@ -61,7 +62,10 @@ class Firebase {
   }
 
   //// ⭐   Game Admin API   ⭐ ////
-  doCreateGame = ({ gameName }) => {
+
+  doCreateRematch = ({ gameId, memberUIDs }) => {}
+
+  doProposeGame = ({ gameName }) => {
     const user = this.auth.currentUser
     if (!user) {
       console.log("trying to create a game when not signed in")
@@ -70,29 +74,107 @@ class Firebase {
     const gamesRef = this.firestore.collection("games")
     return gamesRef.add({
       gameName,
-      memberUIDs: [user.uid],
-      memberRequests: [],
-      guestList: [],
       startedBy: user.uid,
       inProgress: false,
       completed: false
     })
   }
-  doSendInvite = ({ uid, displayName = "unknown", gameName }) => {
+  doCreateGameFromInvites = ({ memberUIDs, gameId, gameName }) => {
+    const _promises = []
+    const user = this.auth.currentUser
+    const gameRef = this.fdb.ref(`/currentGames/${gameId}`)
+    const startedBy = user.uid
+    const gameStates = memberUIDs.reduce((obj, uid) => {
+      const storagePile = randomListOfItemIds(uid)
+      obj[uid] = {
+        storagePile,
+        house: {},
+        inviteStillExists: true
+      }
+      return obj
+    }, {})
+    _promises.push(
+      gameRef.update({
+        gameName,
+        startedBy,
+        memberUIDs,
+        whosTurnItIs: { uid: memberUIDs[0], startTime: moment().toISOString() },
+        centerCardPile: [],
+        gameStates
+      })
+    )
+    const firestoreRef = this.firestore.doc(`/games/${gameId}`)
+    _promises.push(
+      firestoreRef.update({
+        memberUIDs,
+        inProgress: true,
+        completed: false
+      })
+    )
+    return Promise.all(_promises)
+  }
+  doSendInvite = ({
+    uid,
+    displayName = "unknown",
+    avatarNumber,
+    gameName,
+    gameId,
+    confirmed = false
+  }) => {
     const user = this.auth.currentUser
     const invitesRef = this.firestore.collection("invites")
     return invitesRef.add({
       invited: uid,
       invitedBy: user.uid,
+      avatarNumber,
+      confirmed,
       displayName,
       gameName,
+      gameId,
       timeStamp: moment().toISOString()
     })
   }
-  doDisInvite = inviteId => {
-    this.firestore.doc(`/invites/${inviteId}`).delete()
+  doDisInvite = ({ inviteId, uid }) => {
+    const user = this.auth.currentUser
+    if (uid === user.uid) {
+      console.log("dont disinvite yourself")
+      return null
+    }
+    return this.firestore.doc(`/invites/${inviteId}`).delete()
   }
+  removeGameInvitation = async ({ gameId }) => {
+    const user = this.auth.currentUser
+    const inviteRef = this.firestore
+      .collection("invites")
+      .where("invited", "==", user.uid)
+      .where("gameId", "==", gameId)
+    const docs = await inviteRef.get().then(snapshot => {
+      const _docs = []
+      snapshot.forEach(doc => {
+        console.log("game invitation doc", doc.data())
+        _docs.push(doc.id)
+      })
+      return _docs
+    })
+    console.log("game invitation docs", docs)
+    await Promise.all(
+      docs.map(docId => this.firestore.doc(`invites/${docId}`).delete())
+    )
 
+    const myGameStateRef = this.fdb.ref(
+      `/currentGames/${gameId}/gameStates/${user.uid}`
+    )
+    await myGameStateRef.update({ inviteStillExists: false })
+    console.log("invite has been obliterated")
+  }
+  doAcceptInvite = ({ inviteId }) => {
+    return this.firestore
+      .doc(`/invites/${inviteId}`)
+      .update({ confirmed: true })
+  }
+  convertInviteToGame = ({ inviteId }) => {
+    return this.firestore.doc(`/invites/${inviteId}`).update({ started: true })
+  }
   doRematch = async ({ oldGameId, gameName, memberUIDs, rematchNumber }) => {
     const oldGameRef = this.firestore.doc(`/games/${oldGameId}`)
     const [strippedGameId] = oldGameId.split("-rematch")

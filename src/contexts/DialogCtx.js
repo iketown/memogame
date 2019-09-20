@@ -4,7 +4,7 @@ const DialogCtx = React.createContext()
 
 const initialState = {
   formOpen: false,
-  formType: "editProfile",
+  formType: "searchPlayers",
   maxWidth: "sm"
 }
 

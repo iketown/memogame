@@ -6,6 +6,7 @@ import greenCircle from "../images/greenCircle.svg"
 import { useGameCtx } from "../contexts/GameCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import ShowMe from "../utils/ShowMe.jsx"
+import { useFirebase } from "../contexts/FirebaseCtx"
 
 const FullPage = styled.div`
   position: absolute;
@@ -107,8 +108,13 @@ const ScoreBoard = styled.div`
 const GameOver = () => {
   const { gameState } = useGameCtx()
   const { user } = useAuthCtx()
+  const { doProposeGame } = useFirebase()
   const scores = gameState && gameState.scores
   const youWon = scores[0].uid === user.uid
+  function handleProposeRematch() {
+    console.log("gameState in rematch", gameState)
+    // const {} = await doProposeGame({gameName: gameState.gameName })
+  }
   return (
     <FullPage>
       <Typography gutterBottom variant="h3">
@@ -144,9 +150,15 @@ const GameOver = () => {
           })}
       </ScoreBoard>
       <div style={{ height: "3rem" }}></div>
-      <Button variant="contained" color="primary">
-        REMATCH
-      </Button>
+      {youWon && (
+        <Button
+          onClick={handleProposeRematch}
+          variant="contained"
+          color="primary"
+        >
+          REMATCH
+        </Button>
+      )}
       {youWon && "YOU WON"}
       <div>
         <ShowMe obj={scores} name="scores" noModal />

@@ -52,6 +52,7 @@ const EditProfile = () => {
         { merge: true }
       )
       .catch(err => console.log("error in profile", err))
+
     dispatch({ type: "CLOSE_FORM" })
   }
 

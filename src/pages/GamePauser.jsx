@@ -36,9 +36,14 @@ const secondsBeforePause = 1000
 const GamePauser = ({ whosTurnItIs }) => {
   const paused = whosTurnItIs && whosTurnItIs.gamePaused
   const { pauseGame, unpauseGame } = useGameFxnsLOC()
-
+  const { gameState } = useGameCtx()
   useEffect(() => {
-    if (whosTurnItIs) {
+    if (
+      whosTurnItIs &&
+      gameState &&
+      !gameState.completed &&
+      gameState.inProgress
+    ) {
       if (whosTurnItIs.lastCheckIn) {
         const secondsSinceLastCheckin =
           moment().diff(moment(whosTurnItIs.lastCheckIn)) / 1000
@@ -51,7 +56,7 @@ const GamePauser = ({ whosTurnItIs }) => {
         if (secondsSinceTurnStarted > secondsBeforePause) pauseGame()
       }
     }
-  }, [pauseGame, whosTurnItIs])
+  }, [gameState, pauseGame, whosTurnItIs])
   return paused ? (
     <FullScreenPaused>
       <div>
