@@ -36,7 +36,12 @@ const CenterPlateSvg = memo(({ children, isOver, canDrop }) => {
   console.log("rendering CenterPlateSvg")
   const plate = useMemo(() => <PlateImage />, [])
   return (
-    <PlateContainer mdUp={mdUp} isOver={isOver} canDrop={canDrop}>
+    <PlateContainer
+      onClick={e => e.stopPropagation()}
+      mdUp={mdUp}
+      isOver={isOver}
+      canDrop={canDrop}
+    >
       {plate}
       {children}
     </PlateContainer>

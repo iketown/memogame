@@ -63,8 +63,6 @@ class Firebase {
 
   //// ⭐   Game Admin API   ⭐ ////
 
-  doCreateRematch = ({ gameId, memberUIDs }) => {}
-
   doProposeGame = ({ gameName }) => {
     const user = this.auth.currentUser
     if (!user) {
@@ -89,7 +87,8 @@ class Firebase {
       obj[uid] = {
         storagePile,
         house: {},
-        inviteStillExists: true
+        inviteStillExists: true,
+        lastSeen: false
       }
       return obj
     }, {})
@@ -174,6 +173,15 @@ class Firebase {
   }
   convertInviteToGame = ({ inviteId }) => {
     return this.firestore.doc(`/invites/${inviteId}`).update({ started: true })
+  }
+  updateLastSeen = ({ gameId }) => {
+    console.log("UPDATING LAST SEEN 2")
+    const user = this.auth.currentUser
+    const myGameStateRef = this.fdb.ref(
+      `/currentGames/${gameId}/gameStates/${user.uid}`
+    )
+    const lastSeen = moment().toISOString()
+    myGameStateRef.update({ lastSeen })
   }
   doRematch = async ({ oldGameId, gameName, memberUIDs, rematchNumber }) => {
     const oldGameRef = this.firestore.doc(`/games/${oldGameId}`)

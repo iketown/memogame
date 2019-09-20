@@ -42,13 +42,6 @@ export const Roof = styled.div`
   justify-content: center;
   align-items: center;
 `
-const HouseContainer = () => {
-  return (
-    <HouseCtxProvider>
-      <House />
-    </HouseCtxProvider>
-  )
-}
 
 const House = () => {
   const { selectedRoom, setSelectedRoom } = useHouseCtx()
@@ -60,7 +53,7 @@ const House = () => {
   )
 
   return (
-    <StyledHouse>
+    <StyledHouse onClick={e => e.stopPropagation()}>
       <HouseGrid>
         <Roof />
         <div className="rooms">
@@ -89,4 +82,4 @@ const House = () => {
   )
 }
 
-export default HouseContainer
+export default House

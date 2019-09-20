@@ -15,7 +15,7 @@ const GamePlayCtx = createContext()
 export const GamePlayCtxProvider = ({ gameId, ...props }) => {
   const [gamePlay, setGamePlayINSTATE] = useState({})
   const { user } = useAuthCtx()
-  const { fdb, removeGameInvitation } = useFirebase()
+  const { fdb, removeGameInvitation, updateLastSeen } = useFirebase()
   const gamePlayListenerRef = useRef()
   const refStopper = useRef()
   const myGameState = useMemo(() => {
@@ -25,8 +25,12 @@ export const GamePlayCtxProvider = ({ gameId, ...props }) => {
       console.log("INVITE STILL EXISTS!")
       removeGameInvitation({ gameId })
     }
+    if (_myGameState && !_myGameState.lastSeen) {
+      console.log("UPDATING LAST SEEN")
+      updateLastSeen({ gameId })
+    }
     return _myGameState
-  }, [gameId, gamePlay, removeGameInvitation, user.uid])
+  }, [gameId, gamePlay, removeGameInvitation, updateLastSeen, user.uid])
 
   const myTotalCards = useMemo(() => {
     let allCards = []

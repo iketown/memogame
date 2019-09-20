@@ -9,6 +9,7 @@ import { DndProvider } from "react-dnd"
 import HTML5Backend from "react-dnd-html5-backend"
 import { Admin } from "../../hooks/Admin"
 import YourTurnDisplay from "./Timers/YourTurnDisplay"
+import { useHouseCtx, HouseCtxProvider } from "../../contexts/HouseContext"
 
 //
 //
@@ -28,7 +29,7 @@ function getTemplateAreas(width) {
   }
 }
 
-const ResponsiveGamePageGrid = styled.div`
+export const ResponsiveGamePageGrid = styled.div`
   width: 100%;
   height: calc(100vh - 75px);
   /* margin-top: 5px; */
@@ -67,9 +68,14 @@ const YourTurnSectionContainer = styled.div`
 `
 const GamePage = () => {
   const widthText = useWidth()
+  const { setSelectedRoom } = useHouseCtx()
   return (
     <DndProvider backend={HTML5Backend}>
-      <ResponsiveGamePageGrid mobileSize={widthText === "xs"} width={widthText}>
+      <ResponsiveGamePageGrid
+        onClick={() => setSelectedRoom({ roomId: "", faceUp: false })}
+        mobileSize={widthText === "xs"}
+        width={widthText}
+      >
         <ScoreSectionContainer>
           <ScoreSection />
         </ScoreSectionContainer>
@@ -81,7 +87,6 @@ const GamePage = () => {
         </CenterSection>
         <StorageSection className="text-center">
           <StorageShed />
-          {/* <Admin /> */}
         </StorageSection>
         <YourTurnSectionContainer>
           <YourTurnDisplay />
@@ -91,4 +96,12 @@ const GamePage = () => {
   )
 }
 
-export default GamePage
+const GamePageWithHouse = () => {
+  return (
+    <HouseCtxProvider>
+      <GamePage />
+    </HouseCtxProvider>
+  )
+}
+
+export default GamePageWithHouse

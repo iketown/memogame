@@ -1,5 +1,5 @@
-import React, { useMemo } from "react"
-import { Grid, Typography } from "@material-ui/core"
+import React, { useMemo, useEffect, useState } from "react"
+import { Grid, Typography, Button } from "@material-ui/core"
 //
 import { useGameCtx } from "../../contexts/GameCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
@@ -9,17 +9,31 @@ import PendingGameView from "./gameAdmin/PendingGameView.jsx"
 import SpinningPageLoader from "../SpinningPageLoader.jsx"
 import GamePage from "./GamePage.responsive.jsx"
 import GameOver from "../../pages/GameOver"
+import GameDoesntExist from "../../pages/gameStart/GameDoesntExist"
 //
 //
 const GameContent = () => {
   const { gameState } = useGameCtx("GameContent")
+  const [gameMissing, setGameMissing] = useState(false)
   const { user } = useAuthCtx()
   const memberUIDs = gameState && gameState.memberUIDs
   const thisIsYourGame = useMemo(
     () => gameState && gameState.startedBy === user.uid,
     [gameState, user.uid]
   )
-  if (!memberUIDs) return <SpinningPageLoader />
+
+  useEffect(() => {
+    let timeOut
+    if (!memberUIDs) {
+      // this game isnt working
+      timeOut = setTimeout(() => setGameMissing(true), 1000)
+    }
+    return () => clearTimeout(timeOut)
+  }, [memberUIDs])
+  if (!memberUIDs) {
+    return gameMissing ? <GameDoesntExist /> : <SpinningPageLoader />
+  }
+
   const youAreAMember = memberUIDs.includes(user.uid)
 
   const gameOn = gameState && gameState.inProgress

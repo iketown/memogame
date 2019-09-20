@@ -52,7 +52,7 @@ const ReceivedInvitesSection = ({ gameName, gameId }) => {
   // if you havent started any games, show list of invitations:
   return (
     <Card style={{ minWidth: "25rem" }}>
-      <CardHeader title="Invitations" />
+      <CardHeader title="You're Invited:" />
       <List>
         {receivedInvites.map(inv => {
           return (
