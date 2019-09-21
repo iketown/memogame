@@ -31,7 +31,6 @@ const ReorderPlaceholder = ({ thisRoom = [], roomId, children, index }) => {
       isOver: !!mon.isOver(),
       canDrop: !!mon.canDrop()
     }),
-    // hover: () => console.log("index", index),
     drop: item => {
       setSelectedRoom({ roomId, faceUp: true })
       return { droppedAt: roomId, index }

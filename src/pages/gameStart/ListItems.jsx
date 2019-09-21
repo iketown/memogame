@@ -29,7 +29,6 @@ export const FriendListItem = ({
   disabled = false
 }) => {
   const { avatarNumber, displayName, email, uid } = profile
-  console.log("friend profile", profile)
   return (
     <ListItem dense>
       <ListItemAvatar>
@@ -54,10 +53,10 @@ export const FriendListItem = ({
 export const InvitationListItem = ({ profile, invite, thisIsMe }) => {
   const { displayName, avatarNumber } = profile || {}
   const { invited: uid, inviteId, confirmed } = invite
-  const { doDisInvite } = useFirebase()
+  const { cancelInvitation } = useFirebase()
 
   function handleDisInvite(inviteId) {
-    doDisInvite({ inviteId, uid })
+    cancelInvitation({ inviteId, uid })
   }
   return (
     <ListItem>

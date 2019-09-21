@@ -26,14 +26,11 @@ const SignUpForm = () => {
   const { handleCloseForm } = useDialogCtx()
   const { user } = useAuthCtx()
   async function formSubmit(values) {
-    console.log("values", values)
     const { email, password, displayName, avatarNumber } = values
     const authUser = await doCreateUserWithEmailAndPassword(
       email.trim(),
       password.trim()
     )
-
-    console.log("authUser", authUser)
 
     firestore
       .collection("publicProfiles")
@@ -59,7 +56,6 @@ const SignUpForm = () => {
   return (
     <Form validate={validate} onSubmit={formSubmit}>
       {({ handleSubmit, values, hasValidationErrors, submitErrors }) => {
-        console.log("form errors", submitErrors)
         return (
           <StyledForm onSubmit={handleSubmit}>
             <Grid container spacing={2}>

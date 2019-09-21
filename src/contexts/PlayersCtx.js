@@ -18,7 +18,6 @@ export const PlayersCtxProvider = props => {
       const { friends = [] } = await profileRef.get().then(doc => doc.data())
       const newFriends = [...new Set([...friends, ...otherUIDs])]
       if (newFriends.length === friends.length) return null
-      console.log("friends", friends)
       profileRef.update({ friends: newFriends })
     }
     if (gameState && (gameState.memberUIDs || gameState.memberRequests)) {

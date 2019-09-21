@@ -36,7 +36,6 @@ const GameOver = ({ history }) => {
       oldGameId: gameId,
       rematchNumber: newRematchNumber
     }).then(({ newLoc }) => {
-      console.log("response from doRematch", newLoc)
       history.push(newLoc)
     })
   }
@@ -61,11 +60,9 @@ const GameOver = ({ history }) => {
                 .sort((a, b) => {
                   const aPoints = a[1].points || 0
                   const bPoints = b[1].points || 0
-                  console.log("comparing", aPoints, bPoints)
                   return aPoints < bPoints ? 1 : -1
                 })
                 .map(([id, gameState]) => {
-                  console.log("id,gameState", id, gameState)
                   return (
                     <ListItem dense>
                       <ListItemAvatar>

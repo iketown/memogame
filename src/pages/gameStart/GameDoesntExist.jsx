@@ -13,7 +13,7 @@ const FullPageDiv = styled.div`
 //
 //
 const GameDoesntExist = ({ history, match }) => {
-  const { doDisInvite, firestore } = useFirebase()
+  const { cancelInvitation, firestore } = useFirebase()
 
   function deleteInvites() {
     const gameId = match.params.gameId
@@ -23,7 +23,6 @@ const GameDoesntExist = ({ history, match }) => {
       .get()
       .then(snapshot => {
         snapshot.forEach(doc => {
-          console.log("deleting invite", doc.id)
           firestore.doc(`invites/${doc.id}`).delete()
         })
       })

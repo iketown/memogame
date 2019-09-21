@@ -15,7 +15,6 @@ import { FaArrowRight, FaTimes } from "react-icons/fa"
 const MyGamesPage = () => {
   const { user } = useAuthCtx()
   const [myGames, setMyGames] = useState([])
-  console.log("uid", user && user.uid)
   const { firestore } = useFirebase()
   useEffect(() => {
     if (user && user.uid) {
@@ -26,7 +25,6 @@ const MyGamesPage = () => {
         const _myGames = []
         querySnapshot.forEach(doc => {
           _myGames.push({ id: doc.id, ...doc.data() })
-          console.log("my game", doc.id, doc.data())
         })
         setMyGames(_myGames)
       })

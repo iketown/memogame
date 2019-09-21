@@ -20,7 +20,6 @@ const CenterSquareContainer = () => {
     accept: ItemTypes.CARD,
     canDrop: () => true,
     drop: (item, monitor) => {
-      console.log("item dropped in center", item)
       return { droppedAt: "center" }
     },
     collect: mon => ({
@@ -28,7 +27,6 @@ const CenterSquareContainer = () => {
       canDrop: !!mon.canDrop()
     })
   })
-  console.log("CenterSquare rendering container")
   return (
     <CenterSquare
       dropRef={dropRef}
@@ -40,7 +38,6 @@ const CenterSquareContainer = () => {
 }
 
 const CenterSquare = ({ centerCardPile, dropRef, isOver, canDrop }) => {
-  console.log("CenterSquare rendering")
   return (
     <div ref={dropRef}>
       <CenterPlate canDrop={canDrop} isOver={isOver}>
@@ -53,7 +50,6 @@ const CenterSquare = ({ centerCardPile, dropRef, isOver, canDrop }) => {
 }
 
 const PileOfCards = memo(({ centerCardPile = [] }) => {
-  console.log("CenterSquare rendering pile of cards", centerCardPile)
   return centerCardPile.map((itemId, index) => {
     return (
       <WindowCard scale={1.5} index={index + 2} key={itemId} itemId={itemId} />
@@ -62,7 +58,6 @@ const PileOfCards = memo(({ centerCardPile = [] }) => {
 }, propsEqual)
 
 function propsEqual(prev, next) {
-  console.log("CenterSquare props", prev, next)
   return isEqual(prev, next)
 }
 

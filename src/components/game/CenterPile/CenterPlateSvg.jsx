@@ -33,7 +33,6 @@ const PlateContainer = styled.div`
 //
 const CenterPlateSvg = memo(({ children, isOver, canDrop }) => {
   const mdUp = useWiderThan("md")
-  console.log("rendering CenterPlateSvg")
   const plate = useMemo(() => <PlateImage />, [])
   return (
     <PlateContainer
@@ -49,7 +48,6 @@ const CenterPlateSvg = memo(({ children, isOver, canDrop }) => {
 }, propsEqual)
 function propsEqual(prev, next) {
   const _equal = isEqual(prev, next)
-  console.log("CenterPlate props", prev, next, _equal)
   return _equal
 }
 

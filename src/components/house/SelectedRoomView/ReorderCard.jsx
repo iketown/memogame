@@ -50,7 +50,6 @@ const ReorderCard = ({
       isDragging: monitor.isDragging()
     }),
     end: async (item, mon) => {
-      console.log("mon get drop result", mon.getDropResult())
       if (mon.getDropResult()) {
         const { droppedAt } = mon.getDropResult()
         if (droppedAt === "center") {
@@ -102,7 +101,6 @@ const ReorderCard = ({
       houseToCenter({ roomId, itemId })
     }
   }
-  console.log("rendering ReorderCard", selectedRoom)
   return (
     <div style={{ position: "relative" }}>
       <div ref={node => drag(drop(node))} style={{ ...style, opacity }}>

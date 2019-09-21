@@ -17,28 +17,25 @@ export const GamePlayCtxProvider = ({ gameId, ...props }) => {
   const [whosOnline, setWhosOnline] = useState({})
 
   const { user } = useAuthCtx()
-  const { fdb, removeGameInvitation, updateLastSeen } = useFirebase()
+  const { fdb, cancelMyInviteFromThisGame, updateLastSeen } = useFirebase()
   const gamePlayListenerRef = useRef()
   const refStopper = useRef()
   const myGameState = useMemo(() => {
     const _myGameState =
       gamePlay && gamePlay.gameStates && gamePlay.gameStates[user.uid]
     if (_myGameState && _myGameState.inviteStillExists) {
-      console.log("INVITE STILL EXISTS!")
-      removeGameInvitation({ gameId })
+      cancelMyInviteFromThisGame({ gameId })
     }
     if (_myGameState && !_myGameState.lastSeen) {
-      console.log("UPDATING LAST SEEN")
       updateLastSeen({ gameId })
     }
     return _myGameState
-  }, [gameId, gamePlay, removeGameInvitation, updateLastSeen, user.uid])
+  }, [gameId, gamePlay, cancelMyInviteFromThisGame, updateLastSeen, user.uid])
 
   useEffect(() => {
     if (!!gamePlay && gamePlay.gameStates) {
       const _whosOnline = Object.entries(gamePlay.gameStates).reduce(
         (obj, [id, state]) => {
-          console.log("reducing", obj, id, state)
           const online = !!state.lastSeen && moment().diff(state.lastSeen)
           // either truthy or false
           obj[id] = online
@@ -74,13 +71,11 @@ export const GamePlayCtxProvider = ({ gameId, ...props }) => {
     const gamePlayRef = fdb.ref(`/currentGames/${gameId}`)
     if (!gamePlayListenerRef.current) {
       gamePlayListenerRef.current = gamePlayRef.on("value", snapshot => {
-        console.log("gamePlay update", snapshot.val(), moment().toISOString())
         const newValue = snapshot.val()
         setGamePlay(newValue)
       })
     } else {
       refStopper.current = refStopper.current ? refStopper.current + 1 : 1
-      console.log("ref stopped another listener", refStopper.current)
     }
   }, [fdb, gameId, gamePlay])
 
@@ -99,7 +94,6 @@ export const useGamePlayCtx = calledBy => {
       "useGamePlay must be a descendant of GamePlayCtxProvider 😕"
     )
 
-  console.log("useGamePlayCtx called by", calledBy)
   const { gamePlay, myGameState, myTotalCards, whosOnline } = ctx
   return { gamePlay, myGameState, myTotalCards, whosOnline }
 }

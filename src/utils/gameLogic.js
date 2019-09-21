@@ -6,13 +6,14 @@ export function shuffle(array) {
     let j = Math.floor(Math.random() * (i + 1)) // random index from 0 to i
     ;[newArray[i], newArray[j]] = [newArray[j], newArray[i]] // swap elements
   }
-  console.log("newArray", newArray)
   return newArray
 }
 
 export const doItemsMatch = (itemId1, itemId2) => {
   if (!itemId1 || !itemId2) {
-    console.log(`zero or one items provided item1:${itemId1} item2:${itemId2}`)
+    console.error(
+      `zero or one items provided item1:${itemId1} item2:${itemId2}`
+    )
     return { color: false, type: false, firstLetter: false }
   }
   const [color1, type1, let1] = itemId1.split("_")

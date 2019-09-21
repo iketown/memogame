@@ -17,7 +17,6 @@ import { usePlayersCtx } from "../contexts/PlayersCtx"
 import { getGameScores } from "../pages/GameOver"
 
 export const useGameFxnsLOC = byWho => {
-  console.log("useGameFxnsLOC called by", byWho)
   const { gameId, gameState } = useGameCtx("useGameFxns")
   const { players } = usePlayersCtx()
   const { gamePlay, myTotalCards } = useGamePlayCtx("useGameFxns")
@@ -61,18 +60,12 @@ export const useGameFxnsLOC = byWho => {
     [myGameState]
   )
   const handleGameOver = useCallback(() => {
-    console.log("game is OVER! newGameState")
     const scores = getGameScores({ gamePlay, players })
     handleEndGame({ gameId, scores })
   }, [gameId, gamePlay, handleEndGame, players])
 
   const _sendNewGameState = useCallback(
     ({ centerCardPile, myUpdateObj, whosTurnItIs, calledFrom }) => {
-      console.log(`sending newGameState from ${calledFrom}`, {
-        centerCardPile,
-        myUpdateObj,
-        whosTurnItIs
-      })
       if (!gamePlay) throw new Error("missing gamePlay")
       if (!!myUpdateObj) {
         myUpdateObj.lastSeen = moment().toISOString()
@@ -102,7 +95,7 @@ export const useGameFxnsLOC = byWho => {
       const gameIsOver = amIDone({ myUpdateObj })
       if (gameIsOver) handleGameOver()
     },
-    [amIDone, fdb, gameId, gamePlay, handleGameOver, user.uid]
+    [amIDone, fdb, gameId, gamePlay, handleGameOver, user]
   )
 
   function _addPoints(quantity) {
@@ -259,7 +252,6 @@ export const useGameFxnsLOC = byWho => {
       myUpdateObj: { storagePile, points },
       calledFrom: "storageToCenter"
     }
-    console.log("storageToCenter newGameState", newGameState)
     _sendNewGameState(newGameState)
   }
   function houseToCenter({ roomId, itemId, noPoints }) {
@@ -288,7 +280,6 @@ export const useGameFxnsLOC = byWho => {
       throw new Error(`these should match ${movingId} / ${itemId}`)
     newRoom.splice(destIndex, 0, movingId)
     const myUpdateObj = { house: { ...myGameState.house, [roomId]: newRoom } }
-    console.log("newGameState reorderRoom", myUpdateObj)
     const whosTurnItIs = _updateWhosTurnItIs({
       endTurnBool: false,
       extendEndTurnTime: false

@@ -2,16 +2,13 @@ import React, { useEffect } from "react"
 import Sound from "react-sound"
 import dropCardContinue from "./dropCardContinue.mp3"
 import buzzWrong from "./buzz-wrong.mp3"
-import { useGameFxns } from "../hooks/useGameFxns"
 import { useSoundCtx } from "../contexts/GameCtx"
 
 //
 //
 const DropCardSound = () => {
   const { playDropCardSound, cancelDropCardSound } = useSoundCtx()
-  useEffect(() => {
-    console.log("playDropCardSound in dropcardsound", playDropCardSound)
-  }, [playDropCardSound])
+  useEffect(() => {}, [playDropCardSound])
   return (
     <>
       <Sound

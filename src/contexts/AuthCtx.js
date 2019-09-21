@@ -22,7 +22,7 @@ export const AuthCtxProvider = props => {
         if (doc.data()) {
           setPublicProfile(doc.data())
         } else {
-          console.log("no public profile for ", user)
+          console.error("no public profile for ", user)
         }
       })
       return unsubscribe

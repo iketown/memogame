@@ -80,7 +80,6 @@ const RoomDnDContainer = ({ title, handleSelectRoom }) => {
 
 const RoomDnD = memo(
   ({ title, handleSelectRoom, heightText, smallUp, thisRoom }) => {
-    console.log("rendering RoomDnD", title)
     return (
       <Room
         height={heightText}

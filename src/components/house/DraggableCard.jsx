@@ -18,7 +18,6 @@ import { usePointsCtx } from "../../contexts/GameCtx"
 
 const DraggableCard = ({ itemId, scale, index, source }) => {
   // draggableCard is the top card in the storage pile.
-  console.log("draggableCard renders", itemId, scale, index, source)
   const { gamePlay } = useGamePlayCtx("DraggableCard")
   const { storageToCenter, storageToHouse } = useGameFxnsLOC()
   const { resetPointsClimber } = usePointsCtx()
@@ -28,7 +27,6 @@ const DraggableCard = ({ itemId, scale, index, source }) => {
   const [{ isDragging }, dragRef] = useDrag({
     item: { type: ItemTypes.CARD, itemId, source },
     end: async (item, mon) => {
-      console.log("mon get drop result", mon.getDropResult())
       // cancelMovingCard()
       if (mon.getDropResult()) {
         const { droppedAt, index } = mon.getDropResult()
@@ -57,7 +55,7 @@ const DraggableCard = ({ itemId, scale, index, source }) => {
       onDoubleClick={
         isMyTurn
           ? () => storageToCenter({ itemId })
-          : () => console.log("not your turn")
+          : () => console.error("not your turn")
       }
       ref={dragRef}
       style={{

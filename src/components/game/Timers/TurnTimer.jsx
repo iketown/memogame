@@ -23,7 +23,6 @@ const TurnTimer = ({ playerId, children, render = () => null }) => {
   const initialTime = moment(endTurnTime).diff(moment())
   useEffect(() => {
     if (moment(endTurnTime).add(10, "seconds") < moment()) {
-      console.log("forcing turn change")
       handleChangeTurn()
     }
   }, [endTurnTime, handleChangeTurn])

@@ -60,7 +60,6 @@ const PendingGameView = () => {
                   handleClick={
                     myGame
                       ? () => {
-                          console.log("kicking out", uid)
                           removeFromGame({ uid })
                         }
                       : false
@@ -81,7 +80,6 @@ const PendingGameView = () => {
                       handleClick={
                         myGame
                           ? () => {
-                              console.log("allowing in ", uid)
                               handleGameRequest({
                                 requestingUID: uid,
                                 approvedBool: true

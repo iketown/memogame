@@ -8,13 +8,13 @@ import SpinningPageLoader from "../../components/SpinningPageLoader"
 
 const ConfirmedInvite = ({ confirmedInvites = [], history }) => {
   const invite = confirmedInvites[0]
-  const { firestore, doDisInvite } = useFirebase()
+  const { firestore, cancelInvitation } = useFirebase()
   const [gameReady, setGameReady] = useState(false)
   function handleGoToGame() {
     history.push(`/game/${invite.gameId}`)
   }
   function handleCancel(inviteId) {
-    doDisInvite({ inviteId })
+    cancelInvitation({ inviteId })
   }
 
   if (invite && invite.started && !gameReady) {

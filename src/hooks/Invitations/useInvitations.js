@@ -10,7 +10,6 @@ export const useInvitations = () => {
 
   useEffect(() => {
     if (user) {
-      console.log("calling for sent Invites")
       const myInvitesRef = firestore
         .collection("invites")
         .where("invitedBy", "==", user.uid)
@@ -25,7 +24,6 @@ export const useInvitations = () => {
 
   useEffect(() => {
     if (user) {
-      console.log("calling for received Invites")
       const myRecdInvitesRef = firestore
         .collection("invites")
         .where("invited", "==", user.uid)

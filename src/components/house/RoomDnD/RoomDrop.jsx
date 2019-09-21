@@ -55,7 +55,6 @@ const RoomDrop = ({ children, roomId, thisRoom = [], handleSelectRoom }) => {
     }),
     canDrop: () => canDropBool
   })
-  console.log("rendering DnD roomdrop", roomId)
   return (
     <StyledRoomContainer isOver={isOver} canDrop={canDrop} ref={dropRef}>
       {children}

@@ -68,13 +68,9 @@ const Blinker = memo(
           cardCountRef.current[0] !== centerCardPile[0]
         ) {
           const quantity = Math.max(1, cardCountRef.current - pileCount)
-          console.log("quantity cardCount", quantity)
           setBlinking({ color: "red", quantity })
         }
         if (cardCountRef.current < pileCount) {
-          console.log("GAINED SOME cardCount")
-          console.log("cardCountRef.current cardCount", cardCountRef.current)
-          console.log("pileCount cardCount", pileCount)
           const quantity = 1
           setBlinking({ color: "green", quantity })
         }
@@ -101,7 +97,6 @@ const Blinker = memo(
       green: "#3fff0069",
       red: "#ff000052"
     }
-    console.log("cardCount blinking", blinking)
     return (
       <>
         <BlinkingDiv

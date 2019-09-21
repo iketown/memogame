@@ -20,7 +20,6 @@ const StorageShedContainer = () => {
 }
 
 const StorageShed = memo(({ storagePile, heightText }) => {
-  console.log("StorageShed renders", storagePile)
   const { user } = useAuthCtx()
   return (
     <CenterPlate>

@@ -31,9 +31,6 @@ class Firebase {
       firebase.initializeApp(firebaseConfig)
     }
     this.auth = firebase.auth()
-    this.fxns = firebase.functions()
-    this.endTurn = firebase.functions().httpsCallable("endTurn")
-    this.houseToCenter = firebase.functions().httpsCallable("houseToCenter")
     this.app = firebase
     this.fdb = firebase.database()
     this.firestore = firebase.firestore()
@@ -63,10 +60,10 @@ class Firebase {
 
   //// ⭐   Game Admin API   ⭐ ////
 
-  doProposeGame = ({ gameName }) => {
+  proposeGame = ({ gameName }) => {
     const user = this.auth.currentUser
     if (!user) {
-      console.log("trying to create a game when not signed in")
+      console.error("trying to create a game when not signed in")
       return null
     }
     const gamesRef = this.firestore.collection("games")
@@ -77,7 +74,7 @@ class Firebase {
       completed: false
     })
   }
-  doCreateGameFromInvites = ({ memberUIDs, gameId, gameName }) => {
+  createGameFromInvites = ({ memberUIDs, gameId, gameName }) => {
     const _promises = []
     const user = this.auth.currentUser
     const gameRef = this.fdb.ref(`/currentGames/${gameId}`)
@@ -133,15 +130,15 @@ class Firebase {
       timeStamp: moment().toISOString()
     })
   }
-  doDisInvite = ({ inviteId, uid }) => {
+  cancelInvitation = ({ inviteId, uid }) => {
     const user = this.auth.currentUser
     if (uid === user.uid) {
-      console.log("dont disinvite yourself")
+      console.error("dont disinvite yourself")
       return null
     }
     return this.firestore.doc(`/invites/${inviteId}`).delete()
   }
-  removeGameInvitation = async ({ gameId }) => {
+  cancelMyInviteFromThisGame = async ({ gameId }) => {
     const user = this.auth.currentUser
     const inviteRef = this.firestore
       .collection("invites")
@@ -150,12 +147,10 @@ class Firebase {
     const docs = await inviteRef.get().then(snapshot => {
       const _docs = []
       snapshot.forEach(doc => {
-        console.log("game invitation doc", doc.data())
         _docs.push(doc.id)
       })
       return _docs
     })
-    console.log("game invitation docs", docs)
     await Promise.all(
       docs.map(docId => this.firestore.doc(`invites/${docId}`).delete())
     )
@@ -164,7 +159,6 @@ class Firebase {
       `/currentGames/${gameId}/gameStates/${user.uid}`
     )
     await myGameStateRef.update({ inviteStillExists: false })
-    console.log("invite has been obliterated")
   }
   doAcceptInvite = ({ inviteId }) => {
     return this.firestore
@@ -175,7 +169,6 @@ class Firebase {
     return this.firestore.doc(`/invites/${inviteId}`).update({ started: true })
   }
   updateLastSeen = ({ gameId }) => {
-    console.log("UPDATING LAST SEEN 2")
     const user = this.auth.currentUser
     const myGameStateRef = this.fdb.ref(
       `/currentGames/${gameId}/gameStates/${user.uid}`
@@ -206,74 +199,7 @@ class Firebase {
       .then(() => ({ newLoc: rematchLoc }))
   }
 
-  doRequestToJoinGame = async gameId => {
-    // request to join PENDING game.  you cant join a currentGame rightnow.
-    // so you should also not be able to request to join a game that is inProgress
-    const uid = this.auth.currentUser.uid
-    const displayName =
-      this.auth.currentUser.displayName || this.auth.currentUser.email
-    const game = await this.getPendingGameValues(gameId)
-    let { memberUIDs, maxMembers, memberRequests = [] } = game
-    const iAmInThisGame = memberUIDs.includes(uid)
-    const iAlreadyRequested = memberRequests.find(mem => mem.uid === uid)
-    if (
-      memberUIDs.length < maxMembers &&
-      !iAmInThisGame &&
-      !iAlreadyRequested
-    ) {
-      memberRequests.push(uid)
-    }
-    this.savePendingGameValues({ gameId, values: { ...game, memberRequests } })
-  }
-  doHandleGameRequest = async ({ gameId, uid, approved }) => {
-    console.log("gameId, uid, approved", gameId, uid, approved)
-    const game = await this.getPendingGameValues(gameId)
-    // let newMembers = [...game.members]
-    let newRequests = [...game.memberRequests]
-    let memberUIDs = [...game.memberUIDs]
-    const requestingMember = newRequests.find(mem => mem.uid === uid)
-    if (approved && requestingMember) {
-      // newMembers.push(requestingMember)
-      memberUIDs.push(uid)
-    }
-    const memberRequests = newRequests.filter(mem => mem.uid !== uid)
-    this.savePendingGameValues({
-      gameId,
-      values: { ...game, memberRequests, memberUIDs }
-    })
-  }
-  doExitFromGame = async ({ gameId, uid }) => {
-    const _uid = uid || this.auth.currentUser.uid
-    const game = await this.getPendingGameValues(gameId)
-    let { members } = game
-    const newMembers = members.filter(mem => mem.uid !== _uid)
-    this.savePendingGameValues({
-      gameId,
-      values: { ...game, members: newMembers }
-    })
-  }
-  getPendingGameValues = gameId => {
-    const gameRef = this.fdb.ref(`/pendingGames/${gameId}`)
-    let gameValues
-    gameRef.once("value", snap => {
-      gameValues = snap.val()
-    })
-    return gameValues
-  }
-  savePendingGameValues = ({ gameId, values }) => {
-    const gameRef = this.fdb.ref(`/pendingGames/${gameId}`)
-    gameRef.set({ ...values })
-  }
-
-  doCancelGame = async gameId => {
-    const gameRef = this.fdb.ref(`/pendingGames/${gameId}`)
-    const { startedBy } = await this.getPendingGameValues(gameId)
-    console.log("startedBy", startedBy)
-    const { uid } = this.auth.currentUser
-    if (startedBy === uid) gameRef.remove()
-  }
   deleteGame = async ({ gameId }) => {
-    console.log("deleting game", gameId)
     const gameRef = this.fdb.ref(`/currentGames/${gameId}`)
     const firestoreRef = this.firestore.doc(`/games/${gameId}`)
     gameRef.remove()

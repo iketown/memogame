@@ -40,9 +40,9 @@ export const MyGameSection = ({
   const { friendProfiles, sentInvites } = useInvitationCtx()
   const {
     doSendInvite,
-    doDisInvite,
+    cancelInvitation,
     convertInviteToGame,
-    doCreateGameFromInvites
+    createGameFromInvites
   } = useFirebase()
   const { dispatch } = useDialogCtx()
   function handleSendInvite({ uid }) {
@@ -53,13 +53,11 @@ export const MyGameSection = ({
   )
   const confirmedInvites = sentInvites.filter(inv => inv.confirmed)
   const unconfirmedInvites = sentInvites.filter(inv => !inv.confirmed)
-  function handleCancelGame() {
+  async function handleCancelGame() {
     const promises = sentInvites.map(({ inviteId }) =>
-      doDisInvite({ inviteId })
+      cancelInvitation({ inviteId })
     )
-    Promise.all(promises).then(responses => {
-      console.log("responses", responses)
-    })
+    await Promise.all(promises)
     handleCancelGameName()
   }
   async function handleStartGame() {
@@ -68,23 +66,20 @@ export const MyGameSection = ({
     })
     await Promise.all(promises)
     const memberUIDs = sentInvites.map(({ invited }) => invited)
-    const responses = await doCreateGameFromInvites({
+    const responses = await createGameFromInvites({
       memberUIDs,
       gameId,
       gameName
     })
-    console.log("responses handleStartGame", responses)
     // remove unconfirmed invitations
     cancelUnconfirmedInvites()
     history.push(`/game/${gameId}`)
   }
-  function cancelUnconfirmedInvites() {
+  async function cancelUnconfirmedInvites() {
     const promises = unconfirmedInvites.map(({ inviteId }) =>
-      doDisInvite({ inviteId })
+      cancelInvitation({ inviteId })
     )
-    Promise.all(promises).then(responses => {
-      console.log("responses", responses)
-    })
+    await Promise.all(promises)
   }
   return (
     <Card style={{ minWidth: "20rem" }}>

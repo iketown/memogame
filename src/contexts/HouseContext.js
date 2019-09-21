@@ -23,7 +23,6 @@ export const HouseCtxProvider = props => {
       .toISOString()
   }
   const setSelectedRoomAndLog = useCallback(args => {
-    console.log("setSelectedRoom", args)
     if (args.faceUp) {
       setSelectedRoom(old => ({ ...args, expiryTime: expiryTime() }))
     } else {
@@ -31,7 +30,6 @@ export const HouseCtxProvider = props => {
     }
   }, [])
   const resetRoomTimer = useCallback(() => {
-    console.log("resetting room timer?")
     setSelectedRoom(old => ({ ...old, expiryTime: expiryTime() }))
   }, [])
   const onTimerEnd = useCallback(() => {

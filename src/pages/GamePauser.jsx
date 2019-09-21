@@ -47,12 +47,10 @@ const GamePauser = ({ whosTurnItIs }) => {
       if (whosTurnItIs.lastCheckIn) {
         const secondsSinceLastCheckin =
           moment().diff(moment(whosTurnItIs.lastCheckIn)) / 1000
-        console.log("seconds since lastCheckin", secondsSinceLastCheckin)
         if (secondsSinceLastCheckin > secondsBeforePause) pauseGame()
       } else {
         const secondsSinceTurnStarted =
           moment().diff(moment(whosTurnItIs.lastCheckIn)) / 1000
-        console.log("seconds since turn started", secondsSinceTurnStarted)
         if (secondsSinceTurnStarted > secondsBeforePause) pauseGame()
       }
     }
@@ -76,7 +74,6 @@ const GamePauser = ({ whosTurnItIs }) => {
 const MemoGamePauser = memo(GamePauser, sameProps)
 function sameProps(prev, next) {
   const _equal = isEqual(prev.whosTurnItIs, next.whosTurnItIs)
-  console.log("GamePauser equal ?", _equal)
   return _equal
 }
 

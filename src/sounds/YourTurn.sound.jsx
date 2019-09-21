@@ -85,7 +85,6 @@ const YourTurnSound = ({ whosTurnUid }) => {
 
 const MemoYourTurnSound = memo(YourTurnSound, propsEqual)
 function propsEqual(prev, next) {
-  console.log("YourTurnSound props equal", prev, next)
   return false
 }
 

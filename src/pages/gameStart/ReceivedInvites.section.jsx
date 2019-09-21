@@ -28,7 +28,12 @@ import { FaTimesCircle, FaThumbsUp, FaThumbsDown } from "react-icons/fa"
 //
 
 const ReceivedInvitesSection = ({ gameName, gameId }) => {
-  const { firestore, doSendInvite, doDisInvite, doAcceptInvite } = useFirebase()
+  const {
+    firestore,
+    doSendInvite,
+    cancelInvitation,
+    doAcceptInvite
+  } = useFirebase()
   const { receivedInvites } = useInvitationCtx()
   const { user, publicProfile } = useAuthCtx()
 
@@ -37,7 +42,7 @@ const ReceivedInvitesSection = ({ gameName, gameId }) => {
     doSendInvite({ uid, gameName, gameId, displayName, avatarNumber })
   }
   function handleReject(inviteId) {
-    doDisInvite({ inviteId })
+    cancelInvitation({ inviteId })
   }
   function handleAccept(inviteId) {
     doAcceptInvite({ inviteId })
@@ -95,17 +100,9 @@ const MyGameSection = ({ myGames }) => {
   // following one of the other invites means cancelling this one.
   const { user, publicProfile } = useAuthCtx()
   const game = myGames[0]
-  const {
-    avatarNumber,
-    confirmed,
-    displayName,
-    gameId,
-    gameName,
-    inviteId,
-    timeStamp
-  } = game
+  const { avatarNumber, displayName, gameId, gameName, timeStamp } = game
   const { friendProfiles, sentInvites } = useInvitationCtx()
-  const { doSendInvite, doDisInvite } = useFirebase()
+  const { doSendInvite, cancelInvitation } = useFirebase()
 
   function handleSendInvite({ uid }) {
     doSendInvite({ uid, displayName, avatarNumber, gameName, gameId })
@@ -113,13 +110,11 @@ const MyGameSection = ({ myGames }) => {
   const uninvitedFriends = friendProfiles.filter(
     friend => !sentInvites.find(inv => inv.invited === friend.uid)
   )
-  function handleCancelGame() {
+  async function handleCancelGame() {
     const promises = sentInvites.map(({ inviteId }) =>
-      doDisInvite({ inviteId })
+      cancelInvitation({ inviteId })
     )
-    Promise.all(promises).then(responses => {
-      console.log("responses", responses)
-    })
+    await Promise.all(promises)
   }
   return (
     <Card style={{ minWidth: "20rem" }}>

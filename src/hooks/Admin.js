@@ -21,9 +21,7 @@ export const Admin = () => {
       const endTurnTime = whosTurnItIs.endTurnTime
       if (!endTurnTime) throw new Error("missing endTurnTime")
       const msUntilTurnOver = moment(endTurnTime).diff(moment())
-      console.log("seconds left", msUntilTurnOver / 1000)
       const timeOut = setTimeout(() => {
-        console.log("TURN IS OVER.  changing player", moment().toISOString())
         forceNextTurn()
       }, msUntilTurnOver)
       return clearTimeout(timeOut)

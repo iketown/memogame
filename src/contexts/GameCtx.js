@@ -133,118 +133,28 @@ export const usePointsCtx = () => {
 const GameCtx = createContext()
 export const GameCtxProvider = props => {
   const { firestore } = useFirebase()
-  const { fdb } = useFirebase()
   const [gameState, setGameStateR] = useState({})
 
   function setGameState(newState) {
-    console.log("setting game state", newState)
     setGameStateR(newState)
   }
   const gameId = props.gameId
 
   useEffect(() => {
     const gameRef = firestore.doc(`/games/${gameId}`)
-    gameRef.onSnapshot(doc => {
-      console.log("new snapshot")
-      const compareFirst = true
+    const unsubscribe = gameRef.onSnapshot(doc => {
       const values = doc.data()
-      if (compareFirst) {
-        const newGameStateJson = JSON.stringify({ ...values, gameId })
-        const oldStateJson = JSON.stringify(gameState)
-        if (newGameStateJson !== oldStateJson) {
-          console.log("update gameState")
-          setGameState({ ...values, gameId })
-        } else {
-          console.log("not gonna update gameState")
-        }
-      } else {
-        console.log("updating gameState")
-        setGameState({ ...values, gameId })
-      }
-      // if (values) {
-      //   setGameState({ ...values, gameId })
-      // }
+      setGameState({ ...values, gameId })
     })
-  }, [firestore, gameId, gameState])
-
-  const randomListOfItemIds = useCallback(uid => {
-    const allIds = Object.keys(allItems).map(key => `${key}_${uid}`) // add uid to each person's cards so you know where they started, and so they stay unique
-    const shuffledIds = shuffle(allIds)
-    return shuffledIds
-  }, [])
-
-  const createRTDBGame = useCallback(() => {
-    const gamePlayRef = fdb.ref(`/currentGames/${gameId}`)
-    const { gameName, startedBy, memberUIDs } = gameState
-
-    const gameStates = memberUIDs.reduce((obj, uid) => {
-      const storagePile = randomListOfItemIds(uid)
-      obj[uid] = {
-        storagePile,
-        house: {}
-      }
-      return obj
-    }, {})
-    gamePlayRef.set({
-      gameName,
-      startedBy,
-      memberUIDs,
-      whosTurnItIs: { uid: memberUIDs[0], startTime: moment().toISOString() },
-      centerPile: [],
-      gameStates
-    })
-  }, [fdb, gameId, gameState, randomListOfItemIds])
-
-  // const totalCards = useMemo(() => {
-  //   if (!gamePlay) return null
-  //   // return null
-  //   const centerCards = gamePlay.centerCardPile
-
-  //   const storageCards =
-  //     gamePlay.gameStates &&
-  //     Object.values(gamePlay.gameStates).reduce((arr, state) => {
-  //       if (state.storagePile) {
-  //         arr.push(...state.storagePile)
-  //       }
-  //       return arr
-  //     }, [])
-
-  //   const houseCards =
-  //     gamePlay.gameStates &&
-  //     Object.values(gamePlay.gameStates).reduce((arr, state) => {
-  //       if (state.house) {
-  //         Object.values(state.house).forEach(room => arr.push(...room))
-  //       }
-  //       return arr
-  //     }, [])
-  //   if (gamePlay.gameStates) {
-  //     Object.values(gamePlay.gameStates).forEach(gameState => {
-  //       const { house, storagePile } = gameState
-  //       if (house) {
-  //         Object.values(house).forEach(room => {
-  //           houseCards.concat(room)
-  //         })
-  //       }
-  //       if (storagePile && storagePile.length) {
-  //         storageCards.concat(...storagePile)
-  //       }
-  //     })
-  //   }
-
-  //   const center = (centerCards && centerCards.length) || 0
-  //   const houses = (houseCards && houseCards.length) || 0
-  //   const storage = (storageCards && storageCards.length) || 0
-  //   return { center, houses, storage, total: center + houses + storage }
-  // }, [])
+    return unsubscribe
+  }, [firestore, gameId])
 
   if (!gameId) return null
   return (
     <GameCtx.Provider
       value={{
         gameState,
-        firestore,
-        gameId,
-        createRTDBGame
+        gameId
       }}
       {...props}
     />
@@ -252,119 +162,13 @@ export const GameCtxProvider = props => {
 }
 
 export const useGameCtx = byWho => {
-  console.log("useGameCtx called by", byWho)
   const ctx = useContext(GameCtx)
-  const { user } = useAuthCtx()
-  const { firestore } = useFirebase()
   if (!ctx)
     throw new Error("useGameCtx must be a descendant of GameCtxProvider 😕")
-  const { gameState, gameId, gamePlay, createRTDBGame, totalCards } = ctx
-  //
-
-  const _getGameFirestore = async () => {
-    const gameRef = firestore.doc(`games/${gameId}`)
-    const gameInfo = await gameRef
-      .get()
-      .then(doc => {
-        if (doc.exists) {
-          return doc.data()
-        } else {
-          console.log("no such doc.")
-        }
-      })
-      .catch(err => {
-        console.log("error!", err)
-      })
-    return { gameRef, gameInfo }
-  }
-  //
-  const requestJoinGame = async () => {
-    console.log(`requesting ${user.email} to join game ${gameId}`)
-    const { gameRef, gameInfo } = await _getGameFirestore()
-    if (!gameInfo.inProgress) {
-      gameRef.update({
-        memberRequests: firebase.firestore.FieldValue.arrayUnion(user.uid)
-      })
-    } else {
-      console.log("cant join this list")
-    }
-  }
-  const removeRequest = async () => {
-    console.log(`removing ${user.email} from request list - ${gameId}`)
-    const { gameRef } = await _getGameFirestore()
-    gameRef.update({
-      memberRequests: firebase.firestore.FieldValue.arrayRemove(user.uid)
-    })
-  }
-  const setGameInProgress = async () => {
-    const { gameRef } = await _getGameFirestore()
-    const startedAt = moment().toISOString()
-    gameRef.update({
-      inProgress: true,
-      startedAt
-    })
-  }
-  const openGameToNewPlayers = async () => {
-    const { gameRef } = await _getGameFirestore()
-    gameRef.update({
-      inProgress: false
-    })
-  }
-  const removeFromGame = async ({ uid }) => {
-    const { gameRef, gameInfo } = await _getGameFirestore()
-    const newMemberRequests = [...gameInfo.memberRequests, uid]
-    const newMemberUIDs = gameInfo.memberUIDs.filter(_uid => _uid !== uid)
-    return gameRef.update({
-      memberRequests: newMemberRequests,
-      memberUIDs: newMemberUIDs
-    })
-  }
-  const changeGameParameter = async ({ key, value }) => {
-    const { gameRef } = await _getGameFirestore()
-    gameRef.update({ [key]: value })
-  }
-  const handleGameRequest = async ({ requestingUID, approvedBool }) => {
-    const { gameRef, gameInfo } = await _getGameFirestore()
-    if (gameInfo.startedBy !== user.uid) {
-      console.log("not your game", gameInfo.startedBy, user.uid)
-      return null
-    }
-    const requester = gameInfo.memberRequests.find(uid => uid === requestingUID)
-    if (!requester) {
-      console.log("person not found")
-      return "sorry, person not found"
-    }
-
-    // remove person from request list
-    const newRequests = gameInfo.memberRequests.filter(
-      uid => uid !== requestingUID
-    )
-    // add person to members if approved
-    // const newMembers = [...gameInfo.members]
-    const newMemberUIDs = [...gameInfo.memberUIDs]
-    if (approvedBool) {
-      // newMembers.push(requester)
-      newMemberUIDs.push(requestingUID)
-    }
-    gameRef.update({
-      memberRequests: newRequests,
-      // members: newMembers,
-      memberUIDs: newMemberUIDs
-    })
-  }
+  const { gameState, gameId } = ctx
 
   return {
     gameState,
-    gamePlay,
-    gameId,
-    requestJoinGame,
-    removeRequest,
-    handleGameRequest,
-    removeFromGame,
-    createRTDBGame,
-    setGameInProgress,
-    openGameToNewPlayers,
-    totalCards,
-    changeGameParameter
+    gameId
   }
 }

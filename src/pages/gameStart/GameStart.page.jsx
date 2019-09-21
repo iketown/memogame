@@ -59,7 +59,7 @@ const GameStart = () => {
   const [gameName, setGameName] = useState("")
   const [gameNameLocked, setGameNameLocked] = useState(false)
   const [gameId, setGameId] = useState()
-  const { doCreateGame, doProposeGame, doSendInvite } = useFirebase()
+  const { doCreateGame, proposeGame, doSendInvite } = useFirebase()
   const { receivedInvites } = useInvitationCtx()
   const { user, publicProfile } = useAuthCtx()
 
@@ -72,7 +72,7 @@ const GameStart = () => {
     setGameNameLocked(true)
     const { avatarNumber, displayName } = publicProfile
 
-    doProposeGame({ gameName })
+    proposeGame({ gameName })
       .then(({ id }) => {
         setGameId(id)
         return id
@@ -157,118 +157,5 @@ const NameGameSection = ({
     </StyledFlexColumn>
   )
 }
-
-// const InviteFriendsSection = ({ gameName, gameId }) => {
-//   const { friendProfiles, sentInvites } = useInvitationCtx()
-//   const { doSendInvite, doDisInvite } = useFirebase()
-//   const { user, publicProfile } = useAuthCtx()
-
-//   const confirmedInvites = sentInvites.filter(inv => !!inv.confirmed)
-//   const unconfirmedInvites = sentInvites.filter(inv => !inv.confirmed)
-//   function handleInvite(uid) {
-//     const { displayName, avatarNumber } = publicProfile
-//     doSendInvite({ uid, gameName, gameId, displayName, avatarNumber })
-//   }
-
-//   return (
-//     <Grid container item xs={12}>
-//       <Grid xs={12}>
-//         <Typography variant="h4" gutterBottom>
-//           2. Invite friends to <b>{gameName}</b>
-//         </Typography>
-//       </Grid>
-//       <Grid item xs={12} md={4}>
-//         <Card>
-//           <CardHeader title="friends" />
-//           <List>
-//             {friendProfiles.map(
-//               ({ avatarNumber, displayName, email, uid }, index) => {
-//                 const alreadyInvited = !!sentInvites.find(
-//                   inv => inv.invited === uid
-//                 )
-//                 return (
-//                   <ListItem>
-//                     <ListItemAvatar>
-//                       <AvatarMonster num={avatarNumber} />
-//                     </ListItemAvatar>
-//                     <ListItemText primary={displayName} />
-//                     <ListItemSecondaryAction>
-//                       <Button
-//                         disabled={alreadyInvited}
-//                         onClick={() => handleInvite(uid)}
-//                       >
-//                         {alreadyInvited ? ":)" : "invite"}
-//                       </Button>
-//                     </ListItemSecondaryAction>
-//                   </ListItem>
-//                 )
-//               }
-//             )}
-//           </List>
-//         </Card>
-//       </Grid>
-//       <Grid item xs={12} md={4}>
-//         <Card>
-//           <CardHeader title="players" />
-//           <List>
-//             <ListSubheader children="confirmed" />
-//             {confirmedInvites.map(invite => {
-//               let profile = friendProfiles.find(pf => pf.uid === invite.invited)
-//               if (invite.invited === user.uid) {
-//                 profile = publicProfile
-//               }
-//               return (
-//                 <InvitationListItem
-//                   key={invite.invited}
-//                   profile={profile}
-//                   invite={invite}
-//                 />
-//               )
-//             })}
-//             <ListSubheader children="unconfirmed" />
-//             {unconfirmedInvites.map(invite => {
-//               const profile = friendProfiles.find(
-//                 pf => pf.uid === invite.invited
-//               )
-//               return (
-//                 <InvitationListItem
-//                   key={invite.invited}
-//                   profile={profile}
-//                   invite={invite}
-//                 />
-//               )
-//             })}
-//           </List>
-//         </Card>
-//       </Grid>
-//     </Grid>
-//   )
-// }
-
-// const InvitationListItem = ({ profile, invite }) => {
-//   const { displayName, avatarNumber } = profile || {}
-//   const { invited: uid, inviteId, confirmed } = invite
-//   const { doDisInvite } = useFirebase()
-//   function handleDisInvite(inviteId) {
-//     doDisInvite(inviteId)
-//   }
-//   return (
-//     <ListItem>
-//       <ListItemAvatar>
-//         <AvatarMonster num={avatarNumber} />
-//       </ListItemAvatar>
-//       <ListItemText
-//         primary={displayName}
-//         secondary={confirmed ? "confirmed" : "unconfirmed"}
-//       />
-//       <ShowMe obj={invite} name="invite" />
-//       <ListItemSecondaryAction>
-//         <IconButton onClick={() => handleDisInvite(inviteId)}>
-//           <FaTimesCircle />
-//         </IconButton>
-//       </ListItemSecondaryAction>
-//     </ListItem>
-//   )
-// }
 
 export default GameStartWrapper

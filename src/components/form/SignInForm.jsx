@@ -21,11 +21,9 @@ const SignInForm = () => {
     const { email, password } = values
     return doSignInWithUserAndPassword(email.trim(), password.trim())
       .then(authUser => {
-        console.log("authUser", authUser)
         handleCloseForm()
       })
       .catch(err => {
-        console.log("signIn error", err)
         return err
       })
   }

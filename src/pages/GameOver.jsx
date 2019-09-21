@@ -108,13 +108,9 @@ const ScoreBoard = styled.div`
 const GameOver = () => {
   const { gameState } = useGameCtx()
   const { user } = useAuthCtx()
-  const { doProposeGame } = useFirebase()
   const scores = gameState && gameState.scores
   const youWon = scores[0].uid === user.uid
-  function handleProposeRematch() {
-    console.log("gameState in rematch", gameState)
-    // const {} = await doProposeGame({gameName: gameState.gameName })
-  }
+  function handleProposeRematch() {}
   return (
     <FullPage>
       <Typography gutterBottom variant="h3">

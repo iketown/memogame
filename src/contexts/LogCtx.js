@@ -7,29 +7,8 @@ import { itemFromItemId } from "../resources/allItems"
 import { usePlayersCtx } from "./PlayersCtx"
 const LogCtx = createContext()
 
-// export const LogCtxProvider = props => {
-//   const { fdb, doAddToLog } = useFirebase()
-//   const gameId = props.gameId
-//   const [log, setLog] = useState({})
-//   useEffect(() => {
-//     const gameLogRef = fdb.ref(`/currentGames/${gameId}/gameLog`)
-//     gameLogRef.on("value", snapshot => {
-//       const newJson = JSON.stringify(snapshot.val() || {})
-//       const oldJson = JSON.stringify(log)
-//       if (newJson !== oldJson) {
-//         console.log("setting log")
-//         setLog(snapshot.val() || {})
-//       }
-//     })
-//     return gameLogRef.off
-//   }, [fdb, gameId, log])
-//   return (
-//     <LogCtx.Provider value={{ log,  gameId, doAddToLog }} {...props} />
-//   )
-// }
 
 export const useLogCtx = byWho => {
-  console.log("useLogCtx called", byWho)
   const { doAddToLog } = useFirebase()
   const { user } = useAuthCtx()
   const { players } = usePlayersCtx()
@@ -39,7 +18,6 @@ export const useLogCtx = byWho => {
   const gameId = 123
 
   const addLogMessage = ({ itemId, destination }) => {
-    console.log("addLogMessage called")
     // Frank puts Purple Eggplant on center
     // Henry moves card into house
     const myPP = players[user.uid]

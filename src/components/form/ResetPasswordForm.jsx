@@ -12,7 +12,6 @@ const ResetPasswordForm = () => {
   const { doPasswordReset } = useFirebase()
   const [email, setEmail] = useState("")
   function handleReset() {
-    console.log("email", email)
     doPasswordReset(email)
   }
   return (
