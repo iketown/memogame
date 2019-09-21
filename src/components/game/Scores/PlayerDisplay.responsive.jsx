@@ -103,7 +103,7 @@ export const PlayerDisplay = ({ playerId }) => {
         <TurnTimer
           key={lastCheckIn}
           playerId={playerId}
-          render={({ getTime }) =>
+          render={({ getTime, everyoneOnline }) =>
             getTime() > 0 ? (
               <BoxContainer>
                 {Array.from({ length: Math.min(getTime() / 1000, 20) }).map(

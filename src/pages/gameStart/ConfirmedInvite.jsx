@@ -4,6 +4,7 @@ import ShowMe from "../../utils/ShowMe"
 import { Card, CardContent, CardHeader, Button } from "@material-ui/core"
 import { useFirebase } from "../../contexts/FirebaseCtx"
 import rotatingBall from "../../images/rotatingBall.gif"
+import SpinningPageLoader from "../../components/SpinningPageLoader"
 
 const ConfirmedInvite = ({ confirmedInvites = [], history }) => {
   const invite = confirmedInvites[0]
@@ -47,14 +48,12 @@ const ConfirmedInvite = ({ confirmedInvites = [], history }) => {
               GO TO GAME
             </Button>
           ) : (
-            <img
-              alt="waiting display from https://imgur.com/gallery/kv2oHwT"
-              src={rotatingBall}
-            />
+            <div style={{ position: "relative", height: "20rem" }}>
+              <SpinningPageLoader />
+            </div>
           )}
         </div>
       </Card>
-      <ShowMe obj={invite} name="invite" noModal />
     </div>
   )
 }

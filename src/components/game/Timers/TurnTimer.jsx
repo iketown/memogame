@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { useEffect, useCallback, useState } from "react"
 import Timer from "react-compound-timer"
 import moment from "moment"
 import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
@@ -7,8 +7,16 @@ import { useGameFxnsLOC } from "../../../hooks/useGameFxnsLOC"
 //
 //
 const TurnTimer = ({ playerId, children, render = () => null }) => {
-  const { gamePlay } = useGamePlayCtx("TurnTimer")
+  const { gamePlay, whosOnline } = useGamePlayCtx("TurnTimer")
   const { forceNextTurn } = useGameFxnsLOC()
+
+  const handleChangeTurn = useCallback(() => {
+    const everyoneOnline = true
+    if (everyoneOnline) {
+      forceNextTurn()
+    }
+  }, [forceNextTurn])
+
   const endTurnTime =
     (gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.endTurnTime) ||
     moment(gamePlay.whosTurnItIs.startTime).add(secondsPerTurn, "seconds")
@@ -16,16 +24,16 @@ const TurnTimer = ({ playerId, children, render = () => null }) => {
   useEffect(() => {
     if (moment(endTurnTime).add(10, "seconds") < moment()) {
       console.log("forcing turn change")
-      forceNextTurn()
+      handleChangeTurn()
     }
-  }, [endTurnTime, forceNextTurn])
+  }, [endTurnTime, handleChangeTurn])
   return (
     <div>
       <Timer
         key={initialTime}
         initialTime={initialTime}
         direction="backward"
-        checkpoints={[{ time: 0, callback: forceNextTurn }]}
+        checkpoints={[{ time: 0, callback: handleChangeTurn }]}
       >
         {({ getTime }) => render({ getTime })}
       </Timer>

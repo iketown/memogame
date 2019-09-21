@@ -14,6 +14,8 @@ const GamePlayCtx = createContext()
 
 export const GamePlayCtxProvider = ({ gameId, ...props }) => {
   const [gamePlay, setGamePlayINSTATE] = useState({})
+  const [whosOnline, setWhosOnline] = useState({})
+
   const { user } = useAuthCtx()
   const { fdb, removeGameInvitation, updateLastSeen } = useFirebase()
   const gamePlayListenerRef = useRef()
@@ -31,6 +33,23 @@ export const GamePlayCtxProvider = ({ gameId, ...props }) => {
     }
     return _myGameState
   }, [gameId, gamePlay, removeGameInvitation, updateLastSeen, user.uid])
+
+  useEffect(() => {
+    if (!!gamePlay && gamePlay.gameStates) {
+      const _whosOnline = Object.entries(gamePlay.gameStates).reduce(
+        (obj, [id, state]) => {
+          console.log("reducing", obj, id, state)
+          const online = !!state.lastSeen && moment().diff(state.lastSeen)
+          // either truthy or false
+          obj[id] = online
+          return obj
+        }
+      )
+      _whosOnline.all =
+        Object.values(_whosOnline).filter(online => !online).length <= 0
+      setWhosOnline(_whosOnline)
+    }
+  }, [gamePlay])
 
   const myTotalCards = useMemo(() => {
     let allCards = []
@@ -50,7 +69,6 @@ export const GamePlayCtxProvider = ({ gameId, ...props }) => {
 
   useEffect(() => {
     const setGamePlay = newState => {
-      console.log("setting game play")
       setGamePlayINSTATE(newState)
     }
     const gamePlayRef = fdb.ref(`/currentGames/${gameId}`)
@@ -68,7 +86,7 @@ export const GamePlayCtxProvider = ({ gameId, ...props }) => {
 
   return (
     <GamePlayCtx.Provider
-      value={{ gamePlay, myGameState, myTotalCards }}
+      value={{ gamePlay, whosOnline, myGameState, myTotalCards }}
       {...props}
     />
   )
@@ -82,6 +100,6 @@ export const useGamePlayCtx = calledBy => {
     )
 
   console.log("useGamePlayCtx called by", calledBy)
-  const { gamePlay, myGameState, myTotalCards } = ctx
-  return { gamePlay, myGameState, myTotalCards }
+  const { gamePlay, myGameState, myTotalCards, whosOnline } = ctx
+  return { gamePlay, myGameState, myTotalCards, whosOnline }
 }

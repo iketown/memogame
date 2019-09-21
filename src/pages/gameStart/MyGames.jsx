@@ -20,9 +20,12 @@ import { useAuthCtx } from "../../contexts/AuthCtx"
 import ShowMe from "../../utils/ShowMe"
 import { useDialogCtx } from "../../contexts/DialogCtx.js"
 
-export const MyGameSection = ({ myGames = [], history }) => {
+export const MyGameSection = ({
+  myGames = [],
+  handleCancelGameName,
+  history
+}) => {
   // you can't join another game if you're hosting a game.
-  // following one of the other invites means cancelling this one.
   const { user, publicProfile } = useAuthCtx()
   const game = myGames[0]
   const {
@@ -57,6 +60,7 @@ export const MyGameSection = ({ myGames = [], history }) => {
     Promise.all(promises).then(responses => {
       console.log("responses", responses)
     })
+    handleCancelGameName()
   }
   async function handleStartGame() {
     const promises = confirmedInvites.map(({ inviteId }) => {
