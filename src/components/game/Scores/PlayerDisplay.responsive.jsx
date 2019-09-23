@@ -73,7 +73,7 @@ export const PlayerDisplay = ({ playerId }) => {
     houseCount,
     publicProfile
   } = useOtherPlayerInfo(playerId)
-  const { gamePlay } = useGamePlayCtx("PlayerDisplay")
+  const { gamePlay, whosOnline } = useGamePlayCtx("PlayerDisplay")
   const { lastCheckIn } = gamePlay.whosTurnItIs
   const myTurn = gamePlay && gamePlay.whosTurnItIs.uid === playerId
   return myTurn ? (
@@ -103,8 +103,8 @@ export const PlayerDisplay = ({ playerId }) => {
         <TurnTimer
           key={lastCheckIn}
           playerId={playerId}
-          render={({ getTime, everyoneOnline }) =>
-            getTime() > 0 ? (
+          render={({ getTime }) => {
+            return getTime() > 0 ? (
               <BoxContainer>
                 {Array.from({ length: Math.min(getTime() / 1000, 20) }).map(
                   (sec, i) => (
@@ -117,7 +117,7 @@ export const PlayerDisplay = ({ playerId }) => {
                 waiting for admin response
               </span>
             )
-          }
+          }}
         />
       </div>
     </StyledDisplay>

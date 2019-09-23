@@ -33,7 +33,6 @@ export const ResponsiveGamePageGrid = styled.div`
   width: 100%;
   height: calc(100vh - 75px);
   /* margin-top: 5px; */
-  border: 1px solid orange;
   display: grid;
   position: relative;
   grid-template-columns: max-content, max-content;

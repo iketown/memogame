@@ -54,8 +54,12 @@ const ReorderCard = ({
         const { droppedAt } = mon.getDropResult()
         if (droppedAt === "center") {
           // handle dropped in center
-          if (selectedRoom.faceUp || peek) resetPointsClimber()
-          houseToCenter({ itemId, roomId, noPoints: true })
+          if (selectedRoom.faceUp || peek) {
+            resetPointsClimber()
+            houseToCenter({ itemId, roomId, noPoints: true })
+          } else {
+            houseToCenter({ itemId, roomId })
+          }
         } else {
           // handle dropped in house
           // no action.

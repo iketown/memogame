@@ -3,9 +3,12 @@ import React, {
   createContext,
   useState,
   useMemo,
-  useEffect
+  useEffect,
+  useRef
 } from "react"
+import isEqual from "lodash/isEqual"
 import { useFirebase } from "./FirebaseCtx"
+import { useCallCounter } from "../hooks/useCallCounter"
 
 const AuthCtx = createContext()
 
@@ -13,21 +16,32 @@ export const AuthCtxProvider = props => {
   const [user, setUser] = useState(null)
   const [publicProfile, setPublicProfile] = useState(null)
   const { auth, firestore } = useFirebase()
+  const { incrementCallCounter } = useCallCounter("AuthCtxProvider")
+  const userId = useMemo(() => {
+    return user && user.uid
+  }, [user])
 
+  const profileRef = useRef()
   useEffect(() => {
     // get publicProfile from firestore
-    if (user) {
-      const myPublicProfileRef = firestore.doc(`/publicProfiles/${user.uid}`)
-      const unsubscribe = myPublicProfileRef.onSnapshot(doc => {
-        if (doc.data()) {
-          setPublicProfile(doc.data())
-        } else {
-          console.error("no public profile for ", user)
-        }
-      })
-      return unsubscribe
+    if (userId) {
+      const myPublicProfileRef = firestore.doc(`/publicProfiles/${userId}`)
+      if (!profileRef.current) {
+        console.log("listener for public profile STARTING")
+        profileRef.current = myPublicProfileRef.onSnapshot(doc => {
+          if (doc.data()) {
+            const _data = doc.data()
+            incrementCallCounter()
+            setPublicProfile(_data)
+          }
+        })
+      } else {
+        console.log("listener for public profile already exists")
+      }
+      return profileRef.current
     }
-  }, [firestore, user])
+  }, [firestore, incrementCallCounter, publicProfile, userId])
+
   auth.onAuthStateChanged(authUser => {
     if (authUser) {
       setUser(authUser)

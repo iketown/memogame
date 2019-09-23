@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from "react"
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef
+} from "react"
 import { useGameCtx } from "./GameCtx"
 import { useFirebase } from "./FirebaseCtx"
 import { useAuthCtx } from "./AuthCtx"
@@ -10,6 +16,7 @@ export const PlayersCtxProvider = props => {
   const [players, setPlayers] = useState({})
   const { user } = useAuthCtx()
   const { firestore } = useFirebase()
+  const playersRef = useRef()
   useEffect(() => {
     async function updateFriends(memberUIDs) {
       if (!memberUIDs || memberUIDs.length <= 1) return null
@@ -25,10 +32,18 @@ export const PlayersCtxProvider = props => {
       const memUIDs = gameState.memberUIDs || []
       const reqUIDs = gameState.memberRequests || []
       ;[...memUIDs, ...reqUIDs].forEach(uid => {
-        const memberRef = firestore.collection("publicProfiles").doc(uid)
-        memberRef.onSnapshot(doc => {
-          setPlayers(old => ({ ...old, [doc.id]: doc.data() }))
-        })
+        if (!playersRef.current || !playersRef.current[uid]) {
+          if (!playersRef.current) playersRef.current = {}
+          const memberRef = firestore.collection("publicProfiles").doc(uid)
+          playersRef.current[uid] = memberRef.onSnapshot(doc => {
+            setPlayers(old => ({ ...old, [doc.id]: doc.data() }))
+          })
+        } else {
+          console.log(
+            "listener for publicProfile already exists",
+            playersRef.current
+          )
+        }
       })
     }
   }, [firestore, gameState, gameState.memberUIDs, user.uid])

@@ -4,14 +4,11 @@ import React, {
   useEffect,
   useState,
   useMemo,
-  useCallback
+  useCallback,
+  useRef
 } from "react"
-import firebase from "firebase/app"
-import moment from "moment"
 import { useAuthCtx } from "./AuthCtx"
 import { useFirebase } from "./FirebaseCtx"
-import { shuffle } from "../utils/gameLogic"
-import allItems from "../resources/allItems"
 import { useGamePlayCtx } from "./GamePlayCtx"
 
 // ⭐ 🌟 SOUNDS CONTEXT 🌟 ⭐ //
@@ -87,19 +84,14 @@ export const PointsCtxProvider = props => {
   const [pointsDisplay, setPointsDisplay] = useState(false)
   // pointsClimber keeps track of how many points the next card is worth (if you play consecutive cards from house, each value is 1 more than the previous)
   const [pointsClimber, setPointsClimber] = useState(1)
-  const memoSetPointsClimber = useCallback(args => {
-    setPointsClimber(args)
-  }, [])
-  const memoSetPointsDisplay = useCallback(args => {
-    setPointsDisplay(args)
-  }, [])
+
   return (
     <PointsCtx.Provider
       value={{
         pointsDisplay,
-        setPointsDisplay: memoSetPointsDisplay,
+        setPointsDisplay,
         pointsClimber,
-        setPointsClimber: memoSetPointsClimber
+        setPointsClimber
       }}
       {...props}
     />
@@ -115,6 +107,7 @@ export const usePointsCtx = () => {
     setPointsClimber
   } = ctx
   const incrementPointsClimber = useCallback(() => {
+    console.log("incrementing points climber")
     setPointsClimber(old => old + 1)
   }, [setPointsClimber])
   const resetPointsClimber = useCallback(() => {
@@ -139,14 +132,20 @@ export const GameCtxProvider = props => {
     setGameStateR(newState)
   }
   const gameId = props.gameId
-
+  const gameListenerRef = useRef()
   useEffect(() => {
     const gameRef = firestore.doc(`/games/${gameId}`)
-    const unsubscribe = gameRef.onSnapshot(doc => {
-      const values = doc.data()
-      setGameState({ ...values, gameId })
-    })
-    return unsubscribe
+    if (!gameListenerRef.current) {
+      console.log("listener for gameState STARTING")
+
+      gameListenerRef.current = gameRef.onSnapshot(doc => {
+        const values = doc.data()
+        setGameState({ ...values, gameId })
+      })
+    } else {
+      console.log("listener for gameState already exists")
+    }
+    return gameListenerRef.current
   }, [firestore, gameId])
 
   if (!gameId) return null

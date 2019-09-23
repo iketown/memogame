@@ -11,6 +11,26 @@ const FlexDiv = styled.div`
 
 const OfflineDisplay = styled.div`
   opacity: ${p => (p.online ? 1 : 0.5)};
+  background: ${p =>
+    p.online
+      ? "none"
+      : `
+    repeating-linear-gradient(45deg,
+    rgba(0, 0, 0, 0.2),
+    rgba(0, 0, 0, 0.2) 10px,
+    rgba(0, 0, 0, 0.3) 10px,
+    rgba(0, 0, 0, 0.3) 20px)`};
+  position: relative;
+  .offline {
+    position: absolute;
+    transform: rotate(-25deg) translateX(-50%);
+    z-index: 100;
+    top: 60%;
+    left: 50%;
+    font-size: 1rem;
+    font-weight: bold;
+    color: blue;
+  }
 `
 const ScoreSection = () => {
   const { gamePlay, whosOnline } = useGamePlayCtx("ScoreSection")
@@ -27,12 +47,15 @@ const ScoreSection = () => {
               ? -1
               : 1
           })
-          .map(([playerId, playerState]) => (
-            <OfflineDisplay online={whosOnline && !!whosOnline[playerId]}>
-              <PlayerDisplay key={playerId} playerId={playerId} />
-            </OfflineDisplay>
-          ))}
-      <ShowMe obj={whosOnline} name="whosOnline" />
+          .map(([playerId, playerState]) => {
+            const online = whosOnline && !!whosOnline[playerId]
+            return (
+              <OfflineDisplay key={playerId} online={online}>
+                {!online && <div className="offline">OFFLINE</div>}
+                <PlayerDisplay key={playerId} playerId={playerId} />
+              </OfflineDisplay>
+            )
+          })}
     </FlexDiv>
   )
 }

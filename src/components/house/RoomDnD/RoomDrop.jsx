@@ -47,13 +47,14 @@ const RoomDrop = ({ children, roomId, thisRoom = [], handleSelectRoom }) => {
     accept: ItemTypes.CARD,
     drop: (item, mon) => {
       setSelectedRoom({ roomId, faceUp: true })
-      return { droppedAt: roomId, index: thisRoom.length }
+      return { droppedAt: roomId }
     },
     collect: monitor => ({
       isOver: !!monitor.isOver(),
       canDrop: !!monitor.canDrop()
     }),
-    canDrop: () => canDropBool
+    canDrop: (props, monitor) =>
+      canDropBool && monitor.isOver({ shallow: true })
   })
   return (
     <StyledRoomContainer isOver={isOver} canDrop={canDrop} ref={dropRef}>

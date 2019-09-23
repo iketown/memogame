@@ -7,7 +7,6 @@ export const useInvitations = () => {
   const { user } = useAuthCtx()
   const [sentInvites, setSentInvites] = useState([])
   const [receivedInvites, setReceivedInvites] = useState([])
-
   useEffect(() => {
     if (user) {
       const myInvitesRef = firestore

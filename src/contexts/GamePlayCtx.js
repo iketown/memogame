@@ -40,7 +40,8 @@ export const GamePlayCtxProvider = ({ gameId, ...props }) => {
           // either truthy or false
           obj[id] = online
           return obj
-        }
+        },
+        {}
       )
       _whosOnline.all =
         Object.values(_whosOnline).filter(online => !online).length <= 0

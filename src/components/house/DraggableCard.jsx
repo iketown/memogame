@@ -38,6 +38,7 @@ const DraggableCard = ({ itemId, scale, index, source }) => {
         } else {
           // handle dropped in house
           resetPointsClimber()
+          console.log("storagetoHouse", itemId, droppedAt, index)
           storageToHouse({ itemId, roomId: droppedAt, index })
           // storageToHouseFX({ roomId: droppedAt, itemId, index })
         }

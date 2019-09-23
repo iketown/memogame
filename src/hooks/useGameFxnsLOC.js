@@ -113,7 +113,8 @@ export const useGameFxnsLOC = byWho => {
     const newHouse = { ...myGameState.house }
     if (!newHouse) throw new Error("house is missing")
     if (newHouse[roomId]) {
-      const newIndex = index || newHouse[roomId].length
+      const newIndex =
+        typeof index === "number" ? index : newHouse[roomId].length
       newHouse[roomId] = [
         ...newHouse[roomId].slice(0, newIndex),
         itemId,

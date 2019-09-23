@@ -143,9 +143,7 @@ const SelectedRoom = () => {
             initialTime={moment(expiryTime).diff(moment())}
             checkpoints={[{ time: 0, callback: onTimerEnd }]}
           >
-            <StyledSeconds>
-              <Timer.Seconds />
-            </StyledSeconds>
+            <StyledSeconds>{/* <Timer.Seconds /> */}</StyledSeconds>
           </Timer>
         )}
       </SelectedRoomSection>

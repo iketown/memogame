@@ -11,11 +11,10 @@ const TurnTimer = ({ playerId, children, render = () => null }) => {
   const { forceNextTurn } = useGameFxnsLOC()
 
   const handleChangeTurn = useCallback(() => {
-    const everyoneOnline = true
-    if (everyoneOnline) {
+    if (whosOnline && whosOnline.all) {
       forceNextTurn()
     }
-  }, [forceNextTurn])
+  }, [forceNextTurn, whosOnline])
 
   const endTurnTime =
     (gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.endTurnTime) ||

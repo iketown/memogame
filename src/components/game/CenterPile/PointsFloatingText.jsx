@@ -1,7 +1,7 @@
 import React, { useState } from "react"
 import styled from "styled-components"
 import { Button } from "@material-ui/core"
-import { FaStar, FaCircle } from "react-icons/fa"
+import { FaStar } from "react-icons/fa"
 import { useTransition, animated, config } from "react-spring"
 import ShowMe from "../../../utils/ShowMe.jsx"
 //
