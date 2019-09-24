@@ -15,6 +15,7 @@
     "react": "^16.8.6",
     "react-beautiful-dnd": "11.0.5",
     "react-card-flip": "0.8.1",
+    "react-carousel-slider": "2.0.13",
     "react-compound-timer": "1.1.5",
     "react-countdown-hook": "0.1.1",
     "react-dnd": "9.3.4",
@@ -29,6 +30,7 @@
     "react-spring": "8.0.27",
     "react-svg": "10.0.20",
     "react-transition-group": "4.2.2",
+    "react-youtube": "7.9.0",
     "scheduler": "0.15.0",
     "shortid": "2.2.14",
     "styled-components": "4.3.2"

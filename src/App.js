@@ -15,7 +15,7 @@ import GameStart from "./pages/gameStart/GameStart.page"
 import GamePageResponsive from "./components/game/GamePage.responsive.jsx"
 import { SnackbarProvider } from "notistack"
 import SpinningPageLoader from "./components/SpinningPageLoader"
-import HomePage from "./pages/Home.page.jsx"
+import HomePage from "./pages/homePage/Home.page"
 import GameContainer from "./pages/GameContainer.jsx"
 import GameOver from "./pages/GameOver.jsx"
 import GameContent from "./components/game/GameContent.jsx"
@@ -47,7 +47,7 @@ const App = () => {
                   <Route path="/gamestart" component={GameStart} />
                   <Route path="/loader" component={SpinningPageLoader} />
                   <Route path="/house" component={GamePageResponsive} />
-                  <Route path="/" component={HomePage} />
+                  <Route exact path="/" component={HomePage} />
                 </FullHeightContainer>
               </DialogCtxProvider>
             </AuthCtxProvider>

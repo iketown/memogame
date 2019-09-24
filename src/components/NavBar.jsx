@@ -82,7 +82,7 @@ const NavBar = props => {
           <BrainGears height="30px" style={{ flexGrow: 1 }} />
           <Typography variant="h6" style={{ flexGrow: 1, marginLeft: "5px" }}>
             <Link style={{ color: "inherit", textDecoration: "none" }} to="/">
-              MEMOGA.ME {widthText}
+              MEMOGA.ME
             </Link>
           </Typography>
 
