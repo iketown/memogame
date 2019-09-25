@@ -13,6 +13,7 @@ const SearchPlayers = () => {
   const [searchResultsEmail, setSearchResultsEmail] = useState([])
   const { firestore, doSendInvite } = useFirebase()
   const { state, handleCloseForm } = useDialogCtx()
+
   function handleSendInvite({ uid }) {
     const { displayName, avatarNumber } = publicProfile
     const { gameId, gameName } = state
@@ -61,7 +62,7 @@ const SearchPlayers = () => {
           return (
             <FriendListItem
               key={profile.id}
-              profile={{ ...profile, uid: profile.id }}
+              friendUid={profile.id}
               handleSendInvite={handleSendInvite}
               disabled={
                 state.sentInvites &&
