@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState } from "react"
 import {
   Button,
   Toolbar,
@@ -21,7 +21,7 @@ import { useFirebase } from "../contexts/FirebaseCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { useDialogCtx } from "../contexts/DialogCtx"
 import ButtonLink from "./navigation/ButtonLink.jsx"
-import { useWidth, useWindowSize } from "../hooks/useScreenSize"
+import { useWidth } from "../hooks/useScreenSize"
 import { FaBars } from "react-icons/fa"
 
 const NavBar = props => {
@@ -37,7 +37,6 @@ const NavBar = props => {
   }
   const { user, publicProfile } = useAuthCtx()
   const widthText = useWidth()
-  const { heightText } = useWindowSize()
 
   const { dispatch: dialogDispatch } = useDialogCtx()
   const handleAuth = formType => () => {
@@ -70,7 +69,8 @@ const NavBar = props => {
         return menus.sm
       case "md":
       case "lg":
-        return <div>menu</div>
+      case "xl":
+        return signedInMenuItems
       default:
         return <div>no width</div>
     }
@@ -86,19 +86,22 @@ const NavBar = props => {
             </Link>
           </Typography>
 
-          {!!user && signedInMenuItems}
+          {!!user && getContent()}
           {!user && signedOutMenuItems}
-          {getContent()}
         </Toolbar>
       </AppBar>
-      <ExpandingMenu open={mobileOpen} />
+      <ExpandingMenu
+        open={mobileOpen}
+        handleClose={() => setMobileOpen(false)}
+      />
     </>
   )
 }
 
 export default withRouter(NavBar)
 
-const ExpandingMenu = withRouter(({ open, history }) => {
+const ExpandingMenu = withRouter(({ open, handleClose, history }) => {
+  const { publicProfile } = useAuthCtx()
   return (
     <Collapse in={open}>
       <List>
@@ -106,10 +109,16 @@ const ExpandingMenu = withRouter(({ open, history }) => {
           <ListItemAvatar>
             <UserMenuButton history={history} />
           </ListItemAvatar>
-          My User Name
+          {publicProfile && publicProfile.displayName}
         </ListItem>
-        <ListItem>hey</ListItem>
-        <ListItem>hey</ListItem>
+        <ListItem
+          onClick={() => {
+            history.push("/gamestart")
+            handleClose()
+          }}
+        >
+          Start a Game
+        </ListItem>
       </List>
     </Collapse>
   )

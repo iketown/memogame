@@ -5,6 +5,6 @@ export const useCallCounter = calledBy => {
   const incrementCallCounter = useCallback(() => {
     console.log("callCount", calledBy, count + 1)
     setCount(old => old + 1)
-  })
+  }, [calledBy, count])
   return { incrementCallCounter }
 }

@@ -3,8 +3,6 @@ import Sound from "react-sound"
 
 import startTurn from "./startTurn.mp3"
 import endTurn from "./endTurn.mp3"
-import winGame from "./winGame.mp3"
-import loseGame from "./loseGame.mp3"
 
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { useGamePlayCtx } from "../contexts/GamePlayCtx"

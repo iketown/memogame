@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react"
 import { Typography } from "@material-ui/core"
 import { TransitionGroup, CSSTransition } from "react-transition-group"
 import styled from "styled-components"
-import { FaStar } from "react-icons/fa"
 //
 const PointsContainer = styled.div`
   .points-display {

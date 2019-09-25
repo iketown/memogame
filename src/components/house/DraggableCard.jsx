@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, memo } from "react"
+import React, { useMemo, memo } from "react"
 import styled from "styled-components"
 import { useWiderThan } from "../../hooks/useScreenSize"
 import { Card } from "@material-ui/core"
@@ -38,7 +38,6 @@ const DraggableCard = ({ itemId, scale, index, source }) => {
         } else {
           // handle dropped in house
           resetPointsClimber()
-          console.log("storagetoHouse", itemId, droppedAt, index)
           storageToHouse({ itemId, roomId: droppedAt, index })
           // storageToHouseFX({ roomId: droppedAt, itemId, index })
         }

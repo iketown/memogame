@@ -33,7 +33,7 @@ const FormTextInput = ({
           variant="outlined"
           required={required}
           inputProps={{ maxLength, onBlur }}
-          InputProps={{ endAdornment, startAdornment }}
+          // InputProps={{ endAdornment, startAdornment }}
         />
       )}
     />

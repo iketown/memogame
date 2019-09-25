@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react"
 import { useFirebase } from "./FirebaseCtx"
-import { useAuthCtx } from "./AuthCtx"
 
 const ChatCtx = createContext()
 

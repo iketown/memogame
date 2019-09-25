@@ -1,6 +1,6 @@
 import React from "react"
 import styled from "styled-components"
-import { useDrag, useDrop } from "react-dnd"
+import { useDrop } from "react-dnd"
 import { ItemTypes } from "../../../dnd/itemTypes"
 import { FaArrowDown } from "react-icons/fa"
 import { maxItemsPerRoom } from "../../../utils/gameLogic"

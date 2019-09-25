@@ -1,32 +1,27 @@
 import React from "react"
 import styled from "styled-components"
 import { Link } from "react-router-dom"
-import { Typography, Grid, Container, Divider, Button } from "@material-ui/core"
+import { Typography, Grid, Container, Button } from "@material-ui/core"
 import head from "../../images/BrainLoader/head.svg"
 import CardSlider from "./CardSlider"
 import YouTube from "react-youtube"
 
-const typeVariants = [
-  "body1",
-  "body2",
-  "button",
-  "caption",
-  "h1",
-  "h2",
-  "h3",
-  "h4",
-  "h5",
-  "inherit",
-  "overline",
-  "srOnly",
-  "subtitle1",
-  "subtitle2"
-]
-
-const PicDescription = styled.div`
-  text-align: center;
-  padding: 1rem;
-`
+// const typeVariants = [
+//   "body1",
+//   "body2",
+//   "button",
+//   "caption",
+//   "h1",
+//   "h2",
+//   "h3",
+//   "h4",
+//   "h5",
+//   "inherit",
+//   "overline",
+//   "srOnly",
+//   "subtitle1",
+//   "subtitle2"
+// ]
 
 const BackgroundDiv = styled.div`
   position: fixed;
@@ -88,10 +83,10 @@ const Home = () => {
                 </Paragraph>
                 <Paragraph>
                   The goal of <em>MEMOGAME</em> is to move all the cards from
-                  your <em>STORAGE</em> pile into the <em>CENTER</em> pile. The{" "}
-                  <em>CENTER</em> pile is shared with the other players, who are
-                  also trying to do the same with their cards. The game ends
-                  when any player gets all their cards into the center.
+                  your <em>STORAGE</em> pile into the <em>CENTER</em> pile. The
+                  center pile is shared with the other players, who are also
+                  trying to do the same with their cards. The game ends when any
+                  player gets all their cards into the center.
                 </Paragraph>
                 <Paragraph>
                   To play a card, it has to MATCH the card that’s already there.
@@ -123,8 +118,12 @@ const Home = () => {
                 </Paragraph>
                 <Heading>Play</Heading>
                 <Paragraph>
-                  You can play a (face-down) card from your house at ANY time,
-                  even when it is not your turn.
+                  For the most part, you'll be playing cards from your house{" "}
+                  <em>from memory.</em> You can play a (face-down) card from
+                  your house at any time, even when it is not your turn. Be
+                  careful though, because if you play a card that{" "}
+                  <em>doesn't match</em>, the entire center pile gets shuffled
+                  to the bottom of your storage pile. (that's bad).
                 </Paragraph>
                 <Heading>Bonus Points</Heading>
                 <Paragraph>
@@ -142,12 +141,11 @@ const Home = () => {
             <Grid item xs={12}>
               <Heading>Scoring</Heading>
               <Paragraph>
-                When a player has moved all their cards to the center so both
-                their storage pile and house are empty, that player "goes out"
-                and the game ends. Each of the players who still had cards left
-                must <em>subtract</em> those cards from their score, and the
-                player who went out <em>adds</em> all those points to his/her
-                score.
+                When a player "goes out" by moving all their cards from their
+                storage pile and house into the center, the game ends. Each of
+                the players who still had cards left must <em>subtract</em>{" "}
+                those cards from their score, and the player who went out{" "}
+                <em>adds</em> all those points to his/her score.
               </Paragraph>
               <Heading>Ready to try?</Heading>
               <div style={{ textAlign: "center", marginBottom: "5rem" }}>

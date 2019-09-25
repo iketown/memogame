@@ -1,16 +1,13 @@
 import React from "react"
 import styled from "styled-components"
-import { Form, Field } from "react-final-form"
-import { Grid, Typography, Button, TextField } from "@material-ui/core"
-import { FaUser } from "react-icons/fa"
+import { Form } from "react-final-form"
+import { Grid, Typography, Button } from "@material-ui/core"
 //
 import ChooseAvatar from "./ChooseAvatar.jsx"
 import AvatarMonster from "../AvatarMonster.jsx"
 import { useFirebase } from "../../contexts/FirebaseCtx"
-import ShowMe from "../../utils/ShowMe.jsx"
 import FormTextInput from "./FormTextInput.jsx"
 import { useDialogCtx } from "../../contexts/DialogCtx.js"
-import { useAuthCtx } from "../../contexts/AuthCtx"
 //
 //
 const StyledForm = styled.form`
@@ -24,7 +21,6 @@ const StyledForm = styled.form`
 const SignUpForm = () => {
   const { doCreateUserWithEmailAndPassword, firestore } = useFirebase()
   const { handleCloseForm } = useDialogCtx()
-  const { user } = useAuthCtx()
   async function formSubmit(values) {
     const { email, password, displayName, avatarNumber } = values
     const authUser = await doCreateUserWithEmailAndPassword(

@@ -5,9 +5,8 @@ import AvatarMonster from "../components/AvatarMonster"
 import greenCircle from "../images/greenCircle.svg"
 import { useGameCtx } from "../contexts/GameCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
-import ShowMe from "../utils/ShowMe.jsx"
 import { useFirebase } from "../contexts/FirebaseCtx"
-
+import ButtonLink from "../components/navigation/ButtonLink.jsx"
 const FullPage = styled.div`
   position: absolute;
   top: 0;
@@ -107,10 +106,28 @@ const ScoreBoard = styled.div`
 
 const GameOver = () => {
   const { gameState } = useGameCtx()
+  const { proposeGame, createGameFromInvites, assignRematchLoc } = useFirebase()
   const { user } = useAuthCtx()
   const scores = gameState && gameState.scores
   const youWon = scores[0].uid === user.uid
-  function handleProposeRematch() {}
+
+  console.log(gameState, "gameState")
+  console.log("scores", scores)
+  async function handleProposeRematch() {
+    const { gameName, memberUIDs, gameId: oldGameId } = gameState
+    const newGameName = `${gameName} rematch`
+    const { id: newGameId } = await proposeGame({
+      gameName: newGameName
+    })
+    // alert this gameState to the rematch game's location
+    await assignRematchLoc({ oldGameId, newGameId })
+    // create the newGame
+    await createGameFromInvites({
+      memberUIDs,
+      gameId: newGameId,
+      gameName: newGameName
+    })
+  }
   return (
     <FullPage>
       <Typography gutterBottom variant="h3">
@@ -146,16 +163,30 @@ const GameOver = () => {
           })}
       </ScoreBoard>
       <div style={{ height: "3rem" }}></div>
-      {youWon && (
+      {youWon && <Typography variant="h6">YOU WON!</Typography>}
+      {youWon && !gameState.rematchGameId && (
         <Button
           onClick={handleProposeRematch}
+          variant="outlined"
+          color="primary"
+        >
+          Offer a rematch ?
+        </Button>
+      )}
+      {!youWon && gameState.rematchGameId && (
+        <Typography gutterBottom variant="h6">
+          {scores[0].displayName} invites you to a <b>REMATCH</b>
+        </Typography>
+      )}
+      {gameState.rematchGameId && (
+        <ButtonLink
+          to={`/game/${gameState.rematchGameId}`}
           variant="contained"
           color="primary"
         >
-          REMATCH
-        </Button>
+          GO to REMATCH!
+        </ButtonLink>
       )}
-      {youWon && "YOU WON"}
       {/* <div>
         <ShowMe obj={scores} name="scores" noModal />
       </div> */}

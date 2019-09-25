@@ -4,7 +4,6 @@ import styled from "styled-components"
 import { ItemTypes } from "../../../dnd/itemTypes"
 import { maxItemsPerRoom } from "../../../utils/gameLogic"
 import { useHouseCtx } from "../../../contexts/HouseContext"
-import moment from "moment"
 
 //
 //
@@ -39,7 +38,7 @@ const StyledRoomContainer = styled.div`
 //
 //
 const RoomDrop = ({ children, roomId, thisRoom = [], handleSelectRoom }) => {
-  const { selectedRoom, setSelectedRoom } = useHouseCtx()
+  const {  setSelectedRoom } = useHouseCtx()
   const canDropBool = useMemo(() => {
     return thisRoom.length < maxItemsPerRoom
   }, [thisRoom.length])

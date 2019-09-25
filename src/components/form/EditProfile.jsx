@@ -3,13 +3,11 @@ import {
   Grid,
   DialogContent,
   DialogTitle,
-  Avatar,
   DialogActions,
   Button
 } from "@material-ui/core"
 import styled from "styled-components"
-import { FaUser } from "react-icons/fa"
-import { Form, Field } from "react-final-form"
+import { Form } from "react-final-form"
 //
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import ShowMe from "../../utils/ShowMe"

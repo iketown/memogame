@@ -1,39 +1,17 @@
-import React, { useState, useEffect } from "react"
-import {
-  Grid,
-  TextField,
-  Typography,
-  Button,
-  List,
-  ListItem,
-  ListItemAvatar,
-  ListItemText,
-  ListItemSecondaryAction,
-  IconButton,
-  Card,
-  CardHeader,
-  ListSubheader
-} from "@material-ui/core"
+import React, { useState } from "react"
+import { Grid, TextField, Typography, Button } from "@material-ui/core"
 import styled from "styled-components"
-import moment from "moment"
 //
 import ReceivedInvitesSection from "./ReceivedInvites.section.jsx"
 import MyGames from "./MyGames"
 import ConfirmedInvite from "./ConfirmedInvite"
 import SpinningPageLoader from "../../components/SpinningPageLoader.jsx"
-import ShowMe from "../../utils/ShowMe.jsx"
 import { useFirebase } from "../../contexts/FirebaseCtx"
-import { usePlayersCtx } from "../../contexts/PlayersCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx.js"
-import AvatarMonster from "../../components/AvatarMonster.jsx"
-import { FaArrowRight, FaTimes, FaTimesCircle } from "react-icons/fa"
-import { useFriendProfiles } from "../../hooks/Invitations/useFriendProfiles.js"
-import { useInvitations } from "../../hooks/Invitations/useInvitations.js"
 import {
   InvitationCtxProvider,
   useInvitationCtx
 } from "../../contexts/InvitationCtx.js"
-import { switchStatement } from "@babel/types"
 //
 //
 const FullHeightGrid = styled(Grid)`
@@ -58,8 +36,7 @@ const GameStartWrapper = () => {
 const GameStart = () => {
   const [gameName, setGameName] = useState("")
   const [gameNameLocked, setGameNameLocked] = useState(false)
-  const [gameId, setGameId] = useState()
-  const { doCreateGame, proposeGame, doSendInvite } = useFirebase()
+  const { proposeGame, doSendInvite } = useFirebase()
   const { receivedInvites } = useInvitationCtx()
   const { user, publicProfile } = useAuthCtx()
 
@@ -73,10 +50,7 @@ const GameStart = () => {
     const { avatarNumber, displayName } = publicProfile
 
     proposeGame({ gameName })
-      .then(({ id }) => {
-        setGameId(id)
-        return id
-      })
+      .then(({ id }) => id)
       .then(id => {
         // invite yourself & confirm
         doSendInvite({
@@ -151,7 +125,12 @@ const NameGameSection = ({
         onChange={e => setGameName(e.target.value.toUpperCase())}
         label="Game Name"
       />
-      <Button variant="contained" color="primary" onClick={handleLockGameName}>
+      <Button
+        disabled={gameName.length < 3}
+        variant="contained"
+        color="primary"
+        onClick={handleLockGameName}
+      >
         OK
       </Button>
     </StyledFlexColumn>

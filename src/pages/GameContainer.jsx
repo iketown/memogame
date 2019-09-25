@@ -9,7 +9,6 @@ import {
 } from "../contexts/GameCtx"
 import { ChatCtxProvider } from "../contexts/ChatCtx"
 import GameContent from "../components/game/GameContent.jsx"
-import SnackbarHandler from "../components/SnackBarHandler.jsx"
 import { PlayersCtxProvider } from "../contexts/PlayersCtx"
 import { GamePlayCtxProvider } from "../contexts/GamePlayCtx"
 import GameSounds from "../sounds/GameSounds.jsx"
@@ -22,14 +21,13 @@ const Game = props => {
 
   if (!user) return <div>must sign in</div>
   return (
-    <GameCtxProvider gameId={gameId}>
+    <GameCtxProvider key={gameId} gameId={gameId}>
       <GamePlayCtxProvider gameId={gameId}>
         <PointsCtxProvider>
           <PlayersCtxProvider>
             <StoragePileCtxProvider gameId={gameId}>
               <ChatCtxProvider gameId={gameId}>
                 <SoundCtxProvider>
-                  <SnackbarHandler gameId={gameId} />
                   <GameContent />
                   <GameSounds />
                   <GamePauser />

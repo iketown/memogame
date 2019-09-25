@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React from "react"
 import { Typography, Button } from "@material-ui/core"
 import styled from "styled-components"
 import { withRouter } from "react-router-dom"
@@ -13,7 +13,7 @@ const FullPageDiv = styled.div`
 //
 //
 const GameDoesntExist = ({ history, match }) => {
-  const { cancelInvitation, firestore } = useFirebase()
+  const { firestore } = useFirebase()
 
   function deleteInvites() {
     const gameId = match.params.gameId

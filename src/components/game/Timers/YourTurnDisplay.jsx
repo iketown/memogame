@@ -28,7 +28,7 @@ const YourTurnDisplay = () => {
   const { user } = useAuthCtx()
   const { gamePlay } = useGamePlayCtx("YourTurnDisplay")
   const { players } = usePlayersCtx()
-  const { endMyTurn } = useGameFxnsLOC()
+  const { endMyTurn, pauseGame } = useGameFxnsLOC()
   const whosTurn =
     gamePlay && gamePlay.whosTurnItIs && gamePlay.whosTurnItIs.uid
   const itsYourTurn = whosTurn === user.uid
@@ -54,6 +54,11 @@ const YourTurnDisplay = () => {
               <br />
               <Button onClick={endMyTurn} variant="contained" color="primary">
                 End Turn
+              </Button>
+              <br />
+              <br />
+              <Button size="small" onClick={pauseGame}>
+                Pause Game
               </Button>
             </StyledText>
           )

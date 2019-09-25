@@ -1,6 +1,5 @@
 import React, { memo } from "react"
 import { useDrop } from "react-dnd"
-import styled from "styled-components"
 //
 import PointsReactTransGroup from "./PointsReactTransGroup.jsx"
 import { ItemTypes } from "../../../dnd/itemTypes"

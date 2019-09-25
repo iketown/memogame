@@ -44,7 +44,7 @@ export function useWindowSize() {
     return () => window.removeEventListener("resize", handleResize)
   }, [])
 
-  const { height = 0, width = 0 } = windowSize
+  const { height = 0 } = windowSize
 
   function getHeightText() {
     switch (true) {

@@ -1,34 +1,29 @@
 import React from "react"
 import {
-  Card,
-  CardHeader,
-  List,
   ListItem,
   ListItemAvatar,
   ListItemText,
-  CardContent,
-  ListSubheader,
   ListItemSecondaryAction,
   IconButton,
   Button,
-  Divider,
   Tooltip
 } from "@material-ui/core"
-import moment from "moment"
 //
 import { useFirebase } from "../../contexts/FirebaseCtx"
-import { useInvitationCtx } from "../../contexts/InvitationCtx"
 import AvatarMonster from "../../components/AvatarMonster.jsx"
-import { useAuthCtx } from "../../contexts/AuthCtx"
-import ShowMe from "../../utils/ShowMe"
-import { FaTimesCircle, FaThumbsUp, FaThumbsDown } from "react-icons/fa"
+import { FaTimesCircle } from "react-icons/fa"
+import { usePublicProfile } from "../../hooks/Invitations/usePublicProfile"
+
+//
+//
 
 export const FriendListItem = ({
-  profile,
   handleSendInvite,
+  friendUid,
   disabled = false
 }) => {
-  const { avatarNumber, displayName, email, uid } = profile
+  const profile = usePublicProfile(friendUid)
+  const { avatarNumber, displayName } = profile
   return (
     <ListItem dense>
       <ListItemAvatar>
@@ -40,7 +35,7 @@ export const FriendListItem = ({
           variant="contained"
           color="primary"
           size="small"
-          onClick={() => handleSendInvite({ uid })}
+          onClick={() => handleSendInvite({ uid: friendUid })}
           disabled={disabled}
         >
           {disabled ? "invited already" : "INVITE"}
@@ -50,7 +45,8 @@ export const FriendListItem = ({
   )
 }
 
-export const InvitationListItem = ({ profile, invite, thisIsMe }) => {
+export const InvitationListItem = ({ invite, thisIsMe }) => {
+  const profile = usePublicProfile(invite.invited)
   const { displayName, avatarNumber } = profile || {}
   const { invited: uid, inviteId, confirmed } = invite
   const { cancelInvitation } = useFirebase()

@@ -1,14 +1,12 @@
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { withRouter } from "react-router-dom"
-import ShowMe from "../../utils/ShowMe"
-import { Card, CardContent, CardHeader, Button } from "@material-ui/core"
+import { Card, CardHeader, Button } from "@material-ui/core"
 import { useFirebase } from "../../contexts/FirebaseCtx"
-import rotatingBall from "../../images/rotatingBall.gif"
 import SpinningPageLoader from "../../components/SpinningPageLoader"
 
 const ConfirmedInvite = ({ confirmedInvites = [], history }) => {
   const invite = confirmedInvites[0]
-  const { firestore, cancelInvitation } = useFirebase()
+  const { cancelInvitation } = useFirebase()
   const [gameReady, setGameReady] = useState(false)
   function handleGoToGame() {
     history.push(`/game/${invite.gameId}`)

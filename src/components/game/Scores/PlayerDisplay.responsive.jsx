@@ -73,7 +73,7 @@ export const PlayerDisplay = ({ playerId }) => {
     houseCount,
     publicProfile
   } = useOtherPlayerInfo(playerId)
-  const { gamePlay, whosOnline } = useGamePlayCtx("PlayerDisplay")
+  const { gamePlay } = useGamePlayCtx("PlayerDisplay")
   const { lastCheckIn } = gamePlay.whosTurnItIs
   const myTurn = gamePlay && gamePlay.whosTurnItIs.uid === playerId
   return myTurn ? (

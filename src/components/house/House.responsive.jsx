@@ -1,12 +1,10 @@
-import React, { useState, useCallback } from "react"
+import React, { useCallback } from "react"
 import styled from "styled-components"
 import { images } from "../../images/newRooms/index"
-import { Typography, Button } from "@material-ui/core"
 //
 import RoomDnD from "./RoomDnD/RoomDnD"
 import SelectedRoom from "./SelectedRoomView/SelectedRoom.responsive.jsx"
-import { useWindowSize } from "../../hooks/useScreenSize"
-import { useHouseCtx, HouseCtxProvider } from "../../contexts/HouseContext"
+import { useHouseCtx } from "../../contexts/HouseContext"
 //
 //
 

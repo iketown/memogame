@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React from "react"
 import styled from "styled-components"
 import { Button } from "@material-ui/core"
 import Timer from "react-compound-timer/build"
@@ -10,7 +10,6 @@ import ReorderCard from "./ReorderCard"
 import ReorderPlaceholder from "./ReorderPlaceholder"
 import SelectedRoomDrop from "./SelectedRoomDrop"
 import { useGameFxnsLOC } from "../../../hooks/useGameFxnsLOC"
-import ShowMe from "../../../utils/ShowMe.jsx"
 //
 const SelectedRoomSection = styled.div`
   position: relative;
@@ -83,7 +82,7 @@ const SelectedRoom = () => {
   } = useHouseCtx()
   const { reorderRoom } = useGameFxnsLOC()
   //   const [thisRoom, setThisRoom] = useState(myHouse[selectedRoom])
-  const { roomId, faceUp, expiryTime } = selectedRoom
+  const { roomId, expiryTime } = selectedRoom
   const thisRoom = myHouse[roomId] || []
 
   const moveCard = (itemId, atIndex) => {

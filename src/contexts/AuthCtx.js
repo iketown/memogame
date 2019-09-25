@@ -6,7 +6,6 @@ import React, {
   useEffect,
   useRef
 } from "react"
-import isEqual from "lodash/isEqual"
 import { useFirebase } from "./FirebaseCtx"
 import { useCallCounter } from "../hooks/useCallCounter"
 

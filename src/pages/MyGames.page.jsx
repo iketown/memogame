@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react"
 import { Link } from "react-router-dom"
 import { useFirebase } from "../contexts/FirebaseCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
-import ShowMe from "../utils/ShowMe"
 import {
   List,
   ListItem,
@@ -38,7 +37,6 @@ const MyGamesPage = () => {
           <GameListItem key={game.id} game={game} />
         ))}
       </List>
-      <ShowMe obj={myGames} name="myGames" noModal />
     </div>
   )
 }

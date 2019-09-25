@@ -1,7 +1,6 @@
 import React from "react"
 import { useDialogCtx } from "./DialogCtx"
 import { Dialog, DialogContent } from "@material-ui/core"
-import ShowMe from "../utils/ShowMe.jsx"
 import SignUpForm from "../components/form/SignUpForm.jsx"
 import SignInForm from "../components/form/SignInForm"
 import EditProfile from "../components/form/EditProfile.jsx"
@@ -29,7 +28,7 @@ function getContent(formType) {
   }
 }
 const DialogContainer = () => {
-  const { state, dispatch, handleCloseForm } = useDialogCtx()
+  const { state, handleCloseForm } = useDialogCtx()
   const { formOpen, formType, maxWidth = "md", fullWidth = true } = state
 
   return (

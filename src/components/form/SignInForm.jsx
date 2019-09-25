@@ -1,7 +1,7 @@
 import React from "react"
 import styled from "styled-components"
-import { Form, Field } from "react-final-form"
-import { Grid, Typography, Button, TextField } from "@material-ui/core"
+import { Form } from "react-final-form"
+import { Grid, Typography, Button } from "@material-ui/core"
 //
 import FormTextInput from "./FormTextInput.jsx"
 import { useFirebase } from "../../contexts/FirebaseCtx"
@@ -28,7 +28,7 @@ const SignInForm = () => {
       })
   }
   function validate(values) {
-    const { password, passwordConf, email } = values
+    const { password, email } = values
     const errors = {}
     if (!email) errors.email = "Email Required"
     if (!password) errors.password = "Password Required"

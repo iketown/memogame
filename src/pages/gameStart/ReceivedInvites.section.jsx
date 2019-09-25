@@ -11,8 +11,7 @@ import {
   ListItemSecondaryAction,
   IconButton,
   Button,
-  Divider,
-  Tooltip
+  Divider
 } from "@material-ui/core"
 import moment from "moment"
 //
@@ -22,25 +21,16 @@ import { useInvitationCtx } from "../../contexts/InvitationCtx"
 import AvatarMonster from "../../components/AvatarMonster.jsx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import ShowMe from "../../utils/ShowMe"
-import { FaTimesCircle, FaThumbsUp, FaThumbsDown } from "react-icons/fa"
+import { FaThumbsUp, FaThumbsDown } from "react-icons/fa"
 
 //
 //
 
 const ReceivedInvitesSection = ({ gameName, gameId }) => {
-  const {
-    firestore,
-    doSendInvite,
-    cancelInvitation,
-    doAcceptInvite
-  } = useFirebase()
+  const { cancelInvitation, doAcceptInvite } = useFirebase()
   const { receivedInvites } = useInvitationCtx()
-  const { user, publicProfile } = useAuthCtx()
+  const { user } = useAuthCtx()
 
-  function handleInvite(uid) {
-    const { displayName, avatarNumber } = publicProfile
-    doSendInvite({ uid, gameName, gameId, displayName, avatarNumber })
-  }
   function handleReject(inviteId) {
     cancelInvitation({ inviteId })
   }

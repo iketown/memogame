@@ -1,7 +1,6 @@
 import React, { memo } from "react"
 import styled from "styled-components"
 import { Roof } from "../../house/House.responsive.jsx"
-import { Room } from "../../house/RoomDnD/RoomDnD"
 import { useStoragePileCtx } from "../../../contexts/GameCtx"
 import DraggableCard, { WindowCard } from "../../house/DraggableCard.jsx"
 import { useWindowSize } from "../../../hooks/useScreenSize"

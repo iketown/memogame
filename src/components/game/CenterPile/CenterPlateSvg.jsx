@@ -1,11 +1,8 @@
-import React, { useState, useEffect, useRef, useMemo, memo } from "react"
-import ReactSVG from "react-svg"
-import { Button } from "@material-ui/core"
+import React, { useMemo, memo } from "react"
 import styled from "styled-components"
 import centerPlate from "../../../images/centerPlate.svg"
 import { useWiderThan } from "../../../hooks/useScreenSize"
 import isEqual from "lodash/isEqual"
-import { useGamePlayCtx } from "../../../contexts/GamePlayCtx"
 
 const PlateContainer = styled.div`
   height: ${p => (p.mdUp ? "12rem" : "10rem")};

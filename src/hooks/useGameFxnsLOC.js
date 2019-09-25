@@ -1,29 +1,21 @@
-import {
-  useGameCtx,
-  usePointsCtx,
-  useSoundCtx,
-  useStoragePileCtx
-} from "../contexts/GameCtx"
+import { useGameCtx, usePointsCtx, useSoundCtx } from "../contexts/GameCtx"
 import { useCallback } from "react"
 import { useGamePlayCtx } from "../contexts/GamePlayCtx"
 import { useAuthCtx } from "../contexts/AuthCtx"
 import { doItemsMatch, shuffle, pointsRequiredToWin } from "../utils/gameLogic"
 import moment from "moment"
-import { storage } from "firebase"
 import { useFirebase } from "../contexts/FirebaseCtx"
 import { secondsPerTurn } from "../utils/gameLogic"
-import { useDialogCtx } from "../contexts/DialogCtx"
 import { usePlayersCtx } from "../contexts/PlayersCtx"
 import { getGameScores } from "../pages/GameOver"
 
 export const useGameFxnsLOC = byWho => {
   const { gameId, gameState } = useGameCtx("useGameFxns")
   const { players } = usePlayersCtx()
-  const { gamePlay, myTotalCards } = useGamePlayCtx("useGameFxns")
+  const { gamePlay } = useGamePlayCtx("useGameFxns")
   const { user } = useAuthCtx()
   const { dropCardSound } = useSoundCtx()
   const { fdb, handleEndGame } = useFirebase()
-  const { dispatch } = useDialogCtx()
   const {
     setPointsDisplay,
     pointsClimber,

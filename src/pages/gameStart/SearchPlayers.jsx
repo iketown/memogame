@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react"
 import { DialogContent, TextField, List } from "@material-ui/core"
 import { useFirebase } from "../../contexts/FirebaseCtx"
-import ShowMe from "../../utils/ShowMe"
 import { FriendListItem } from "./ListItems.jsx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
 import { useDialogCtx } from "../../contexts/DialogCtx"
 //
 //
 const SearchPlayers = () => {
-  const { user, publicProfile } = useAuthCtx()
+  const { publicProfile } = useAuthCtx()
   const [searchString, setSearchString] = useState("")
   const [searchResultsName, setSearchResultsName] = useState([])
   const [searchResultsEmail, setSearchResultsEmail] = useState([])
@@ -52,6 +51,7 @@ const SearchPlayers = () => {
   return (
     <DialogContent>
       <TextField
+        fullWidth
         label="search username or email"
         value={searchString}
         onChange={e => setSearchString(e.target.value)}
@@ -71,9 +71,10 @@ const SearchPlayers = () => {
           )
         })}
       </List>
-      <ShowMe obj={state} name="state" noModal />
+
+      {/* <ShowMe obj={state} name="state" noModal />
       <ShowMe obj={searchResultsName} name="searchResultsName" noModal />
-      <ShowMe obj={searchResultsEmail} name="searchResultsEmail" noModal />
+      <ShowMe obj={searchResultsEmail} name="searchResultsEmail" noModal /> */}
     </DialogContent>
   )
 }

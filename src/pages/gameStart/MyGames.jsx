@@ -7,8 +7,7 @@ import {
   ListSubheader,
   Button,
   Divider,
-  CardActions,
-  CardActionArea
+  CardActions
 } from "@material-ui/core"
 import { withRouter } from "react-router-dom"
 import moment from "moment"
@@ -17,7 +16,6 @@ import { InvitationListItem, FriendListItem } from "./ListItems.jsx"
 import { useFirebase } from "../../contexts/FirebaseCtx"
 import { useInvitationCtx } from "../../contexts/InvitationCtx"
 import { useAuthCtx } from "../../contexts/AuthCtx"
-import ShowMe from "../../utils/ShowMe"
 import { useDialogCtx } from "../../contexts/DialogCtx.js"
 
 export const MyGameSection = ({
@@ -28,16 +26,8 @@ export const MyGameSection = ({
   // you can't join another game if you're hosting a game.
   const { user, publicProfile } = useAuthCtx()
   const game = myGames[0]
-  const {
-    avatarNumber,
-    confirmed,
-    displayName,
-    gameId,
-    gameName,
-    inviteId,
-    timeStamp
-  } = game
-  const { friendProfiles, sentInvites } = useInvitationCtx()
+  const { avatarNumber, displayName, gameId, gameName, timeStamp } = game
+  const { sentInvites } = useInvitationCtx()
   const {
     doSendInvite,
     cancelInvitation,
@@ -48,9 +38,13 @@ export const MyGameSection = ({
   function handleSendInvite({ uid }) {
     doSendInvite({ uid, displayName, avatarNumber, gameName, gameId })
   }
-  const uninvitedFriends = friendProfiles.filter(
-    friend => !sentInvites.find(inv => inv.invited === friend.uid)
-  )
+  const uninvitedFriends =
+    (publicProfile &&
+      publicProfile.friends &&
+      publicProfile.friends.filter(
+        friendUid => !sentInvites.find(inv => inv.invited === friendUid)
+      )) ||
+    []
   const confirmedInvites = sentInvites.filter(inv => inv.confirmed)
   const unconfirmedInvites = sentInvites.filter(inv => !inv.confirmed)
   async function handleCancelGame() {
@@ -66,7 +60,7 @@ export const MyGameSection = ({
     })
     await Promise.all(promises)
     const memberUIDs = sentInvites.map(({ invited }) => invited)
-    const responses = await createGameFromInvites({
+    await createGameFromInvites({
       memberUIDs,
       gameId,
       gameName
@@ -104,13 +98,8 @@ export const MyGameSection = ({
             const thisIsMe = invite.invited === user.uid
             return (
               <InvitationListItem
-                key={invite.invited}
+                key={invite.inviteId}
                 invite={invite}
-                profile={
-                  thisIsMe
-                    ? publicProfile
-                    : friendProfiles.find(({ uid }) => uid === invite.invited)
-                }
                 thisIsMe={thisIsMe}
               />
             )
@@ -124,22 +113,17 @@ export const MyGameSection = ({
               <InvitationListItem
                 key={invite.invited}
                 invite={invite}
-                profile={
-                  thisIsMe
-                    ? publicProfile
-                    : friendProfiles.find(({ uid }) => uid === invite.invited)
-                }
                 thisIsMe={thisIsMe}
               />
             )
           })}
           <Divider />
           <ListSubheader>friends</ListSubheader>
-          {uninvitedFriends.map(profile => {
+          {uninvitedFriends.map(uid => {
             return (
               <FriendListItem
-                key={profile.uid}
-                profile={profile}
+                friendUid={uid}
+                key={uid}
                 handleSendInvite={handleSendInvite}
               />
             )
