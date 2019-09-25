@@ -115,7 +115,14 @@ const GameOver = () => {
   console.log("scores", scores)
   async function handleProposeRematch() {
     const { gameName, memberUIDs, gameId: oldGameId } = gameState
-    const newGameName = `${gameName} rematch`
+    let newGameName
+    if (gameName.includes("rematch")) {
+      const [rawName, num] = gameName.split("rematch")
+      const newNum = !!num ? Number(num) + 1 : 2
+      newGameName = `${rawName} rematch ${newNum}`
+    } else {
+      newGameName = `gameName rematch`
+    }
     const { id: newGameId } = await proposeGame({
       gameName: newGameName
     })
