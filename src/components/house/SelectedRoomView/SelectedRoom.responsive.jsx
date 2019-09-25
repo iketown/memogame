@@ -145,15 +145,21 @@ const SelectedRoom = () => {
             <StyledSeconds>{/* <Timer.Seconds /> */}</StyledSeconds>
           </Timer>
         )}
+        <Button
+          fullWidth
+          variant="contained"
+          color="primary"
+          style={{
+            position: "absolute",
+            bottom: "-3rem",
+            left: "50%",
+            transform: "translateX(-50%)"
+          }}
+          onClick={() => setSelectedRoom({ roomId: "", faceUp: false })}
+        >
+          CLOSE
+        </Button>
       </SelectedRoomSection>
-      <Button
-        fullWidth
-        variant="contained"
-        color="primary"
-        onClick={() => setSelectedRoom({ roomId: "", faceUp: false })}
-      >
-        CLOSE
-      </Button>
     </>
   )
 }

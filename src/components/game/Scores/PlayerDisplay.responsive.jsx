@@ -113,9 +113,7 @@ export const PlayerDisplay = ({ playerId }) => {
                 )}
               </BoxContainer>
             ) : (
-              <span style={{ fontSize: "9px", color: "grey" }}>
-                waiting for admin response
-              </span>
+              <span style={{ fontSize: "9px", color: "grey" }}>. . . . .</span>
             )
           }}
         />
